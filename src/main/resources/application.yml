@@ -1,0 +1,19 @@
+server:
+  port: 8920
+spring:
+  application:
+    name: kiss-nest
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Helloshic7!
+    url: jdbc:mysql://rm-j6ca5pt36q4h487712o.mysql.rds.aliyuncs.com/kiss-account?characterEncoding=utf-8&useSSL=false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+mybatis:
+  config-location: classpath:mybatis-config.xml
+logging:
+  level:
+    com.kiss.kissnest.mapper: debug
