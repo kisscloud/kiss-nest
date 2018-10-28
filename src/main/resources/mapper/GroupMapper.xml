@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.GroupMapper">
+
+    <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group">
+        insert into groups (name,operatorId,operatorName)
+        value
+        (#{name},#{operatorId},#{operatorName})
+    </insert>
+
+    <delete id="deleteGroupById" parameterType="java.lang.Integer">
+        delete from groups where id = #{id}
+    </delete>
+
+    <update id="updateGroup" parameterType="com.kiss.kissnest.entity.Group">
+        update groups
+        set
+        name = #{name},
+        operatorId = #{operatorId},
+        operatorName = #{operatorName}
+        where id = #{id}
+    </update>
+    
+    <update id="addCount" parameterType="java.util.Map">
+        update groups
+        set
+        <if test="type == 'projects'">
+            projectsCount = projectsCount + 1
+        </if>
+        <if test="type == 'members'">
+            membersCount = membersCount + 1
+        </if>
+        <if test="type == 'needs'">
+            needsCount = needsCount + 1
+        </if>
+        <if test="type == 'issues'">
+            issuesCount = issuesCount + 1
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getGroupById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups WHERE id = #{id};
+    </select>
+
+    <select id="getGroups" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups;
+    </select>
+
+    <select id="getGroupsByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups where name = #{name};
+    </select>
+</mapper>

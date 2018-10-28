@@ -29,14 +29,15 @@
 
     <!-- 引入外部映射配置文件 -->
     <mappers>
-        <!--<mapper resource="mapper/AccountGroupMapper.xml"/>-->
-        <!--<mapper resource="mapper/AccountMapper.xml"/>-->
-        <!--<mapper resource="mapper/RoleMapper.xml"/>-->
-        <!--<mapper resource="mapper/PermissionMapper.xml"/>-->
-        <!--<mapper resource="mapper/PermissionModuleMapper.xml"/>-->
-        <!--<mapper resource="mapper/OperationLogMapper.xml"/>-->
-        <!--<mapper resource="mapper/DbEnumsMapper.xml"/>-->
-        <!--<mapper resource="mapper/ClientMapper.xml"/>-->
-        <!--<mapper resource="mapper/ClientModuleMapper.xml"/>-->
+        <mapper resource="mapper/BuildLogMapper.xml"/>
+        <mapper resource="mapper/DeployLogMapper.xml"/>
+        <mapper resource="mapper/GroupProjectMapper.xml"/>
+        <mapper resource="mapper/GroupMapper.xml"/>
+        <mapper resource="mapper/MemberMapper.xml"/>
+        <mapper resource="mapper/ProjectMapper.xml"/>
+        <mapper resource="mapper/ProjectMemberMapper.xml"/>
+        <mapper resource="mapper/ServerMapper.xml"/>
+        <mapper resource="mapper/TeamGroupMapper.xml"/>
+        <mapper resource="mapper/TeamMapper.xml"/>
     </mappers>
 </configuration>

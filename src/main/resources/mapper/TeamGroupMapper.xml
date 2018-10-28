@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.TeamGroupMapper">
+
+    <insert id="createTeamGroup" parameterType="com.kiss.kissnest.entity.TeamGroup">
+        insert into teamgroups (teamId,groupId,operatorId,operatorName)
+        value
+        (#{teamId},#{teamId},#{operatorId},#{operatorName})
+    </insert>
+
+    <delete id="deleteTeamGroupById" parameterType="java.lang.Integer">
+        delete from teamgroups where id = #{id}
+    </delete>
+
+    <update id="updateTeamGroup" parameterType="com.kiss.kissnest.entity.TeamGroup">
+        update teamgroups
+        set
+        id = #{id}
+        <if test="teamId != null">
+            ,teamId = #{teamId}
+        </if>
+        <if test="groupId != null">
+            ,groupId = #{groupId}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getTeamGroupById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.TeamGroup">
+        select * from teamgroups where id = #{id};
+    </select>
+
+    <select id="getTeamGroups" resultType="com.kiss.kissnest.entity.TeamGroup">
+        select * from teamgroups;
+    </select>
+    
+    <select id="getTeamGroupsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.TeamGroup">
+        select * from teamgroups where teamId = #{teamId};
+    </select>
+</mapper>

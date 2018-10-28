@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.MemberMapper">
+
+    <insert id="createMember" parameterType="com.kiss.kissnest.entity.Member">
+        insert into members (accountId,operatorId,operatorName)
+        value
+        (#{accountId},#{operatorId},#{operatorName})
+    </insert>
+    
+    <delete id="deleteMemberById" parameterType="java.lang.Integer">
+        delete from members where id = #{id}
+    </delete>
+    
+    <update id="updateMember" parameterType="com.kiss.kissnest.entity.Member">
+        update members
+        set 
+        id = #{id}
+        <if test="accountId != null">
+            ,accountId = #{accountId}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <update id="addCount" parameterType="java.util.Map">
+        update members
+        set
+        <if test="type == 'groups'">
+            groupsCount = groupsCount + 1
+        </if>
+        <if test="test == 'projects'">
+            projectsCount = projectsCount + 1
+        </if>
+        <if test="test == 'needs'">
+            needsCount = needsCount + 1
+        </if>
+        <if test="test == 'issues'">
+            issuesCount = issuesCount + 1
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getMemberById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select * from members where id = #{id};
+    </select>
+    
+    <select id="getMembers" resultType="com.kiss.kissnest.entity.Member">
+        select * from members;
+    </select>
+    
+    <select id="getMembersByAccountId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select * from members where accountId = #{accountId};
+    </select>
+</mapper>

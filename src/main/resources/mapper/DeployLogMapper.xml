@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.DeployLogMapper">
+    <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog">
+        insert into deploylogs (serverIds,branch,version,projectId,remark,status,operationId,operatorName)
+        value
+        (#{serverIds},#{branch},#{version},#{projectId},#{remark},#{status},#{operationId},#{operatorName})
+    </insert>
+
+    <delete id="deleteDeployLogById" parameterType="java.lang.Integer">
+        delete from deploylogs where id = #{id}
+    </delete>
+
+    <update id="updateDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog">
+        update deploylogs
+        set
+        id = #{id}
+        <if test="serverIds != null">
+            serverIds = #{serverIds}
+        </if>
+        <if test="branch != null">
+            branch = #{branch}
+        </if>
+        <if test="version != null">
+            version = #{version}
+        </if>
+        <if test="projectId != null">
+            projectId = #{projectId}
+        </if>
+        <if test="remark != null">
+            remark = #{remark}
+        </if>
+        <if test="status != null">
+            status = #{status}
+        </if>
+        <if test="operationId != null">
+            operationId = #{operationId}
+        </if>
+        <if test="operatorName != null">
+            operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getDeployLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.DeployLog">
+        select * from deploylogs where id = #{id};
+    </select>
+
+    <select id="getDeployLogs" resultType="com.kiss.kissnest.entity.DeployLog">
+        select * from deploylogs;
+    </select>
+</mapper>

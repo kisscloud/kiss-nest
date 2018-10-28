@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
+    <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
+        insert into buildlogs (branch,version,projectId,remark,status,output,operatorId,operatorName)
+        value
+        (#{branch},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName})
+    </insert>
+    
+    <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
+        delete from buildlogs where id = #{id}
+    </delete>
+    
+    <update id="updateBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
+        update buildlogs
+        set
+        id = #{id}
+        <if test="branch != null">
+            ,branch = #{branch}
+        </if>
+        <if test="version != null">
+            ,version = #{version}
+        </if>
+        <if test="projectId != null">
+            ,projectId = #{projectId}
+        </if>
+        <if test="remark != null">
+            ,remark = #{remark}
+        </if>
+        <if test="status != null">
+            ,status = #{status}
+        </if>
+        <if test="output != null">
+            ,output = #{output}
+        </if>
+        <if test="operationId != null">
+            ,operationId = #{operationId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+    
+    <select id="getBuildLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs where id = #{id};
+    </select>
+
+    <select id="getBuildLogs" resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs;
+    </select>
+</mapper>

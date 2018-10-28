@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.ServerMapper">
+
+    <insert id="createServer" parameterType="com.kiss.kissnest.entity.Server">
+        insert into servers (ip,operatorId,operatorName)
+        value
+        (#{ip},#{operatorId},#{operatorName})
+    </insert>
+
+    <delete id="deleteServerById" parameterType="java.lang.Integer">
+        delete from servers where id = #{id}
+    </delete>
+
+    <update id="updateServer" parameterType="com.kiss.kissnest.entity.Server">
+        update servers
+        set
+        id = #{id}
+        <if test="ip != null">
+            ,ip = #{ip}
+        </if>
+        <if test="parameters != null">
+            ,parameters = #{parameters}
+        </if>
+        <if test="runTime != null">
+            ,runTime = #{runTime}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        <if test="lastDeployedAt != null">
+            ,lastDeployedAt = #{lastDeployedAt}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getServerById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where id = #{id};
+    </select>
+
+    <select id="getServers" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers;
+    </select>
+</mapper>

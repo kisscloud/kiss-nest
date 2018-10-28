@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.ProjectMemberMapper">
+
+    <insert id="createProjectMember" parameterType="com.kiss.kissnest.entity.ProjectMember">
+        insert into projectsmembers (projectId,memberId,operatorId,operatorName)
+        value
+        (#{projectId},#{memberId},#{operatorId},#{operatorName})
+    </insert>
+
+    <delete id="deleteProjectMemberById" parameterType="java.lang.Integer">
+        delete from projectsmembers where id = #{id}
+    </delete>
+
+    <update id="updateProjectMember" parameterType="com.kiss.kissnest.entity.ProjectMember">
+        update projectsmembers
+        set
+        id = #{id}
+        <if test="projectId != null">
+            ,projectId = #{projectId}
+        </if>
+        <if test="memberId != null">
+            ,memberId = #{memberId}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getProjectMemberById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectMember">
+        select * from projectsmembers where id = #{id};
+    </select>
+
+    <select id="getProjectsMembers" resultType="com.kiss.kissnest.entity.ProjectMember">
+        select * from projectsmembers;
+    </select>
+</mapper>

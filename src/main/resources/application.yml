@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: Helloshic7!
-    url: jdbc:mysql://rm-j6ca5pt36q4h487712o.mysql.rds.aliyuncs.com/kiss-account?characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://rm-j6ca5pt36q4h487712o.mysql.rds.aliyuncs.com/kiss-backhub?characterEncoding=utf-8&useSSL=false
 eureka:
   client:
     service-url:
@@ -17,3 +17,9 @@ mybatis:
 logging:
   level:
     com.kiss.kissnest.mapper: debug
+jenkins:
+  url: http://localhost:8112
+  account: admin
+  password: e20e6ba9448f468fb39dec3529984cfc
+  buildUrl: http://localhost:8112/job/%s/build
+  buildWithParameterUrl: http://localhost:8112/job/%s/buildWithParameters
