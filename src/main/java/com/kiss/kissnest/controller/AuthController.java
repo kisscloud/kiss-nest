@@ -16,6 +16,7 @@ public class AuthController {
 
     @PostMapping("/code/login")
     public ResultOutput ClientAuthorization(@RequestBody ClientAuthorizationInput clientAuthorizationInput) {
+        clientAuthorizationInput.setExpired(3600);
         return clientServiceFeign.ClientAuthorization(clientAuthorizationInput);
     }
 }
