@@ -21,9 +21,21 @@ public class GroupProjectDaoImpl implements GroupProjectDao {
     }
 
     @Override
+    public Integer createGroupProjects(List<GroupProject> groupProjects) {
+
+        return groupProjectMapper.createGroupProjects(groupProjects);
+    }
+
+    @Override
     public Integer deleteGroupProjectById(Integer id) {
 
         return groupProjectMapper.deleteGroupProjectById(id);
+    }
+
+    @Override
+    public Integer deleteGroupProjectByGroupId(Integer groupId) {
+
+        return groupProjectMapper.deleteGroupProjectByGroupId(groupId);
     }
 
     @Override

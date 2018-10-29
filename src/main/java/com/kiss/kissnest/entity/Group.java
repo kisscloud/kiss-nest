@@ -11,6 +11,8 @@ public class Group {
 
     private String name;
 
+    private Integer teamId;
+
     private Integer projectsCount;
 
     private Integer membersCount;

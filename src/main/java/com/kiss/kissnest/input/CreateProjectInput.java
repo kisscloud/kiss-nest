@@ -7,5 +7,4 @@ public class CreateProjectInput {
 
     private String name;
 
-    private String groupId;
 }

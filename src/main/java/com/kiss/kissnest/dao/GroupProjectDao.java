@@ -8,7 +8,11 @@ public interface GroupProjectDao {
 
     Integer createGroupProject(GroupProject groupProject);
 
+    Integer createGroupProjects(List<GroupProject> groupProjects);
+
     Integer deleteGroupProjectById(Integer id);
+
+    Integer deleteGroupProjectByGroupId(Integer groupId);
 
     Integer updateGroupProjectById(GroupProject groupProject);
 

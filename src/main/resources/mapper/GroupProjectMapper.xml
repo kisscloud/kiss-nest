@@ -11,9 +11,21 @@
         value
         (#{groupId},#{projectId},#{operatorId},#{operatorName})
     </insert>
+
+    <insert id="createGroupProjects" parameterType="com.kiss.kissnest.entity.GroupProject">
+        insert into groupsprojects (groupId,projectId,operatorId,operatorName)
+        value
+        <foreach collection="list" separator="," item="projects">
+            (#{projects.groupId},#{projects.projectId},#{projects.operatorId},#{projects.operatorName})
+        </foreach>
+    </insert>
     
     <delete id="deleteGroupProjectById" parameterType="java.lang.Integer">
         delete from groupsprojects where id = #{id}
+    </delete>
+    
+    <delete id="deleteGroupProjectByGroupId" parameterType="java.lang.Integer">
+        delete from groupsprojects where groupId = #{groupId}
     </delete>
     
     <update id="updateGroupProjectById" parameterType="com.kiss.kissnest.entity.GroupProject">

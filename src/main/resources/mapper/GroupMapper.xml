@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.GroupMapper">
 
     <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group">
-        insert into groups (name,operatorId,operatorName)
+        insert into groups (name,teamId,operatorId,operatorName)
         value
-        (#{name},#{operatorId},#{operatorName})
+        (#{name},#{teamId},#{operatorId},#{operatorName})
     </insert>
 
     <delete id="deleteGroupById" parameterType="java.lang.Integer">
@@ -29,16 +29,16 @@
         update groups
         set
         <if test="type == 'projects'">
-            projectsCount = projectsCount + 1
+            projectsCount = projectsCount + #{increment}
         </if>
         <if test="type == 'members'">
-            membersCount = membersCount + 1
+            membersCount = membersCount + #{increment}
         </if>
         <if test="type == 'needs'">
-            needsCount = needsCount + 1
+            needsCount = needsCount + #{increment}
         </if>
         <if test="type == 'issues'">
-            issuesCount = issuesCount + 1
+            issuesCount = issuesCount + #{increment}
         </if>
         where id = #{id}
     </update>

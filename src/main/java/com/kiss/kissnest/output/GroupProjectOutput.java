@@ -1,17 +1,17 @@
-package com.kiss.kissnest.entity;
+package com.kiss.kissnest.output;
 
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class ProjectMember {
+public class GroupProjectOutput {
 
     private Integer id;
 
-    private Integer projectId;
+    private Integer groupId;
 
-    private Integer accountId;
+    private Integer projectId;
 
     private Integer operatorId;
 

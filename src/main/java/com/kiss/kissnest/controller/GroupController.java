@@ -1,9 +1,12 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.entity.Group;
+import com.kiss.kissnest.entity.GroupProject;
 import com.kiss.kissnest.entity.TeamGroup;
+import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
+import com.kiss.kissnest.service.GroupProjectService;
 import com.kiss.kissnest.service.GroupService;
 import com.kiss.kissnest.service.TeamGroupService;
 import com.kiss.kissnest.util.BeanCopyUtil;
@@ -21,22 +24,22 @@ public class GroupController {
     private GroupService groupService;
 
     @Autowired
-    private TeamGroupService teamGroupService;
+    private GroupProjectService groupProjectService;
 
 
     @PostMapping("/group")
     @ApiOperation(value = "添加组织")
     public ResultOutput createGroup (@RequestBody CreateGroupInput createGroupInput) {
 
-        ResultOutput createOutput = groupService.createGroup((Group) BeanCopyUtil.copy(createGroupInput,Group.class));
-
-        if (createOutput.getCode() != 200) {
-            return createOutput;
-        }
-
-        ResultOutput createTeamGroup = teamGroupService.createTeamGroup((TeamGroup) BeanCopyUtil.copy(createGroupInput,TeamGroup.class));
+        ResultOutput createOutput = groupService.createGroup(createGroupInput);
 
         return createOutput;
+    }
+
+    @PostMapping("/group/projects")
+    public ResultOutput bindGroupProjects (@RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
+
+        return groupProjectService.bindGroupProjects(bindGroupProjectsInput);
     }
 
     @DeleteMapping("/group")

@@ -28,6 +28,8 @@ public class NestStatusCode {
     public static final Integer DELETE_MEMBER_FAILED = 6004;
     public static final Integer UPDATE_MEMBER_FAILED = 6005;
 
+    public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
+
 
 
 

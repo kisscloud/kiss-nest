@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ProjectMemberMapper">
 
     <insert id="createProjectMember" parameterType="com.kiss.kissnest.entity.ProjectMember">
-        insert into projectsmembers (projectId,memberId,operatorId,operatorName)
+        insert into projectsmembers (projectId,accountId,operatorId,operatorName)
         value
-        (#{projectId},#{memberId},#{operatorId},#{operatorName})
+        (#{projectId},#{accountId},#{operatorId},#{operatorName})
     </insert>
 
     <delete id="deleteProjectMemberById" parameterType="java.lang.Integer">
@@ -23,8 +23,8 @@
         <if test="projectId != null">
             ,projectId = #{projectId}
         </if>
-        <if test="memberId != null">
-            ,memberId = #{memberId}
+        <if test="accountId != null">
+            ,accountId = #{accountId}
         </if>
         <if test="operatorId != null">
             ,operatorId = #{operatorId}
