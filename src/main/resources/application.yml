@@ -23,3 +23,9 @@ jenkins:
   password: e20e6ba9448f468fb39dec3529984cfc
   buildUrl: http://localhost:8112/job/%s/build
   buildWithParameterUrl: http://localhost:8112/job/%s/buildWithParameters
+
+kiss:
+  nest:
+    clientId: e489c5a6da934fe2b441824809b50ae6
+    clientSecret: b1c1f5f3d6cb43a2a0b599daaa99b558
+    clientExpired: 1296000
