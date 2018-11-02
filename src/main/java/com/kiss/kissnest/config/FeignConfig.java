@@ -13,6 +13,7 @@ import java.util.Map;
 
 @Configuration
 public class FeignConfig implements RequestInterceptor {
+
     @Override
     public void apply(RequestTemplate requestTemplate) {
         requestTemplate.header("X-Access-Token", getHeaders(getHttpServletRequest()).get("x-access-token"));
