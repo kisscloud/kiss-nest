@@ -28,6 +28,7 @@ public class TeamValidaor implements Validator {
         if (CreateTeamInput.class.isInstance(target)) {
             CreateTeamInput createTeamInput = (CreateTeamInput) target;
             validateName(createTeamInput.getName(),errors);
+            validateSlug(createTeamInput.getSlug(),errors);
         } else if (UpdateTeamInput.class.isInstance(target)) {
             UpdateTeamInput updateTeamInput = (UpdateTeamInput) target;
             validateId(updateTeamInput.getId(),"id",errors);
@@ -66,5 +67,12 @@ public class TeamValidaor implements Validator {
         }
 
         return true;
+    }
+
+    public void validateSlug (String slug,Errors errors) {
+
+        if (StringUtils.isEmpty(slug)) {
+            errors.rejectValue("slug","","项目路径不能为空");
+        }
     }
 }

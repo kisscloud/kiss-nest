@@ -55,4 +55,16 @@ public class TeamDaoImpl implements TeamDao {
 
         return teamMapper.getTeamByName(name);
     }
+
+    @Override
+    public Integer addRepositoryIdById(Team team) {
+
+        return teamMapper.addRepositoryIdById(team);
+    }
+
+    @Override
+    public Integer getRepositoryIdByTeamId(Integer id) {
+
+        return teamMapper.getRepositoryIdByTeamId(id);
+    }
 }

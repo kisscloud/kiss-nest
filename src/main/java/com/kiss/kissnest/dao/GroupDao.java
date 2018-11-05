@@ -20,4 +20,8 @@ public interface GroupDao {
     List<Group> getGroups(Integer teamId);
 
     Group getGroupByNameAndTeamId(String name,Integer teamId);
+
+    Group getGroupBySlugAndTeamId(String slug,Integer teamId);
+
+    Integer addRepositoryIdById(Integer id);
 }

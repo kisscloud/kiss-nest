@@ -19,4 +19,8 @@ public interface TeamDao {
     List<Team> getTeams();
 
     Team getTeamByName(String name);
+
+    Integer addRepositoryIdById(Team team);
+
+    Integer getRepositoryIdByTeamId(Integer id);
 }

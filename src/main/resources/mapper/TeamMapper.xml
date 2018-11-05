@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.TeamMapper">
 
     <insert id="createTeam" parameterType="com.kiss.kissnest.entity.Team" useGeneratedKeys="true" keyProperty="id">
-        insert into teams (name,operatorId,operatorName)
+        insert into teams (name,slug,operatorId,operatorName)
         value
-        (#{name},#{operatorId},#{operatorName})
+        (#{name},#{slug},#{operatorId},#{operatorName})
     </insert>
 
     <delete id="deleteTeamById" parameterType="java.lang.Integer">
@@ -49,5 +49,16 @@
     
     <select id="getTeamByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Team">
         select * from teams where name = #{name} limit 0,1;
+    </select>
+
+    <update id="addRepositoryIdById" parameterType="com.kiss.kissnest.entity.Team">
+        update teams
+        set
+        repositoryId = #{repositoryId}
+        where id = #{id};
+    </update>
+    
+    <select id="getRepositoryIdByTeamId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select repositoryId from teams where id = #{id};
     </select>
 </mapper>

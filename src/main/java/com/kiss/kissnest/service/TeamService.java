@@ -6,15 +6,19 @@ import com.kiss.kissnest.dao.TeamGroupDao;
 import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.entity.TeamGroup;
+import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
+import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import output.ResultOutput;
 import utils.ThreadLocalUtil;
 
@@ -32,6 +36,10 @@ public class TeamService {
     @Autowired
     private MemberDao memberDao;
 
+    @Autowired
+    private GitlabApiUtil gitlabApiUtil;
+
+    @Transactional
     public ResultOutput createTeam(CreateTeamInput teamInput) {
 
         Team team = (Team) BeanCopyUtil.copy(teamInput,Team.class);
@@ -42,7 +50,21 @@ public class TeamService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_TEAM_FAILED);
         }
 
-        bindMemberTeam(team.getId());
+        Integer bindCount = bindMemberTeam(team.getId());
+
+        if (bindCount == 0) {
+            throw new TransactionalException(NestStatusCode.BIND_ACCOUNT_TEAM_FAILED);
+        }
+
+        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        GitlabGroup gitlabGroup = gitlabApiUtil.createGroup(team.getSlug(),accessToken);
+
+        if (gitlabGroup == null) {
+            throw  new TransactionalException(NestStatusCode.CREATE_TEAM_REPOSITORY_FAILED);
+        }
+
+        team.setRepositoryId(gitlabGroup.getId());
+        teamDao.addRepositoryIdById(team);
 
         TeamOutput teamOutput = new TeamOutput();
         BeanUtils.copyProperties(team,teamOutput);

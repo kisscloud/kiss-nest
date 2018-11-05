@@ -22,4 +22,8 @@ public interface MemberMapper {
     List<Member> getMembers();
 
     Member getMemberByAccountId(Integer accountId);
+
+    Integer updateAccessTokenByAccountId(Map params);
+
+    String getAccessTokenByAccountId(Integer accountId);
 }

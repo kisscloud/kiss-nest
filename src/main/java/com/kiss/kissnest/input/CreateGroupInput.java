@@ -10,4 +10,6 @@ public class CreateGroupInput {
     private Integer teamId;
 
     private Integer status;
+
+    private String slug;
 }

@@ -22,4 +22,8 @@ public interface GroupMapper {
     List<Group> getGroups(Integer teamId);
 
     Group getGroupByNameAndTeamId(Map params);
+
+    Group getGroupBySlugAndTeamId(Map params);
+
+    Integer addRepositoryIdById(Integer id);
 }

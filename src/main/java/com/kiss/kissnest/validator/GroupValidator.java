@@ -47,6 +47,7 @@ public class GroupValidator implements Validator {
 
             if (teamIdValidated) {
                 validateName(createGroupInput.getName(),teamId,errors);
+                validateSlug(createGroupInput.getSlug(),teamId,errors);
             }
 
             validateStatus(createGroupInput.getStatus(),errors);
@@ -122,5 +123,18 @@ public class GroupValidator implements Validator {
             }
         }
 
+    }
+
+    public void validateSlug (String slug,Integer teamId,Errors errors) {
+
+        if (StringUtils.isEmpty(slug)) {
+            errors.rejectValue("slug","","项目路径不能为空");
+        }
+
+        Group group = groupDao.getGroupBySlugAndTeamId(slug,teamId);
+
+        if (group != null) {
+            errors.rejectValue("slug","","项目路径已存在");
+        }
     }
 }

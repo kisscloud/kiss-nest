@@ -9,6 +9,7 @@ import com.kiss.kissnest.validator.TeamValidaor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
@@ -31,7 +32,7 @@ public class TeamController {
 
     @PostMapping("/team")
     @ApiOperation(value = "添加团队")
-    public ResultOutput createTeam (@RequestBody CreateTeamInput teamInput) {
+    public ResultOutput createTeam (@Validated @RequestBody CreateTeamInput teamInput) {
 
         return teamService.createTeam(teamInput);
     }
@@ -45,7 +46,7 @@ public class TeamController {
 
     @PutMapping("/team")
     @ApiOperation(value = "更新团队")
-    public ResultOutput updateTeam (@RequestBody UpdateTeamInput teamInput) {
+    public ResultOutput updateTeam (@Validated @RequestBody UpdateTeamInput teamInput) {
 
         return teamService.updateTeam((Team) BeanCopyUtil.copy(teamInput,Team.class));
     }

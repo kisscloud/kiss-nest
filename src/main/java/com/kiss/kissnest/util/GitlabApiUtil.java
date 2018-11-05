@@ -37,10 +37,9 @@ public class GitlabApiUtil {
         return accessToken;
     }
 
-    public GitlabGroup createGroup (String groupName,String password) {
+    public GitlabGroup createGroup (String groupName,String accessToken) {
 
         try {
-            String accessToken = getAccessToken(password);
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = gitlabAPI.createGroup(groupName);
             return gitlabGroup;
@@ -50,10 +49,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabGroup createSubGroup (String groupName,String password,Integer parentId) {
+    public GitlabGroup createSubGroup (String groupName,String accessToken,Integer parentId) {
 
         try {
-            String accessToken = getAccessToken(password);
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = gitlabAPI.createGroup(groupName,groupName,null,null,null,parentId);
             return gitlabGroup;
@@ -63,10 +61,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabProject createProject (String projectName,String password) {
+    public GitlabProject createProject (String projectName,String accessToken) {
 
         try {
-            String accessToken = getAccessToken(password);
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
             GitlabProject gitlabProject = gitlabAPI.createProject(projectName);
             return gitlabProject;
@@ -76,17 +73,16 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabProject createProjectForGroup (String projectName,String groupPath,String password) {
+    public GitlabProject createProjectForGroup (String projectName,String groupPath,String accessToken) {
 
         try {
-            String accessToken = getAccessToken(password);
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = null;
 
             try {
                 gitlabGroup = gitlabAPI.getGroup(groupPath);
             } catch (FileNotFoundException e) {
-                gitlabGroup = createGroup(groupPath,password);
+                gitlabGroup = createGroup(groupPath,accessToken);
             }
 
             GitlabProject gitlabProject = gitlabAPI.createProjectForGroup(projectName,gitlabGroup);
@@ -105,9 +101,10 @@ public class GitlabApiUtil {
         map.put("password","57zlrschzaxwgm57");
         String resp = HttpUtil.doPost("https://gitlab.com/oauth/token",JSONObject.toJSONString(map));
         String token = JSONObject.parseObject(resp).getString("access_token");
-        GitlabAPI gitlabAPI = GitlabAPI.connect("https://gitlab.com",token,TokenType.ACCESS_TOKEN);
-        GitlabGroup gitlabGroup = gitlabAPI.getGroup("gitApi");
-        GitlabGroup gitlabGroup1 = gitlabAPI.createGroup("gitApi1","gitApi1",null,null,null,gitlabGroup.getId());
-        System.out.println("hello");
+        System.out.println(token);
+//        GitlabAPI gitlabAPI = GitlabAPI.connect("https://gitlab.com",token,TokenType.ACCESS_TOKEN);
+//        GitlabGroup gitlabGroup = gitlabAPI.getGroup("gitApi");
+//        GitlabGroup gitlabGroup1 = gitlabAPI.createGroup("gitApi1","gitApi1",null,null,null,gitlabGroup.getId());
+//        System.out.println("hello");
     }
 }

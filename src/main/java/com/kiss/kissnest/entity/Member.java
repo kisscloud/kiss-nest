@@ -13,6 +13,8 @@ public class Member {
 
     private Integer teamId;
 
+    private String accessToken;
+
     private Integer groupsCount;
 
     private Integer projectsCount;

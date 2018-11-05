@@ -13,6 +13,8 @@ public class Group {
 
     private Integer teamId;
 
+    private String slug;
+
     private Integer projectsCount;
 
     private Integer membersCount;

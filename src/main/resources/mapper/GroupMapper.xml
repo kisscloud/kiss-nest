@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.GroupMapper">
 
-    <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group">
+    <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group" keyProperty="id" useGeneratedKeys="true">
         insert into groups (name,teamId,operatorId,operatorName)
         value
         (#{name},#{teamId},#{operatorId},#{operatorName})
@@ -61,4 +61,15 @@
     <select id="getGroupByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Group">
         select * from groups where name = #{name} and teamId = #{teamId} limit 0,1;
     </select>
+
+    <select id="getGroupBySlugAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups where slug = #{slug} and teamId = #{teamId} limit 0,1;
+    </select>
+
+    <update id="addRepositoryIdById" parameterType="com.kiss.kissnest.entity.Team">
+        update groups
+        set
+        repositoryId = #{repositoryId}
+        where id = #{id};
+    </update>
 </mapper>

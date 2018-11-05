@@ -61,4 +61,20 @@ public class GroupDaoImpl implements GroupDao {
 
         return groupMapper.getGroupByNameAndTeamId(params);
     }
+
+    @Override
+    public Group getGroupBySlugAndTeamId(String slug, Integer teamId) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("slug",slug);
+        params.put("teamId",teamId);
+
+        return groupMapper.getGroupBySlugAndTeamId(params);
+    }
+
+    @Override
+    public Integer addRepositoryIdById(Integer id) {
+
+        return groupMapper.addRepositoryIdById(id);
+    }
 }
