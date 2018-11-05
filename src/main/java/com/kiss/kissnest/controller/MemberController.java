@@ -11,5 +11,8 @@ public class MemberController {
     @Autowired
     private MemberDao memberDao;
 
-//    public ResultOutput createMember()
+//    public ResultOutput createMember() {
+//
+//
+//    }
 }

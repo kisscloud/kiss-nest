@@ -17,7 +17,7 @@ public interface GroupDao {
 
     Group getGroupById(Integer id);
 
-    List<Group> getGroups();
+    List<Group> getGroups(Integer teamId);
 
-    List<Group> getGroupsByName(String name);
+    Group getGroupByNameAndTeamId(String name,Integer teamId);
 }

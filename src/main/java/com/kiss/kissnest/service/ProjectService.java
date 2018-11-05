@@ -20,12 +20,6 @@ public class ProjectService {
 
     public ResultOutput createProject(Project project) {
 
-        List<Project> projectList = projectDao.getProjectsByName(project.getName());
-
-        if (projectList != null && projectList.size() != 0) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NAME_EXIST);
-        }
-
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
@@ -54,12 +48,6 @@ public class ProjectService {
 
     public ResultOutput updateProject(Project project) {
 
-        Project exist = projectDao.getProjectById(project.getId());
-
-        if (exist == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
-        }
-
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {
@@ -76,9 +64,9 @@ public class ProjectService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(project,ProjectOutput.class));
     }
 
-    public ResultOutput getProjects() {
+    public ResultOutput getProjects(Integer teamId) {
 
-        List<Project> projects = projectDao.getProjects();
+        List<Project> projects = projectDao.getProjects(teamId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(projects,ProjectOutput.class));
     }

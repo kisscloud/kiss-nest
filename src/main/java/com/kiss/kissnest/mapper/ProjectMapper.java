@@ -19,7 +19,9 @@ public interface ProjectMapper {
 
     Project getProjectById(Integer id);
 
-    List<Project> getProjects();
+    List<Project> getProjects(Integer teamId);
 
-    List<Project> getProjectsByName(String name);
+    Project getProjectByNameAndTeamId(Map params);
+
+    Project getProjectBySlugAndTeamId(Map params);
 }

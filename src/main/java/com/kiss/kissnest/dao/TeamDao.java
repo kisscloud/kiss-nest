@@ -17,4 +17,6 @@ public interface TeamDao {
     Team getTeamById(Integer id);
 
     List<Team> getTeams();
+
+    Team getTeamByName(String name);
 }

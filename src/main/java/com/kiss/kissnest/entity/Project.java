@@ -11,6 +11,8 @@ public class Project {
 
     private String name;
 
+    private Integer teamId;
+
     private Integer membersCount;
 
     private Integer needsCount;
@@ -20,6 +22,10 @@ public class Project {
     private Integer operatorId;
 
     private String operatorName;
+
+    private Integer type;
+
+    private String slug;
 
     private Date createdAt;
 

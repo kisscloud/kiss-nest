@@ -11,6 +11,8 @@ public class Member {
 
     private Integer accountId;
 
+    private Integer teamId;
+
     private Integer groupsCount;
 
     private Integer projectsCount;

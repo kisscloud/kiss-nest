@@ -21,5 +21,5 @@ public interface MemberMapper {
 
     List<Member> getMembers();
 
-    List<Member> getMembersByAccountId(Integer accountId);
+    Member getMemberByAccountId(Integer accountId);
 }

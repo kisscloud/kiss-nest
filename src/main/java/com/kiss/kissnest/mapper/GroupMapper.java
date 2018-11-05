@@ -19,7 +19,7 @@ public interface GroupMapper {
 
     Group getGroupById(Integer id);
 
-    List<Group> getGroups();
+    List<Group> getGroups(Integer teamId);
 
-    List<Group> getGroupsByName(String name);
+    Group getGroupByNameAndTeamId(Map params);
 }

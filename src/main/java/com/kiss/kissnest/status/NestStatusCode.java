@@ -30,6 +30,8 @@ public class NestStatusCode {
 
     public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
 
+    public static final Integer BIND_ACCOUNT_TEAM_FAILED = 8001;
+
 
 
 

@@ -6,6 +6,7 @@ import com.kiss.kissnest.mapper.GroupMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,14 +47,18 @@ public class GroupDaoImpl implements GroupDao {
     }
 
     @Override
-    public List<Group> getGroups() {
+    public List<Group> getGroups(Integer teamId) {
 
-        return groupMapper.getGroups();
+        return groupMapper.getGroups(teamId);
     }
 
     @Override
-    public List<Group> getGroupsByName(String name) {
+    public Group getGroupByNameAndTeamId(String name,Integer teamId) {
 
-        return groupMapper.getGroupsByName(name);
+        Map<String,Object> params = new HashMap<>();
+        params.put("name",name);
+        params.put("teamId",teamId);
+
+        return groupMapper.getGroupByNameAndTeamId(params);
     }
 }

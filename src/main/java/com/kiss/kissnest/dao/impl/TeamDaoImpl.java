@@ -49,4 +49,10 @@ public class TeamDaoImpl implements TeamDao {
 
         return teamMapper.getTeams();
     }
+
+    @Override
+    public Team getTeamByName(String name) {
+
+        return teamMapper.getTeamByName(name);
+    }
 }

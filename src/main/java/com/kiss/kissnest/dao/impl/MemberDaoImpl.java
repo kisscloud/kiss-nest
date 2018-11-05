@@ -52,8 +52,8 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> getMembersByAccountId(Integer accountId) {
+    public Member getMemberByAccountId(Integer accountId) {
 
-        return memberMapper.getMembersByAccountId(accountId);
+        return memberMapper.getMemberByAccountId(accountId);
     }
 }

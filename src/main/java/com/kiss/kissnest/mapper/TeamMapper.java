@@ -19,4 +19,6 @@ public interface TeamMapper {
     Team getTeamById(Integer id);
 
     List<Team> getTeams();
+
+    Team getTeamByName(String name);
 }

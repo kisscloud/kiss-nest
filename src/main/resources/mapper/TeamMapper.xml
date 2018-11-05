@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.TeamMapper">
 
-    <insert id="createTeam" parameterType="com.kiss.kissnest.entity.Team">
+    <insert id="createTeam" parameterType="com.kiss.kissnest.entity.Team" useGeneratedKeys="true" keyProperty="id">
         insert into teams (name,operatorId,operatorName)
         value
         (#{name},#{operatorId},#{operatorName})
@@ -45,5 +45,9 @@
 
     <select id="getTeams" resultType="com.kiss.kissnest.entity.Team">
         select * from teams;
+    </select>
+    
+    <select id="getTeamByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Team">
+        select * from teams where name = #{name} limit 0,1;
     </select>
 </mapper>

@@ -20,9 +20,9 @@ public class MemberService {
 
     public ResultOutput createMember(Member member) {
 
-        List<Member> members = memberDao.getMembersByAccountId(member.getAccountId());
+        Member exist = memberDao.getMemberByAccountId(member.getAccountId());
 
-        if (members != null && members.size() != 0) {
+        if (exist != null ) {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_NAME_EXIST);
         }
 

@@ -16,10 +16,11 @@
         delete from groups where id = #{id}
     </delete>
 
-    <update id="updateGroup" parameterType="com.kiss.kissnest.entity.Group">
+    <update id="updateGroupById" parameterType="com.kiss.kissnest.entity.Group">
         update groups
         set
         name = #{name},
+        teamId = #{teamId},
         operatorId = #{operatorId},
         operatorName = #{operatorName}
         where id = #{id}
@@ -37,8 +38,14 @@
         <if test="type == 'needs'">
             needsCount = needsCount + #{increment}
         </if>
+        <if test="type == 'needSolved'">
+            needSolvedCount = needSolvedCount + #{increment}
+        </if>
         <if test="type == 'issues'">
             issuesCount = issuesCount + #{increment}
+        </if>
+        <if test="type == 'issueSolved'">
+            issueSolvedCount = issueSolvedCount + #{increment}
         </if>
         where id = #{id}
     </update>
@@ -47,11 +54,11 @@
         select * from groups WHERE id = #{id};
     </select>
 
-    <select id="getGroups" resultType="com.kiss.kissnest.entity.Group">
-        select * from groups;
+    <select id="getGroups" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups where teamId = #{teamId};
     </select>
 
-    <select id="getGroupsByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Group">
-        select * from groups where name = #{name};
+    <select id="getGroupByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Group">
+        select * from groups where name = #{name} and teamId = #{teamId} limit 0,1;
     </select>
 </mapper>

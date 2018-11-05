@@ -19,11 +19,17 @@ public class Group {
 
     private Integer needsCount;
 
+    private Integer needSolvedCount;
+
     private Integer issuesCount;
+
+    private Integer issueSolvedCount;
 
     private Integer operatorId;
 
     private String operatorName;
+
+    private Integer status;
 
     private Date createdAt;
 

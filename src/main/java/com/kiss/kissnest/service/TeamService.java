@@ -1,17 +1,22 @@
 package com.kiss.kissnest.service;
 
+import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.dao.TeamGroupDao;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.entity.TeamGroup;
+import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import entity.Guest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import output.ResultOutput;
+import utils.ThreadLocalUtil;
 
 import java.util.List;
 
@@ -24,13 +29,20 @@ public class TeamService {
     @Autowired
     private TeamGroupDao teamGroupDao;
 
-    public ResultOutput createTeam(Team team) {
+    @Autowired
+    private MemberDao memberDao;
+
+    public ResultOutput createTeam(CreateTeamInput teamInput) {
+
+        Team team = (Team) BeanCopyUtil.copy(teamInput,Team.class);
 
         Integer count = teamDao.createTeam(team);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_TEAM_FAILED);
         }
+
+        bindMemberTeam(team.getId());
 
         TeamOutput teamOutput = new TeamOutput();
         BeanUtils.copyProperties(team,teamOutput);
@@ -89,5 +101,39 @@ public class TeamService {
         List<Team> teams = teamDao.getTeams();
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(teams,TeamOutput.class));
+    }
+
+    public ResultOutput changeTeam(Integer teamId) {
+
+        Integer count = bindMemberTeam(teamId);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.BIND_ACCOUNT_TEAM_FAILED);
+        }
+
+        return ResultOutputUtil.success();
+    }
+
+    public Integer bindMemberTeam (Integer teamId) {
+        //获取当前操作用户
+        Guest guest = ThreadLocalUtil.getGuest();
+        Integer accountId = guest.getId();
+        Member member = memberDao.getMemberByAccountId(accountId);
+
+        if (member != null) {
+            //更新
+            member.setTeamId(teamId);
+            Integer count = memberDao.updateMember(member);
+            return count;
+        }
+
+        member = new Member();
+        member.setTeamId(teamId);
+        member.setAccountId(accountId);
+        member.setOperatorId(accountId);
+        member.setOperatorName(guest.getName());
+        Integer count = memberDao.createMember(member);
+
+        return count;
     }
 }

@@ -8,4 +8,6 @@ public class CreateGroupInput {
     private String name;
 
     private Integer teamId;
+
+    private Integer status;
 }

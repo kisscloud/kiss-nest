@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.MemberMapper">
 
     <insert id="createMember" parameterType="com.kiss.kissnest.entity.Member">
-        insert into members (accountId,operatorId,operatorName)
+        insert into members (accountId,teamId,operatorId,operatorName)
         value
-        (#{accountId},#{operatorId},#{operatorName})
+        (#{accountId},#{teamId},#{operatorId},#{operatorName})
     </insert>
     
     <delete id="deleteMemberById" parameterType="java.lang.Integer">
@@ -22,6 +22,9 @@
         id = #{id}
         <if test="accountId != null">
             ,accountId = #{accountId}
+        </if>
+        <if test="teamId != null">
+            ,teamId = #{teamId}
         </if>
         <if test="operatorId != null">
             ,operatorId = #{operatorId}
@@ -58,7 +61,7 @@
         select * from members;
     </select>
     
-    <select id="getMembersByAccountId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
-        select * from members where accountId = #{accountId};
+    <select id="getMemberByAccountId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select * from members where accountId = #{accountId} limit 0,1;
     </select>
 </mapper>

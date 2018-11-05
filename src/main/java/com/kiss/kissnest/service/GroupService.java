@@ -34,12 +34,6 @@ public class GroupService {
 
         Group group = (Group) BeanCopyUtil.copy(createGroupInput,Group.class);
 
-        List<Group> groups = groupDao.getGroupsByName(group.getName());
-
-        if (groups != null && groups.size() != 0) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_EXIST);
-        }
-
         Integer count = groupDao.createGroup(group);
 
         if (count == 0) {
@@ -76,12 +70,6 @@ public class GroupService {
 
     public ResultOutput updateGroup(Group group) {
 
-        Group exist = groupDao.getGroupById(group.getId());
-
-        if (exist == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
-        }
-
         Integer count = groupDao.updateGroupById(group);
 
         if (count == 0) {
@@ -102,9 +90,9 @@ public class GroupService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(group,GroupOutput.class));
     }
 
-    public ResultOutput getGroups() {
+    public ResultOutput getGroups(Integer teamId) {
 
-        List<Group> groups = groupDao.getGroups();
+        List<Group> groups = groupDao.getGroups(teamId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(groups,GroupOutput.class));
     }
