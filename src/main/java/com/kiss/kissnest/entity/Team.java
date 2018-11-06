@@ -11,6 +11,10 @@ public class Team {
 
     private String name;
 
+    private String slug;
+
+    private Integer repositoryId;
+
     private Integer groupsCount;
 
     private Integer operatorId;

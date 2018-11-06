@@ -10,9 +10,12 @@ import com.kiss.kissnest.service.GroupProjectService;
 import com.kiss.kissnest.service.GroupService;
 import com.kiss.kissnest.service.TeamGroupService;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.validator.GroupValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
@@ -26,10 +29,18 @@ public class GroupController {
     @Autowired
     private GroupProjectService groupProjectService;
 
+    @Autowired
+    private GroupValidator groupValidator;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+
+        binder.setValidator(groupValidator);
+    }
 
     @PostMapping("/group")
     @ApiOperation(value = "添加组织")
-    public ResultOutput createGroup (@RequestBody CreateGroupInput createGroupInput) {
+    public ResultOutput createGroup (@Validated @RequestBody CreateGroupInput createGroupInput) {
 
         ResultOutput createOutput = groupService.createGroup(createGroupInput);
 
@@ -37,29 +48,30 @@ public class GroupController {
     }
 
     @PostMapping("/group/projects")
-    public ResultOutput bindGroupProjects (@RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
+    @ApiOperation(value = "组织绑定项目")
+    public ResultOutput bindGroupProjects (@Validated @RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
 
         return groupProjectService.bindGroupProjects(bindGroupProjectsInput);
     }
 
     @DeleteMapping("/group")
     @ApiOperation(value = "删除组织")
-    public ResultOutput deleteGroup (Integer id) {
+    public ResultOutput deleteGroup (@RequestParam("id") Integer id) {
 
         return groupService.deleteGroup(id);
     }
 
     @PutMapping("/group")
     @ApiOperation(value = "更新组织")
-    public ResultOutput updateGroup (@RequestBody UpdateGroupInput updateGroupInput) {
+    public ResultOutput updateGroup (@Validated @RequestBody UpdateGroupInput updateGroupInput) {
 
         return groupService.updateGroup((Group) BeanCopyUtil.copy(updateGroupInput,Group.class));
     }
 
     @GetMapping("/groups")
     @ApiOperation(value = "获取组织")
-    public ResultOutput getGroups () {
+    public ResultOutput getGroups (@RequestParam("teamId") Integer teamId) {
 
-        return groupService.getGroups();
+        return groupService.getGroups(teamId);
     }
 }

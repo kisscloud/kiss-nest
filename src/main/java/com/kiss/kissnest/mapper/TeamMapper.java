@@ -19,4 +19,10 @@ public interface TeamMapper {
     Team getTeamById(Integer id);
 
     List<Team> getTeams();
+
+    Team getTeamByName(String name);
+
+    Integer addRepositoryIdById(Team team);
+
+    Integer getRepositoryIdByTeamId(Integer id);
 }

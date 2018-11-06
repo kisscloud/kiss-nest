@@ -2,18 +2,23 @@ package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.GroupDao;
 import com.kiss.kissnest.dao.GroupProjectDao;
+import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.GroupProject;
+import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.output.GroupOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import output.ResultOutput;
+import utils.ThreadLocalUtil;
 
 import java.util.List;
 
@@ -29,16 +34,16 @@ public class GroupService {
     @Autowired
     private TeamDao teamDao;
 
+    @Autowired
+    private MemberDao memberDao;
+
+    @Autowired
+    private GitlabApiUtil gitlabApiUtil;
+
     @Transactional
     public ResultOutput createGroup(CreateGroupInput createGroupInput) {
 
         Group group = (Group) BeanCopyUtil.copy(createGroupInput,Group.class);
-
-        List<Group> groups = groupDao.getGroupsByName(group.getName());
-
-        if (groups != null && groups.size() != 0) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_EXIST);
-        }
 
         Integer count = groupDao.createGroup(group);
 
@@ -47,6 +52,21 @@ public class GroupService {
         }
 
         teamDao.addGroupsCount(group.getTeamId());
+
+        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        Integer parentId = teamDao.getRepositoryIdByTeamId(group.getTeamId());
+
+        if (parentId == null) {
+            throw new TransactionalException(NestStatusCode.GROUP_PARENTID_LOSED);
+        }
+
+        GitlabGroup gitlabGroup = gitlabApiUtil.createSubGroup(group.getSlug(),accessToken,parentId);
+
+        if (gitlabGroup == null) {
+            throw new TransactionalException(NestStatusCode.CREATE_GROUP_REPOSITORY_FAILED);
+        }
+
+        groupDao.addRepositoryIdById(group.getId());
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(group,GroupOutput.class));
     }
@@ -76,12 +96,6 @@ public class GroupService {
 
     public ResultOutput updateGroup(Group group) {
 
-        Group exist = groupDao.getGroupById(group.getId());
-
-        if (exist == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
-        }
-
         Integer count = groupDao.updateGroupById(group);
 
         if (count == 0) {
@@ -102,9 +116,9 @@ public class GroupService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(group,GroupOutput.class));
     }
 
-    public ResultOutput getGroups() {
+    public ResultOutput getGroups(Integer teamId) {
 
-        List<Group> groups = groupDao.getGroups();
+        List<Group> groups = groupDao.getGroups(teamId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(groups,GroupOutput.class));
     }

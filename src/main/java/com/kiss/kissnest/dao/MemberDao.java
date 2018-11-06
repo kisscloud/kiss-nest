@@ -19,5 +19,9 @@ public interface MemberDao {
 
     List<Member> getMembers();
 
-    List<Member> getMembersByAccountId(Integer accountId);
+    Member getMemberByAccountId(Integer accountId);
+
+    Integer updateAccessTokenByAccountId(Integer accountId,String accessToken);
+
+    String getAccessTokenByAccountId(Integer accountId);
 }

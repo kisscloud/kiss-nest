@@ -5,9 +5,12 @@ import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.input.UpdateTeamInput;
 import com.kiss.kissnest.service.TeamService;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.validator.TeamValidaor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
@@ -18,11 +21,20 @@ public class TeamController {
     @Autowired
     private TeamService teamService;
 
+    @Autowired
+    private TeamValidaor teamValidaor;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+
+        binder.setValidator(teamValidaor);
+    }
+
     @PostMapping("/team")
     @ApiOperation(value = "添加团队")
-    public ResultOutput createTeam (@RequestBody CreateTeamInput teamInput) {
+    public ResultOutput createTeam (@Validated @RequestBody CreateTeamInput teamInput) {
 
-        return teamService.createTeam((Team) BeanCopyUtil.copy(teamInput,Team.class));
+        return teamService.createTeam(teamInput);
     }
 
     @DeleteMapping("/team")
@@ -34,7 +46,7 @@ public class TeamController {
 
     @PutMapping("/team")
     @ApiOperation(value = "更新团队")
-    public ResultOutput updateTeam (@RequestBody UpdateTeamInput teamInput) {
+    public ResultOutput updateTeam (@Validated @RequestBody UpdateTeamInput teamInput) {
 
         return teamService.updateTeam((Team) BeanCopyUtil.copy(teamInput,Team.class));
     }
@@ -44,5 +56,12 @@ public class TeamController {
     public ResultOutput getTeams () {
 
         return teamService.getTeams();
+    }
+
+    @GetMapping("/team/change")
+    @ApiOperation(value = "切换团队")
+    public ResultOutput changeTeam (@RequestParam("teamId") Integer teamId) {
+
+        return teamService.changeTeam(teamId);
     }
 }

@@ -8,4 +8,6 @@ public class UpdateGroupInput {
     private Integer id;
 
     private String name;
+
+    private Integer teamId;
 }

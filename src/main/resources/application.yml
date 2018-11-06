@@ -29,3 +29,9 @@ kiss:
     clientId: e489c5a6da934fe2b441824809b50ae6
     clientSecret: b1c1f5f3d6cb43a2a0b599daaa99b558
     clientExpired: 1296000
+
+oauth2:
+  server:
+    url: https://gitlab.com
+    token:
+      path: /oauth/token

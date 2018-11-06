@@ -5,9 +5,12 @@ import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.service.ProjectService;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.validator.ProjectValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
@@ -18,9 +21,18 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private ProjectValidator projectValidator;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+
+        binder.setValidator(projectValidator);
+    }
+
     @PostMapping("/project")
     @ApiOperation(value = "添加项目")
-    public ResultOutput createProject (@RequestBody CreateProjectInput createProjectInput) {
+    public ResultOutput createProject (@Validated @RequestBody CreateProjectInput createProjectInput) {
 
         return projectService.createProject((Project) BeanCopyUtil.copy(createProjectInput,Project.class));
     }
@@ -34,15 +46,15 @@ public class ProjectController {
 
     @PutMapping("/project")
     @ApiOperation(value = "更新项目")
-    public ResultOutput updateProject (@RequestBody UpdateProjectInput updateProjectInput) {
+    public ResultOutput updateProject (@Validated @RequestBody UpdateProjectInput updateProjectInput) {
 
         return projectService.updateProject((Project) BeanCopyUtil.copy(updateProjectInput,Project.class));
     }
 
     @GetMapping("/projects")
     @ApiOperation(value = "获取项目")
-    public ResultOutput getProjects () {
+    public ResultOutput getProjects (@RequestParam("teamId") Integer teamId) {
 
-        return projectService.getProjects();
+        return projectService.getProjects(teamId);
     }
 }

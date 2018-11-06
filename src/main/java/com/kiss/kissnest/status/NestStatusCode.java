@@ -1,20 +1,26 @@
 package com.kiss.kissnest.status;
 
-public class NestStatusCode {
+import status.CodeEnums;
 
-    public static final Integer TEAM_GROUPS_EXIST = 2001;
-    public static final Integer CREATE_TEAM_FAILED = 2002;
-    public static final Integer TEAM_NOT_EXIST = 2003;
-    public static final Integer UPDATE_TEAM_FAILED = 2004;
+public class NestStatusCode extends CodeEnums {
 
-    public static final Integer CREATE_TEAMGROUP_FAILED = 3002;
-    public static final Integer GROUP_NOT_EXIST = 3003;
+
+    public static final Integer TEAM_GROUPS_EXIST = 1001;
+    public static final Integer CREATE_TEAM_FAILED = 1002;
+    public static final Integer TEAM_NOT_EXIST = 1003;
+    public static final Integer UPDATE_TEAM_FAILED = 1004;
+    public static final Integer CREATE_TEAM_REPOSITORY_FAILED = 1004;
+
+    public static final Integer CREATE_TEAMGROUP_FAILED = 2002;
+    public static final Integer GROUP_NOT_EXIST = 2003;
 
     public static final Integer GROUP_EXIST = 4001;
     public static final Integer CREATE_GROUP_FAILED = 4002;
     public static final Integer GROUP_PROJECT_EXIST = 4003;
     public static final Integer DELETE_GROUP_FAILED = 4004;
     public static final Integer UPDATE_GROUP_FAILED = 4005;
+    public static final Integer GROUP_PARENTID_LOSED = 4006;
+    public static final Integer CREATE_GROUP_REPOSITORY_FAILED = 4006;
 
     public static final Integer PROJECT_NAME_EXIST = 5001;
     public static final Integer CREATE_PROJECT_FAILED = 5002;
@@ -30,12 +36,11 @@ public class NestStatusCode {
 
     public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
 
+    public static final Integer BIND_ACCOUNT_TEAM_FAILED = 8001;
 
+    public static final Integer CREATE_MEMBER_ACCESS_FAILED = 9001;
+    public static final Integer UPDATE_MEMBER_ACCESS_FAILED = 9002;
 
-
-
-
-
-
+    public static final Integer SERVICE_ERROR = 3001;
 
 }

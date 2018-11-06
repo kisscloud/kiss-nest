@@ -11,6 +11,10 @@ public class Member {
 
     private Integer accountId;
 
+    private Integer teamId;
+
+    private String accessToken;
+
     private Integer groupsCount;
 
     private Integer projectsCount;

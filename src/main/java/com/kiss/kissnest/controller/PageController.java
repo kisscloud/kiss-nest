@@ -27,9 +27,9 @@ public class PageController {
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
-    public ResultOutput GetPageGroupsParams() {
+    public ResultOutput GetPageGroupsParams(Integer teamId) {
 
-        ResultOutput groups = groupService.getGroups();
+        ResultOutput groups = groupService.getGroups(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("groups", groups.getData());
@@ -40,9 +40,9 @@ public class PageController {
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/projects")
-    public ResultOutput GetPageProjectsParams() {
+    public ResultOutput GetPageProjectsParams(Integer teamId) {
 
-        ResultOutput projects = projectService.getProjects();
+        ResultOutput projects = projectService.getProjects(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());

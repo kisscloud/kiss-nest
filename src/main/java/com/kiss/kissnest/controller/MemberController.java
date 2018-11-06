@@ -1,7 +1,14 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.dao.MemberDao;
+import com.kiss.kissnest.input.CreateMemberAccessInput;
+import com.kiss.kissnest.service.MemberService;
+import com.kiss.kissnest.validator.MemberValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import output.ResultOutput;
 
@@ -9,7 +16,20 @@ import output.ResultOutput;
 public class MemberController {
 
     @Autowired
-    private MemberDao memberDao;
+    private MemberService memberService;
 
-//    public ResultOutput createMember()
+    @Autowired
+    private MemberValidator memberValidator;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+
+        binder.setValidator(memberValidator);
+    }
+
+    @PostMapping("/member/access")
+    public ResultOutput getMemberAccess(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
+
+        return memberService.getMemberAccess(createMemberAccessInput);
+    }
 }

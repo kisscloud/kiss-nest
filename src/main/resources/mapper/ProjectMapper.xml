@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ProjectMapper">
 
     <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project">
-        insert into projects (name,operatorId,operatorName)
+        insert into projects (name,teamId,slug,operatorId,operatorName)
         value
-        (#{name},#{operatorId},#{operatorName})
+        (#{name},#{teamId},#{slug},#{operatorId},#{operatorName})
     </insert>
     
     <delete id="deleteProjectById" parameterType="java.lang.Integer">
@@ -22,6 +22,15 @@
         id = #{id}
         <if test="name != null">
             ,name = #{name}
+        </if>
+        <if test="teamId != null">
+            ,teamId = #{teamId}
+        </if>
+        <if test="slug != null">
+            ,slug = #{slug}
+        </if>
+        <if test="teamId != null">
+            ,teamId = #{teamId}
         </if>
         <if test="operatorId != null">
             ,operatorId = #{operatorId}
@@ -51,11 +60,15 @@
         select * from projects where id = #{id};
     </select>
 
-    <select id="getProjects" resultType="com.kiss.kissnest.entity.Project">
-        select * from projects;
+    <select id="getProjects" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where teamId = #{teamId}
     </select>
 
-    <select id="getProjectsByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Project">
-        select * from projects where name = #{name};
+    <select id="getProjectByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where name = #{name} and teamId = #{teamId} limit 0,1;
+    </select>
+    
+    <select id="getProjectBySlugAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where slug = #{slug} and teamId = #{teamId};
     </select>
 </mapper>

@@ -17,7 +17,9 @@ public interface ProjectDao {
 
     Project getProjectById(Integer id);
 
-    List<Project> getProjects();
+    List<Project> getProjects(Integer teamId);
 
-    List<Project> getProjectsByName(String name);
+    Project getProjectByNameAndTeamId(String name,Integer teamId);
+
+    Project getProjectBySlugAndTeamId(String slug,Integer teamId);
 }
