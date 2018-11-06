@@ -5,6 +5,7 @@ import com.kiss.kissnest.input.CreateJobInput;
 import com.kiss.kissnest.service.BuildLogService;
 import com.kiss.kissnest.validator.JobValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,13 +29,13 @@ public class BuildController {
     }
 
     @PostMapping("/job")
-    public ResultOutput createJob(@RequestBody CreateJobInput createJobInput) {
+    public ResultOutput createJob(@Validated @RequestBody CreateJobInput createJobInput) {
 
         return buildLogService.createJob(createJobInput);
     }
 
     @PostMapping("/job/build")
-    public ResultOutput buildJob(@RequestBody BuildJobInput buildJobInput) {
+    public ResultOutput buildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
         return buildLogService.buildJob(buildJobInput);
     }
