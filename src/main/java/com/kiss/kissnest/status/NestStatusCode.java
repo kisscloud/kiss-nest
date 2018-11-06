@@ -34,6 +34,8 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer UPDATE_PROJECT_FAILED = 5005;
     public static final Integer PROJECT_SLUG_EMPTY= 5005;
     public static final Integer CREATE_PROJECT_REPOSITORY_FAILED = 5006;
+    public static final Integer PROJECT_ID_IS_EMPTY = 5006;
+
 
 
 
@@ -55,6 +57,10 @@ public class NestStatusCode extends CodeEnums {
 
     public static final Integer CREATE_JENKINS_JOB_ERROR = 10001;
     public static final Integer BUILD_JENKINS_JOB_ERROR = 10002;
+    public static final Integer SHELL_IS_EMPTY = 10003;
+    public static final Integer TYPE_IS_EMPTY = 10004;
+    public static final Integer BRANCH_IS_EMPTY = 10005;
+
 
     public static final Integer SERVICE_ERROR = 3001;
 
