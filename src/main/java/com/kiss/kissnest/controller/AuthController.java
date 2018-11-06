@@ -37,8 +37,7 @@ public class AuthController {
         clientAuthorizationInput.setClientId(clientId);
         clientAuthorizationInput.setSecret(clientSecret);
         clientAuthorizationInput.setExpired(Long.valueOf(clientExpired));
-        ResultOutput authInfo = clientServiceFeign.ClientAuthorization(clientAuthorizationInput);
 
-        return authInfo;
+        return clientServiceFeign.ClientAuthorization(clientAuthorizationInput);
     }
 }
