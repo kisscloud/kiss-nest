@@ -7,9 +7,11 @@ import com.kiss.kissnest.output.MemberOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
+import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
@@ -25,6 +27,9 @@ public class MemberService {
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
+
+    @Autowired
+    private JenkinsUtil jenkinsUtil;
 
     public ResultOutput createMember(Member member) {
 
@@ -87,19 +92,17 @@ public class MemberService {
     public ResultOutput getMemberAccess (CreateMemberAccessInput createMemberAccessInput) {
 
         try {
-            String token = gitlabApiUtil.getAccessToken(createMemberAccessInput.getPassword());
+            Guest guest = ThreadLocalUtil.getGuest();
+            String accessToken = gitlabApiUtil.getAccessToken(guest.getName(),createMemberAccessInput.getPassword());
 
-            if (StringUtils.isEmpty(token)) {
+            if (StringUtils.isEmpty(accessToken)) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
             }
 
-            Guest guest = ThreadLocalUtil.getGuest();
-
             Member member = memberDao.getMemberByAccountId(guest.getId());
 
-
             if (member != null) {
-                Integer count = memberDao.updateAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId(),token);
+                Integer count = memberDao.updateAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId(),accessToken);
 
                 if (count == 0) {
                     return ResultOutputUtil.error(NestStatusCode.UPDATE_MEMBER_ACCESS_FAILED);
@@ -110,7 +113,7 @@ public class MemberService {
                 member.setAccountId(guest.getId());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
-                member.setAccessToken(token);
+                member.setAccessToken(accessToken);
                 Integer count = memberDao.createMember(member);
 
                 if (count == 0) {
@@ -122,6 +125,46 @@ public class MemberService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
+        }
+    }
+
+    public ResultOutput getMemberApiToken (CreateMemberAccessInput createMemberAccessInput) {
+
+        try {
+            Guest guest = ThreadLocalUtil.getGuest();
+            String apiToken = jenkinsUtil.generateApiToken(guest.getName(),createMemberAccessInput.getPassword());
+
+            if (apiToken == null) {
+                return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_APITOKEN_FAILED);
+            }
+
+            Member member = memberDao.getMemberByAccountId(guest.getId());
+
+            if (member != null) {
+                Integer count = memberDao.updateApiTokenByAccountId(ThreadLocalUtil.getGuest().getId(),apiToken);
+
+                if (count == 0) {
+                    return ResultOutputUtil.error(NestStatusCode.UPDATE_MEMBER_APITOKEN_FAILED);
+                }
+
+            } else {
+                member = new Member();
+                member.setAccountId(guest.getId());
+                member.setOperatorId(guest.getId());
+                member.setOperatorName(guest.getName());
+                member.setApiToken(apiToken);
+                Integer count = memberDao.createMember(member);
+
+                if (count == 0) {
+                    return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_APITOKEN_FAILED);
+                }
+            }
+
+            return ResultOutputUtil.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
+
         }
     }
 }

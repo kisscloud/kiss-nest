@@ -20,13 +20,22 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer DELETE_GROUP_FAILED = 4004;
     public static final Integer UPDATE_GROUP_FAILED = 4005;
     public static final Integer GROUP_PARENTID_LOSED = 4006;
-    public static final Integer CREATE_GROUP_REPOSITORY_FAILED = 4006;
+    public static final Integer CREATE_GROUP_REPOSITORY_FAILED = 4007;
+    public static final Integer PROJECT_MASTER_GROUP_NOT_EXIST = 4008;
+    public static final Integer GROUP_REPOSITORYID_NOT_EXIST = 4008;
+
+
+
 
     public static final Integer PROJECT_NAME_EXIST = 5001;
     public static final Integer CREATE_PROJECT_FAILED = 5002;
     public static final Integer PROJECT_NOT_EXIST = 5003;
     public static final Integer DELETE_PROJECT_FAILED = 5004;
     public static final Integer UPDATE_PROJECT_FAILED = 5005;
+    public static final Integer PROJECT_SLUG_EMPTY= 5005;
+    public static final Integer CREATE_PROJECT_REPOSITORY_FAILED = 5006;
+
+
 
     public static final Integer MEMBER_NAME_EXIST = 6001;
     public static final Integer CREATE_MEMBER_FAILED = 6002;
@@ -40,6 +49,12 @@ public class NestStatusCode extends CodeEnums {
 
     public static final Integer CREATE_MEMBER_ACCESS_FAILED = 9001;
     public static final Integer UPDATE_MEMBER_ACCESS_FAILED = 9002;
+    public static final Integer CREATE_MEMBER_APITOKEN_FAILED = 9003;
+    public static final Integer UPDATE_MEMBER_APITOKEN_FAILED = 9004;
+    public static final Integer MEMBER_APITOKEN_IS_EMPTY = 9005;
+
+    public static final Integer CREATE_JENKINS_JOB_ERROR = 10001;
+    public static final Integer BUILD_JENKINS_JOB_ERROR = 10002;
 
     public static final Integer SERVICE_ERROR = 3001;
 

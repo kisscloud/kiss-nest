@@ -1,5 +1,6 @@
 package com.kiss.kissnest.dao;
 
+import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface ProjectDao {
     Project getProjectByNameAndTeamId(String name,Integer teamId);
 
     Project getProjectBySlugAndTeamId(String slug,Integer teamId);
+
+    Integer addRepositoryIdById(Project project);
 }

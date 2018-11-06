@@ -13,6 +13,10 @@ public class Project {
 
     private Integer teamId;
 
+    private Integer groupId;
+
+    private Integer repositoryId;
+
     private Integer membersCount;
 
     private Integer needsCount;

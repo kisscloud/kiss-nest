@@ -75,4 +75,11 @@
     <select id="getAccessTokenByAccountId" parameterType="java.lang.Integer" resultType="java.lang.String">
         select accessToken from members where accountId = #{accountId}
     </select>
+
+    <update id="updateApiTokenByAccountId" parameterType="java.util.Map">
+        update members
+        set
+        apiToken = #{apiToken}
+        where accountId = #{accountId}
+    </update>
 </mapper>

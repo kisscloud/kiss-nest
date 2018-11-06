@@ -77,4 +77,16 @@ public class MemberDaoImpl implements MemberDao {
 
         return memberMapper.getAccessTokenByAccountId(accountId);
     }
+
+    @Override
+    public Integer updateApiTokenByAccountId(Integer accountId, String apiToken) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("accountId",accountId);
+        params.put("apiToken",apiToken);
+
+        Integer count = memberMapper.updateApiTokenByAccountId(params);
+
+        return count;
+    }
 }

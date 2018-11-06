@@ -18,11 +18,12 @@ logging:
   level:
     com.kiss.kissnest.mapper: debug
 jenkins:
-  url: http://localhost:8112
-  account: admin
-  password: e20e6ba9448f468fb39dec3529984cfc
-  buildUrl: http://localhost:8112/job/%s/build
-  buildWithParameterUrl: http://localhost:8112/job/%s/buildWithParameters
+  url: http://localhost:8060
+#  account: admin
+#  password: e20e6ba9448f468fb39dec3529984cfc
+  buildUrl: http://localhost:8060/job/%s/build
+  buildWithParameterUrl: http://localhost:8060/job/%s/buildWithParameters
+  generateTokenUrl: http://localhost:8060/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
 
 kiss:
   nest:
@@ -30,7 +31,7 @@ kiss:
     clientSecret: b1c1f5f3d6cb43a2a0b599daaa99b558
     clientExpired: 1296000
 
-oauth2:
+gitlab:
   server:
     url: https://gitlab.com
     token:

@@ -73,8 +73,8 @@ public class GroupDaoImpl implements GroupDao {
     }
 
     @Override
-    public Integer addRepositoryIdById(Integer id) {
+    public Integer addRepositoryIdById(Group group) {
 
-        return groupMapper.addRepositoryIdById(id);
+        return groupMapper.addRepositoryIdById(group);
     }
 }

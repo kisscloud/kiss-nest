@@ -34,7 +34,7 @@ public class ProjectController {
     @ApiOperation(value = "添加项目")
     public ResultOutput createProject (@Validated @RequestBody CreateProjectInput createProjectInput) {
 
-        return projectService.createProject((Project) BeanCopyUtil.copy(createProjectInput,Project.class));
+        return projectService.createProject(createProjectInput);
     }
 
     @DeleteMapping("/project")
@@ -57,4 +57,12 @@ public class ProjectController {
 
         return projectService.getProjects(teamId);
     }
+
+    @GetMapping("/project/repository")
+    @ApiOperation(value = "创建项目仓库")
+    public ResultOutput createProjectRepository (@RequestParam("projectId") Integer projectId) {
+
+        return projectService.createProjectRepository(projectId);
+    }
+
 }

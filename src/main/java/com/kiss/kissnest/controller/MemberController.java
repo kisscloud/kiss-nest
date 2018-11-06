@@ -32,4 +32,10 @@ public class MemberController {
 
         return memberService.getMemberAccess(createMemberAccessInput);
     }
+
+    @PostMapping("/member/apiToken")
+    public ResultOutput getMemberApiToken(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
+
+        return memberService.getMemberApiToken(createMemberAccessInput);
+    }
 }

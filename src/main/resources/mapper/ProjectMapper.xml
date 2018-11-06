@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ProjectMapper">
 
     <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project">
-        insert into projects (name,teamId,slug,operatorId,operatorName)
+        insert into projects (name,teamId,groupId,slug,operatorId,operatorName)
         value
-        (#{name},#{teamId},#{slug},#{operatorId},#{operatorName})
+        (#{name},#{teamId},#{groupId},#{slug},#{operatorId},#{operatorName})
     </insert>
     
     <delete id="deleteProjectById" parameterType="java.lang.Integer">
@@ -71,4 +71,11 @@
     <select id="getProjectBySlugAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">
         select * from projects where slug = #{slug} and teamId = #{teamId};
     </select>
+
+    <update id="addRepositoryIdById" parameterType="com.kiss.kissnest.entity.Project">
+        update projects
+        set
+        repositoryId = #{repositoryId}
+        where id = #{id};
+    </update>
 </mapper>

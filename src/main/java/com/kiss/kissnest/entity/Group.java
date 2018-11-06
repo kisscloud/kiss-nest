@@ -15,6 +15,8 @@ public class Group {
 
     private String slug;
 
+    private Integer repositoryId;
+
     private Integer projectsCount;
 
     private Integer membersCount;

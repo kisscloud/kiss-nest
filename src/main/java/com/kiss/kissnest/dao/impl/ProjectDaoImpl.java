@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.mapper.ProjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,5 +71,11 @@ public class ProjectDaoImpl implements ProjectDao {
         params.put("teamId",teamId);
 
         return projectMapper.getProjectBySlugAndTeamId(params);
+    }
+
+    @Override
+    public Integer addRepositoryIdById(Project project) {
+
+        return projectMapper.addRepositoryIdById(project);
     }
 }

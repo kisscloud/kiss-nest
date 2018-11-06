@@ -9,6 +9,8 @@ public class CreateProjectInput {
 
     private Integer teamId;
 
+    private Integer groupId;
+
     private Integer type;
 
     private String slug;

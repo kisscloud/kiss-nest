@@ -26,4 +26,6 @@ public interface MemberMapper {
     Integer updateAccessTokenByAccountId(Map params);
 
     String getAccessTokenByAccountId(Integer accountId);
+
+    Integer updateApiTokenByAccountId(Map params);
 }

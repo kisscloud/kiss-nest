@@ -24,4 +24,6 @@ public interface MemberDao {
     Integer updateAccessTokenByAccountId(Integer accountId,String accessToken);
 
     String getAccessTokenByAccountId(Integer accountId);
+
+    Integer updateApiTokenByAccountId(Integer accountId,String apiToken);
 }

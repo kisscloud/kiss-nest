@@ -2,6 +2,8 @@ package com.kiss.kissnest.util;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.kiss.kissnest.exception.TransactionalException;
+import com.kiss.kissnest.status.NestStatusCode;
 import entity.Guest;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
@@ -18,18 +20,17 @@ import java.util.Map;
 @Component
 public class GitlabApiUtil {
 
-    @Value("${oauth2.server.url}")
+    @Value("${gitlab.server.url}")
     private String gitlabServerUrl;
 
-    @Value("${oauth2.server.token.path}")
+    @Value("${gitlab.server.token.path}")
     private String tokenPath;
 
-    public String getAccessToken (String password) throws Exception {
+    public String getAccessToken (String account,String password) throws Exception {
 
         Map<String,Object> map = new HashMap<>();
-        Guest guest = ThreadLocalUtil.getGuest();
         map.put("grant_type","password");
-        map.put("username",guest.getName());
+        map.put("username",account);
         map.put("password",password);
         String accessTokenStr = HttpUtil.doPost(gitlabServerUrl + tokenPath,JSONObject.toJSONString(map));
         String accessToken = JSONObject.parseObject(accessTokenStr).getString("access_token");
@@ -73,16 +74,17 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabProject createProjectForGroup (String projectName,String groupPath,String accessToken) {
+    public GitlabProject createProjectForGroup (String projectName,Integer groupId,String accessToken) {
 
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = null;
 
             try {
-                gitlabGroup = gitlabAPI.getGroup(groupPath);
+                gitlabGroup = gitlabAPI.getGroup(groupId);
             } catch (FileNotFoundException e) {
-                gitlabGroup = createGroup(groupPath,accessToken);
+//                gitlabGroup = createGroup(groupPath,accessToken);
+                throw new TransactionalException(NestStatusCode.GROUP_REPOSITORYID_NOT_EXIST);
             }
 
             GitlabProject gitlabProject = gitlabAPI.createProjectForGroup(projectName,gitlabGroup);

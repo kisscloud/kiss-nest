@@ -39,5 +39,6 @@
         <mapper resource="mapper/ServerMapper.xml"/>
         <mapper resource="mapper/TeamGroupMapper.xml"/>
         <mapper resource="mapper/TeamMapper.xml"/>
+        <mapper resource="mapper/JobMapper.xml"/>
     </mappers>
 </configuration>

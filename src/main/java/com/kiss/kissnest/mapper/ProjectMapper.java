@@ -1,5 +1,6 @@
 package com.kiss.kissnest.mapper;
 
+import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,4 +25,6 @@ public interface ProjectMapper {
     Project getProjectByNameAndTeamId(Map params);
 
     Project getProjectBySlugAndTeamId(Map params);
+
+    Integer addRepositoryIdById(Project project);
 }

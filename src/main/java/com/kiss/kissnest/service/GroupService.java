@@ -66,7 +66,8 @@ public class GroupService {
             throw new TransactionalException(NestStatusCode.CREATE_GROUP_REPOSITORY_FAILED);
         }
 
-        groupDao.addRepositoryIdById(group.getId());
+        group.setRepositoryId(gitlabGroup.getId());
+        groupDao.addRepositoryIdById(group);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(group,GroupOutput.class));
     }

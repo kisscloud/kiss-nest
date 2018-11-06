@@ -15,6 +15,8 @@ public class Member {
 
     private String accessToken;
 
+    private String apiToken;
+
     private Integer groupsCount;
 
     private Integer projectsCount;

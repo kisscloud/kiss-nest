@@ -23,5 +23,5 @@ public interface GroupDao {
 
     Group getGroupBySlugAndTeamId(String slug,Integer teamId);
 
-    Integer addRepositoryIdById(Integer id);
+    Integer addRepositoryIdById(Group group);
 }
