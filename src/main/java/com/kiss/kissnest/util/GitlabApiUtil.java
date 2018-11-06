@@ -15,6 +15,7 @@ import utils.ThreadLocalUtil;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -25,6 +26,9 @@ public class GitlabApiUtil {
 
     @Value("${gitlab.server.token.path}")
     private String tokenPath;
+
+    @Value("${kiss.nest.webHook.url}")
+    private String webHookUrl;
 
     public String getAccessToken (String account,String password) throws Exception {
 
@@ -88,6 +92,7 @@ public class GitlabApiUtil {
             }
 
             GitlabProject gitlabProject = gitlabAPI.createProjectForGroup(projectName,gitlabGroup);
+            gitlabAPI.addProjectHook(gitlabProject.getId(),webHookUrl,true,false,true,true,true);
 
             return gitlabProject;
         } catch (Exception e) {
@@ -108,5 +113,10 @@ public class GitlabApiUtil {
 //        GitlabGroup gitlabGroup = gitlabAPI.getGroup("gitApi");
 //        GitlabGroup gitlabGroup1 = gitlabAPI.createGroup("gitApi1","gitApi1",null,null,null,gitlabGroup.getId());
 //        System.out.println("hello");
+        GitlabAPI gitlabAPI = GitlabAPI.connect("https://gitlab.com",token,TokenType.ACCESS_TOKEN);
+
+//        GitlabProject gitlabProject = gitlabAPI.getProject(9219426);
+        gitlabAPI.addProjectHook(9219426,"http://10.100.10.11:8920/kiss/nest/note",true,false,true,true,true);
+        System.out.println();
     }
 }
