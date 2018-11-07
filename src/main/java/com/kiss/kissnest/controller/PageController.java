@@ -43,10 +43,11 @@ public class PageController {
     public ResultOutput GetPageProjectsParams(Integer teamId) {
 
         ResultOutput projects = projectService.getProjects(teamId);
+        ResultOutput groups = groupService.getGroups(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
-        result.put("status", projects.getData());
+        result.put("groups", groups.getData());
 
         return ResultOutputUtil.success(result);
     }
