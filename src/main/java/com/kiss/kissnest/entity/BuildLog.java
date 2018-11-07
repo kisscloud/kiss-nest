@@ -9,7 +9,11 @@ public class BuildLog {
 
     private Integer id;
 
+    private String jobName;
+
     private String branch;
+
+    private Integer number;
 
     private String version;
 

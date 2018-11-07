@@ -4,6 +4,7 @@ import com.kiss.kissnest.entity.BuildLog;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface BuildLogMapper {
@@ -17,4 +18,6 @@ public interface BuildLogMapper {
     BuildLog getBuildLogById(Integer id);
 
     List<BuildLog> getBuildLogs();
+
+    BuildLog getLastBuildByJobNameAndProjectId(Map params);
 }

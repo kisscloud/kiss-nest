@@ -42,4 +42,10 @@ public class BuildController {
 
         return buildLogService.buildJob(buildJobInput);
     }
+
+    @GetMapping("/job/exist")
+    public ResultOutput validateJobExist(@RequestParam("projectId") Integer projectId,@RequestParam("type") Integer type) {
+
+        return buildLogService.validateJobExist(projectId,type);
+    }
 }
