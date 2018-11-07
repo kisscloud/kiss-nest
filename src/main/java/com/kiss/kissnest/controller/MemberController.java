@@ -47,4 +47,10 @@ public class MemberController {
 
        return memberService.validateMember();
     }
+
+    @GetMapping("/member")
+    public ResultOutput getMember() {
+
+        return memberService.getMember();
+    }
 }

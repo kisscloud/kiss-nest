@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
-import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.BuildWithDetails;
-import com.offbytwo.jenkins.model.FolderJob;
-import com.offbytwo.jenkins.model.JobWithDetails;
+import com.offbytwo.jenkins.model.*;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
@@ -174,7 +171,7 @@ public class JenkinsUtil {
         }
     }
 
-    public BuildWithDetails getLastBuild(String jobName,String account,String passwordOrToken) {
+    public BuildWithDetails getLastBuildWithDetail(String jobName,String account,String passwordOrToken) {
 
         JenkinsServer server = null;
 
@@ -200,9 +197,9 @@ public class JenkinsUtil {
 
 //            build.setClient(jenkinsHttpConnection);
 
-
             BuildWithDetails buildWithDetails = build1.details();
-
+            BuildResult buildResult = buildWithDetails.getResult();
+            Map<String,String> map = buildWithDetails.getParameters();
            JenkinsHttpConnection client =  buildWithDetails.getClient();
 
 
@@ -217,6 +214,51 @@ public class JenkinsUtil {
             if (server != null) {
                 server.close();
             }
+        }
+    }
+
+    public BuildWithDetails getLastBuildWithDetail(JenkinsHttpConnection client,String url) {
+
+        JenkinsServer server = null;
+
+        try {
+            BuildWithDetails buildWithDetails = client.get(url,BuildWithDetails.class);
+            return buildWithDetails;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (server != null) {
+                server.close();
+            }
+        }
+    }
+
+    public Build getLastBuild (String jobName,String account,String passwordOrToken) {
+        JenkinsServer server = null;
+
+        try {
+            server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
+            JobWithDetails jobWithDetails = server.getJob(jobName);
+            Build build = jobWithDetails.getLastBuild();
+
+            return build;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (server != null) {
+                server.close();
+            }
+        }
+    }
+
+    public String getConsoleOutputText(JenkinsHttpConnection client,String url) {
+
+        try {
+            return client.get(url);
+        } catch (Exception e) {
+            return "";
         }
     }
 

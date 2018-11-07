@@ -15,4 +15,8 @@
     <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
         select * from Jobs where projectId = #{projectId};
     </select>
+
+    <select id="getJobByProjectIdAndType" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
+        select * from Jobs where projectId = #{projectId} and type = #{type} limit 0,1;
+    </select>
 </mapper>

@@ -24,6 +24,8 @@ jenkins:
   buildUrl: http://localhost:8060/job/%s/build
   buildWithParameterUrl: http://localhost:8060/job/%s/buildWithParameters
   generateTokenUrl: http://localhost:8060/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
+  buildLogUrl: http://localhost:8080/job/%s/%s
+  buildOutputPath: /logText/progressiveHtml
 
 kiss:
   nest:
@@ -39,3 +41,4 @@ gitlab:
     token:
       path: /oauth/token
 
+#http://localhost:8080/jenkins/job/guyue/43/

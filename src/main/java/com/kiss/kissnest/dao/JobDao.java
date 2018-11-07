@@ -7,4 +7,6 @@ public interface JobDao {
     Integer createJob(Job job);
 
     Job getJobByProjectId(Integer projectId);
+
+    Job getJobByProjectIdAndType(Integer projectId,Integer type);
 }

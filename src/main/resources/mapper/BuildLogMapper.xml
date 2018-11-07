@@ -53,4 +53,8 @@
     <select id="getBuildLogs" resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs;
     </select>
+    
+    <select id="getLastBuildByJobNameAndProjectId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs where jobName=#{jobName} and projectId=#{projectId};
+    </select>
 </mapper>

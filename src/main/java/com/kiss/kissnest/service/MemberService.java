@@ -91,6 +91,18 @@ public class MemberService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
     }
 
+    public ResultOutput getMember() {
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        Member member = memberDao.getMemberByAccountId(guest.getId());
+
+        if (member != null) {
+            return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+        } else {
+            return ResultOutputUtil.success();
+        }
+    }
+
     public ResultOutput validateMember() {
 
         Guest guest = ThreadLocalUtil.getGuest();

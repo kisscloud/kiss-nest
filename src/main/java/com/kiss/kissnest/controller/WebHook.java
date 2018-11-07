@@ -56,7 +56,7 @@ public class WebHook {
         parameters.put("branch","master");
         boolean str = jenkinsUtil.buildJob("guyue","master","qrl758","11a74babd53344e010bdd2a60dccea45cf");
 
-        jenkinsUtil.getLastBuild("guyue","qrl758","11a74babd53344e010bdd2a60dccea45cf");
+        jenkinsUtil.getLastBuildWithDetail("guyue","qrl758","11a74babd53344e010bdd2a60dccea45cf");
         return "hello";
     }
 }
