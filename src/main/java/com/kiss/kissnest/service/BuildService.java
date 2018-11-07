@@ -78,7 +78,9 @@ public class BuildService {
         job.setProjectId(projectId);
         job.setShell(createJobInput.getScript());
         job.setType(createJobInput.getType());
+
         jobDao.createJob(job);
+
         return ResultOutputUtil.success();
     }
 

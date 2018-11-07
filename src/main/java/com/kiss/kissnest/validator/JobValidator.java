@@ -30,7 +30,7 @@ public class JobValidator implements Validator {
         if (CreateJobInput.class.isInstance(target)) {
             CreateJobInput createJobInput = (CreateJobInput) target;
             validateProjectId(createJobInput.getProjectId(),errors);
-            validateShell(createJobInput.getShell(),errors);
+            validateShell(createJobInput.getScript(),errors);
             validateType(createJobInput.getType(),errors);
         } else if (BuildJobInput.class.isInstance(target)) {
             BuildJobInput buildJobInput = (BuildJobInput) target;
