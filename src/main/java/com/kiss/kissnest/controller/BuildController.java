@@ -2,7 +2,7 @@ package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.input.BuildJobInput;
 import com.kiss.kissnest.input.CreateJobInput;
-import com.kiss.kissnest.service.BuildLogService;
+import com.kiss.kissnest.service.BuildService;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,10 +14,11 @@ import output.ResultOutput;
 
 @RestController
 @Api(tags = "Build", description = "构建部署相关接口")
+@RequestMapping("/build")
 public class BuildController {
 
     @Autowired
-    private BuildLogService buildLogService;
+    private BuildService buildLogService;
 
     @Autowired
     private JobValidator jobValidator;
@@ -29,15 +30,15 @@ public class BuildController {
     }
 
     @PostMapping("/job")
-    @ApiOperation(value = "创建任务")
+    @ApiOperation(value = "创建构建任务")
     public ResultOutput createJob(@Validated @RequestBody CreateJobInput createJobInput) {
 
         return buildLogService.createJob(createJobInput);
     }
 
-    @PostMapping("/job/build")
-    @ApiOperation(value = "部署任务")
-    public ResultOutput buildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
+    @PostMapping("/job/exec")
+    @ApiOperation(value = "执行构建任务")
+    public ResultOutput ExecJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
         return buildLogService.buildJob(buildJobInput);
     }
