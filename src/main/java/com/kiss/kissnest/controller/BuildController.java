@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
 @RestController
-@Api(tags = "build", description = "构建部署相关接口")
+@Api(tags = "Build", description = "构建部署相关接口")
 public class BuildController {
 
     @Autowired

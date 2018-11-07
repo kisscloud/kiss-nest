@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
 @RestController
-@Api(tags = "member", description = "成员相关接口")
+@Api(tags = "Member", description = "成员相关接口")
 public class MemberController {
 
     @Autowired

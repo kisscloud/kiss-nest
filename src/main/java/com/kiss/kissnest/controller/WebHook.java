@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/kiss/nest")
-@Api(tags = "webHook", description = "动态记录")
+@Api(tags = "WebHook", description = "动态记录")
 public class WebHook {
 
     @Autowired
