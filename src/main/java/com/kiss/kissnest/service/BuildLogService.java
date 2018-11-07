@@ -13,6 +13,7 @@ import com.kiss.kissnest.input.CreateJobInput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
@@ -96,8 +97,26 @@ public class BuildLogService {
             return ResultOutputUtil.error(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
         }
 
-        Thread thread = new Thread(new BuildLogRunnable(jobName,buildJobInput.getProjectId(),guest.getId(),guest.getName(),member.getApiToken()));
-        thread.start();
+        boolean run = true;
+        Integer number = 1;
+
+        synchronized (projectDao) {
+            BuildLog buildLog = buildLogDao.getLastBuildByJobNameAndProjectId(jobName,buildJobInput.getProjectId());
+
+            if (buildLog != null) {
+                if (buildLog.getNumber() != null) {
+                    number = buildLog.getNumber() + 1;
+                } else {
+                    run = false;
+                }
+            }
+        }
+
+        if (run) {
+            Thread thread = new Thread(new BuildLogRunnable(jobName,buildJobInput.getProjectId(),guest.getId(),guest.getName(),member.getApiToken(),number));
+            thread.start();
+        }
+
         return ResultOutputUtil.success();
     }
 
@@ -127,42 +146,71 @@ public class BuildLogService {
 
         private Integer operatorId;
 
-        public BuildLogRunnable(String jobName,Integer projectId,Integer operatorId,String account,String passwordOrToken) {
+        private Integer number;
+
+        public BuildLogRunnable(String jobName,Integer projectId,Integer operatorId,String account,String passwordOrToken,Integer number) {
             this.jobName = jobName;
             this.projectId = projectId;
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.operatorId = operatorId;
+            this.number = number;
         }
 
         @Override
         public void run() {
+            Build build = null;
+            JenkinsServer jenkinsServer = jenkinsUtil.getJenkinsServer(account,passwordOrToken);
 
-            //根据项目名查询构建的num
-            BuildLog buildLog = buildLogDao.getLastBuildByJobNameAndProjectId(jobName,projectId);
-            Integer num = buildLog.getNumber();
-            //获取最后一次构建的build
-            Build lastBuild = jenkinsUtil.getLastBuild(jobName,account,passwordOrToken);
-            Integer last = lastBuild.getNumber();
-            //num跟最后一次的num比较
-            //num > last,直接不做处理
-            if (num > last) {
-                return;
+            for (int i=0;i<10;i++) {
+                if (jenkinsServer == null) {
+                    return;
+                }
+
+                build = jenkinsUtil.getBuild(jobName,jenkinsServer,number);
+
+                if (build == null) {
+                    try {
+                        Thread.sleep(6000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    break;
+                }
             }
-            //num == last - 1,就查询last的log就行
-            if (num == last - 1) {
-                JenkinsHttpConnection client =lastBuild.getClient();
-                BuildWithDetails buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client,jenkinsBuildLogUrl);
-                String output = jenkinsUtil.getConsoleOutputText(client,jenkinsBuildLogUrl + jenkinsBuildOutputPath);
-                String result = buildWithDetails.getResult().name();
-                Map<String,String> params = buildWithDetails.getParameters();
-                String branch = params.get("branch");
 
-            }
-            //num < last - 1,冲num+1查询log开始到last - 1
+            saveBuildLog(build,jobName,operatorId,account,projectId,number);
 
-            //num = last,等待60s,每5s有一个循环，60s,之后终结
-            System.out.println(jobName);
+            jenkinsUtil.close(jenkinsServer);
         }
+    }
+
+    public void saveBuildLog(Build build,String jobName,Integer operatorId,String account,Integer projectId,Integer number) {
+
+        JenkinsHttpConnection client =build.getClient();
+        String logUrl = String.format(jenkinsBuildLogUrl,jobName,number);
+        BuildWithDetails buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client,logUrl);
+        client = buildWithDetails.getClient();
+        String output = jenkinsUtil.getConsoleOutputText(client,logUrl + jenkinsBuildOutputPath);
+        String result = buildWithDetails.getResult().name();
+        Map<String,String> params = buildWithDetails.getParameters();
+        String branch = params.get("branch");
+        BuildLog buildLog = new BuildLog();
+        buildLog.setBranch(branch);
+        buildLog.setJobName(jobName);
+        buildLog.setNumber(build.getNumber());
+        buildLog.setOperatorId(operatorId);
+        buildLog.setOperatorName(account);
+        buildLog.setOutput(output);
+        buildLog.setProjectId(projectId);
+
+        if ("success".equalsIgnoreCase(result)) {
+            buildLog.setStatus(0);
+        } else {
+            buildLog.setStatus(1);
+        }
+
+        buildLogDao.createBuildLog(buildLog);
     }
 }

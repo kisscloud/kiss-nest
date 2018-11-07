@@ -186,27 +186,28 @@ public class JenkinsUtil {
             JenkinsHttpConnection jenkinsHttpConnection = jobWithDetails.getClient();
 
 
-            Build build = jobWithDetails.getLastBuild();
-            URL url = new URL(build.getUrl());
+//            Build build = jobWithDetails.getLastBuild();
+//            URL url = new URL(build.getUrl());
+//
+//            String requestUrl = "http://localhost:8060" + url.getPath().replace("jenkins/","");
+//
+//            Build build1 = new Build(build.getNumber(),requestUrl);
+//            build1.setClient(build.getClient());
+//            System.out.println("=====" + build.getNumber());
+//
+//
+//            BuildWithDetails buildWithDetails = build1.details();
+//            BuildResult buildResult = buildWithDetails.getResult();
+//            Map<String,String> map = buildWithDetails.getParameters();
+//           JenkinsHttpConnection client =  buildWithDetails.getClient();
+//
+//
+//
+//            System.out.println(client.get(requestUrl + "/logText/progressiveHtml"));
 
-            String requestUrl = "http://localhost:8060" + url.getPath().replace("jenkins/","");
+            Build build = jobWithDetails.getBuildByNumber(100);
 
-            Build build1 = new Build(build.getNumber(),requestUrl);
-            build1.setClient(build.getClient());
-            System.out.println("=====" + build.getNumber());
-
-//            build.setClient(jenkinsHttpConnection);
-
-            BuildWithDetails buildWithDetails = build1.details();
-            BuildResult buildResult = buildWithDetails.getResult();
-            Map<String,String> map = buildWithDetails.getParameters();
-           JenkinsHttpConnection client =  buildWithDetails.getClient();
-
-
-
-            System.out.println(client.get(requestUrl + "/logText/progressiveHtml"));
-
-            return buildWithDetails;
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -217,20 +218,29 @@ public class JenkinsUtil {
         }
     }
 
-    public BuildWithDetails getLastBuildWithDetail(JenkinsHttpConnection client,String url) {
+    public JenkinsServer getJenkinsServer (String account,String passwordOrToken) {
 
         JenkinsServer server = null;
 
         try {
-            BuildWithDetails buildWithDetails = client.get(url,BuildWithDetails.class);
-            return buildWithDetails;
+            server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            return server;
+        }
+    }
+
+    public Build getBuild (String jobName,JenkinsServer server,Integer number) {
+
+        try {
+            JobWithDetails jobWithDetails = server.getJob(jobName);
+            Build build = jobWithDetails.getBuildByNumber(number);
+
+            return build;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            if (server != null) {
-                server.close();
-            }
         }
     }
 
@@ -253,12 +263,30 @@ public class JenkinsUtil {
         }
     }
 
+    public BuildWithDetails getLastBuildWithDetail(JenkinsHttpConnection client,String url) {
+
+        try {
+            BuildWithDetails buildWithDetails = client.get(url,BuildWithDetails.class);
+            return buildWithDetails;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public String getConsoleOutputText(JenkinsHttpConnection client,String url) {
 
         try {
             return client.get(url);
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    public void close(JenkinsServer server) {
+
+        if (server != null) {
+            server.close();
         }
     }
 
