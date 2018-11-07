@@ -9,14 +9,12 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
 @RestController
 @Api(tags = "Build", description = "构建部署相关接口")
+@RequestMapping("/build")
 public class BuildController {
 
     @Autowired
@@ -32,15 +30,15 @@ public class BuildController {
     }
 
     @PostMapping("/job")
-    @ApiOperation(value = "创建任务")
+    @ApiOperation(value = "创建构建任务")
     public ResultOutput createJob(@Validated @RequestBody CreateJobInput createJobInput) {
 
         return buildLogService.createJob(createJobInput);
     }
 
-    @PostMapping("/job/build")
-    @ApiOperation(value = "部署任务")
-    public ResultOutput buildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
+    @PostMapping("/job/exec")
+    @ApiOperation(value = "执行构建任务")
+    public ResultOutput ExecJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
         return buildLogService.buildJob(buildJobInput);
     }

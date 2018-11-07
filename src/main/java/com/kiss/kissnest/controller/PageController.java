@@ -1,5 +1,6 @@
 package com.kiss.kissnest.controller;
 
+import com.kiss.kissnest.service.BuildLogService;
 import com.kiss.kissnest.service.GroupService;
 import com.kiss.kissnest.service.ProjectService;
 import com.kiss.kissnest.util.ResultOutputUtil;
@@ -25,6 +26,9 @@ public class PageController {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private BuildLogService buildLogService;
+
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
     public ResultOutput GetPageGroupsParams(Integer teamId) {
@@ -48,6 +52,19 @@ public class PageController {
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
         result.put("groups", groups.getData());
+
+        return ResultOutputUtil.success(result);
+    }
+
+
+    @ApiOperation(value = "获取构建页面参数")
+    @GetMapping("/build")
+    public ResultOutput GetPageBuildParams(Integer teamId) {
+
+        ResultOutput projects = projectService.getProjects(teamId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("projects", projects.getData());
 
         return ResultOutputUtil.success(result);
     }
