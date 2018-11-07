@@ -2,7 +2,7 @@ package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.input.BuildJobInput;
 import com.kiss.kissnest.input.CreateJobInput;
-import com.kiss.kissnest.service.BuildLogService;
+import com.kiss.kissnest.service.BuildService;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +18,7 @@ import output.ResultOutput;
 public class BuildController {
 
     @Autowired
-    private BuildLogService buildLogService;
+    private BuildService buildLogService;
 
     @Autowired
     private JobValidator jobValidator;

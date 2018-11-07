@@ -1,6 +1,6 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.service.BuildLogService;
+import com.kiss.kissnest.service.BuildService;
 import com.kiss.kissnest.service.GroupService;
 import com.kiss.kissnest.service.ProjectService;
 import com.kiss.kissnest.util.ResultOutputUtil;
@@ -27,7 +27,7 @@ public class PageController {
     private ProjectService projectService;
 
     @Autowired
-    private BuildLogService buildLogService;
+    private BuildService buildLogService;
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")

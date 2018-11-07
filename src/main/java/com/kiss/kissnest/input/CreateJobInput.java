@@ -7,7 +7,7 @@ public class CreateJobInput {
 
     private Integer projectId;
 
-    private String shell;
+    private String script;
 
     private Integer type;
 }

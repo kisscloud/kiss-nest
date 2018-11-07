@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class BuildLogService {
+public class BuildService {
 
     @Autowired
     private ProjectDao projectDao;
@@ -67,7 +67,7 @@ public class BuildLogService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(),createJobInput.getShell(),guest.getName(),member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(),createJobInput.getScript(),guest.getName(),member.getApiToken());
 
         if (!success) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -76,7 +76,7 @@ public class BuildLogService {
         Job job = new Job();
         job.setJobName(project.getSlug());
         job.setProjectId(projectId);
-        job.setShell(createJobInput.getShell());
+        job.setShell(createJobInput.getScript());
         job.setType(createJobInput.getType());
         jobDao.createJob(job);
         return ResultOutputUtil.success();
