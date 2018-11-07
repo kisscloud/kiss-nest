@@ -17,7 +17,9 @@ import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.ThreadLocalUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MemberService {
@@ -87,6 +89,21 @@ public class MemberService {
         Member member = memberDao.getMemberById(id);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+    }
+
+    public ResultOutput validateMember() {
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        Member member = memberDao.getMemberByAccountId(guest.getId());
+        Map<String,Object> result = new HashMap<>();
+
+        if (member == null || StringUtils.isEmpty(member.getApiToken()) || StringUtils.isEmpty(member.getAccessToken())) {
+            result.put("validate",true);
+        } else {
+            result.put("validate",false);
+        }
+
+        return ResultOutputUtil.success(result);
     }
 
     public ResultOutput getMemberAccess (CreateMemberAccessInput createMemberAccessInput) {

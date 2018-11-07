@@ -3,6 +3,10 @@ package com.kiss.kissnest.util;
 import com.alibaba.fastjson.JSONObject;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
+import com.offbytwo.jenkins.client.JenkinsHttpConnection;
+import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildWithDetails;
+import com.offbytwo.jenkins.model.FolderJob;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,7 @@ import utils.ThreadLocalUtil;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +71,6 @@ public class JenkinsUtil {
         try {
             server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
             StringBuilder builder = readFile(configPath);
-
             if (builder == null) {
                 return false;
             }
@@ -120,6 +124,7 @@ public class JenkinsUtil {
             }
 
             String auth = authorizationExecute(params,url,account,passwordOrToken);
+            System.out.println(auth);
             return auth == null ? false:true;
 
         } catch (Exception e) {
@@ -165,6 +170,52 @@ public class JenkinsUtil {
                 bufferedReader.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public BuildWithDetails getLastBuild(String jobName,String account,String passwordOrToken) {
+
+        JenkinsServer server = null;
+
+        try {
+            server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
+
+
+            FolderJob folderJob = new FolderJob(jobName,jenkinsUrl);
+//            folderJob.createFolder("http://localhost:8060");
+            JobWithDetails jobWithDetails = server.getJob(folderJob,jobName);
+
+            JenkinsHttpConnection jenkinsHttpConnection = jobWithDetails.getClient();
+
+
+            Build build = jobWithDetails.getLastBuild();
+            URL url = new URL(build.getUrl());
+
+            String requestUrl = "http://localhost:8060" + url.getPath().replace("jenkins/","");
+
+            Build build1 = new Build(build.getNumber(),requestUrl);
+            build1.setClient(build.getClient());
+            System.out.println("=====" + build.getNumber());
+
+//            build.setClient(jenkinsHttpConnection);
+
+
+            BuildWithDetails buildWithDetails = build1.details();
+
+           JenkinsHttpConnection client =  buildWithDetails.getClient();
+
+
+
+            System.out.println(client.get(requestUrl + "/logText/progressiveHtml"));
+
+            return buildWithDetails;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (server != null) {
+                server.close();
             }
         }
     }
@@ -278,10 +329,13 @@ public class JenkinsUtil {
 //            httpPost.releaseConnection();
 //            httpClient.close();
 //        }
-        JenkinsServer server = new JenkinsServer(new URI("http://localhost:8060"),"qrl758","11a74babd53344e010bdd2a60dccea45cf");
+//        JenkinsServer server = new JenkinsServer(new URI("http://localhost:8060"),"qrl758","11a74babd53344e010bdd2a60dccea45cf");
+//
+//        JobWithDetails jobWithDetails = server.getJob("guyue");
+        String url = "http://localhost:8080/jenkins/job/guyue/34/";
+        URL url1 = new URL(url);
 
-        JobWithDetails jobWithDetails = server.getJob("guyue");
-
+        System.out.println(url1.getPath().replace("jenkins/",""));
 //        URI uri = URI.create(urlString);
 //        HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 //        CredentialsProvider credsProvider = new BasicCredentialsProvider();
