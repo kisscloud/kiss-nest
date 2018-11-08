@@ -24,7 +24,7 @@ jenkins:
   buildUrl: http://localhost:8060/job/%s/build
   buildWithParameterUrl: http://localhost:8060/job/%s/buildWithParameters
   generateTokenUrl: http://localhost:8060/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
-  buildLogUrl: http://localhost:8080/job/%s/%s
+  buildLogUrl: http://localhost:8060/job/%s/%s
   buildOutputPath: /logText/progressiveHtml
 
 kiss:
@@ -37,7 +37,7 @@ kiss:
 
 gitlab:
   server:
-    url: https://gitlab.com
+    url: http://192.168.99.100:327920
     token:
       path: /oauth/token
 

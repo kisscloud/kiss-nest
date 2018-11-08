@@ -27,4 +27,6 @@ public interface ProjectMapper {
     Project getProjectBySlugAndTeamId(Map params);
 
     Integer addRepositoryIdById(Project project);
+
+    Project getProjectByRepositoryId(Integer repositoryId);
 }

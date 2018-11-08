@@ -25,7 +25,7 @@ public class BuildLog {
 
     private String output;
 
-    private Integer operationId;
+    private Integer operatorId;
 
     private String operatorName;
 

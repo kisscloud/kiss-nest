@@ -72,6 +72,10 @@
         select * from projects where slug = #{slug} and teamId = #{teamId};
     </select>
 
+    <select id="getProjectByRepositoryId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where repositoryId = #{repositoryId};
+    </select>
+    
     <update id="addRepositoryIdById" parameterType="com.kiss.kissnest.entity.Project">
         update projects
         set

@@ -78,4 +78,10 @@ public class ProjectDaoImpl implements ProjectDao {
 
         return projectMapper.addRepositoryIdById(project);
     }
+
+    @Override
+    public Project getProjectByRepositoryId(Integer repositoryId) {
+
+        return projectMapper.getProjectByRepositoryId(repositoryId);
+    }
 }
