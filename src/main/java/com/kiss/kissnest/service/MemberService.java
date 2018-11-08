@@ -110,9 +110,9 @@ public class MemberService {
         Map<String,Object> result = new HashMap<>();
 
         if (member == null || StringUtils.isEmpty(member.getApiToken()) || StringUtils.isEmpty(member.getAccessToken())) {
-            result.put("validate",true);
-        } else {
             result.put("validate",false);
+        } else {
+            result.put("validate",true);
         }
 
         return ResultOutputUtil.success(result);

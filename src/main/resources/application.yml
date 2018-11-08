@@ -37,7 +37,7 @@ kiss:
 
 gitlab:
   server:
-    url: https://gitlab.com
+    url: http://192.168.99.100:327920
     token:
       path: /oauth/token
 

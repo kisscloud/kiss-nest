@@ -25,4 +25,6 @@ public interface ProjectDao {
     Project getProjectBySlugAndTeamId(String slug,Integer teamId);
 
     Integer addRepositoryIdById(Project project);
+
+    Project getProjectByRepositoryId(Integer repositoryId);
 }

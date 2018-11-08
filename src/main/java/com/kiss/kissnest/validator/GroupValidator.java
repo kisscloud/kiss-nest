@@ -50,7 +50,7 @@ public class GroupValidator implements Validator {
                 validateSlug(createGroupInput.getSlug(),teamId,errors);
             }
 
-            validateStatus(createGroupInput.getStatus(),errors);
+//            validateStatus(createGroupInput.getStatus(),errors);
         } else if (UpdateGroupInput.class.isInstance(target)) {
             UpdateGroupInput updateGroupInput = (UpdateGroupInput) target;
             Integer teamId = updateGroupInput.getTeamId();
