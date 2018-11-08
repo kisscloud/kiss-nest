@@ -69,4 +69,16 @@ public class PageController {
         return ResultOutputUtil.success(result);
     }
 
+    @ApiOperation(value = "获取仓库页面参数")
+    @GetMapping("/repositories")
+    public ResultOutput GetPageRepositoriesParams(Integer teamId) {
+
+        ResultOutput projects = projectService.getProjects(teamId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("projects", projects.getData());
+
+        return ResultOutputUtil.success(result);
+    }
+
 }
