@@ -3,6 +3,7 @@ package com.kiss.kissnest.controller;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.service.ProjectRepositoryService;
 import com.kiss.kissnest.service.ProjectService;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.validator.ProjectValidator;
@@ -23,6 +24,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectValidator projectValidator;
+
+    @Autowired
+    private ProjectRepositoryService projectRepositoryService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -62,7 +66,19 @@ public class ProjectController {
     @ApiOperation(value = "创建项目仓库")
     public ResultOutput createProjectRepository (@RequestParam("projectId") Integer projectId) {
 
-        return projectService.createProjectRepository(projectId);
+        return projectRepositoryService.createProjectRepository(projectId);
+    }
+
+    @GetMapping("/project/branches")
+    public ResultOutput getProjectBranches (@RequestParam("projectId") Integer projectId) {
+
+        return projectService.getProjectBranches(projectId);
+    }
+
+    @GetMapping("/project/repository/validate")
+    public ResultOutput validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
+
+        return projectRepositoryService.validateProjectRepositoryExist(projectId);
     }
 
 }

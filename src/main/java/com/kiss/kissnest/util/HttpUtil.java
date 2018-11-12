@@ -132,4 +132,14 @@ public class HttpUtil {
         return null;
     }
 
+    public static void close(CloseableHttpResponse rsp){
+        if(rsp != null){
+            try {
+                EntityUtils.consume(rsp.getEntity());
+                rsp.close();
+            } catch (Exception e) {
+//				log.error(null,e);
+            }
+        }
+    }
 }

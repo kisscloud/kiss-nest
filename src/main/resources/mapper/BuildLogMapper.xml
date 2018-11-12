@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
     <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
-        insert into buildlogs (jobName,branch,number,version,projectId,remark,status,output,operatorId,operatorName)
+        insert into buildlogs (teamId,jobName,branch,number,version,projectId,remark,status,output,jarName,operatorId,operatorName,buildAt)
         value
-        (#{jobName},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName})
+        (#{teamId},#{jobName},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{jarName},#{operatorId},#{operatorName},#{buildAt})
     </insert>
     
     <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
@@ -56,5 +56,12 @@
     
     <select id="getLastBuildByJobNameAndProjectId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs where jobName=#{jobName} and projectId=#{projectId} order by number desc limit 0,1;
+    </select>
+    
+    <select id="getBuildLogsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs where teamId = #{teamId}
+        <if test="start != null">
+            limit #{start},#{size}
+        </if>
     </select>
 </mapper>

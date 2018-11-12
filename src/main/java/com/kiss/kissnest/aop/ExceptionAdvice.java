@@ -42,7 +42,8 @@ public class ExceptionAdvice {
 
             if (fieldErrorList != null) {
                 for (FieldError fieldError : fieldErrorList) {
-                    String message = fieldError.getDefaultMessage();
+//                    String message = fieldError.getDefaultMessage();
+                    String code = fieldError.getCode();
                     String field = fieldError.getField();
                     List<String> messageList = new ArrayList<>();
 
@@ -50,8 +51,8 @@ public class ExceptionAdvice {
                         messageList = formVerifieds.get(field);
                     }
 
-                    String returnMessage = codeUtil.getMessage(Integer.parseInt(message));
-                    messageList.add(returnMessage == null ? message : returnMessage);
+                    String returnMessage = codeUtil.getMessage(Integer.parseInt(code));
+                    messageList.add(returnMessage == null ? code : returnMessage);
                     formVerifieds.put(field, messageList);
                 }
             }

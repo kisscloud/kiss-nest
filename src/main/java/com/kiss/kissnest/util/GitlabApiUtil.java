@@ -4,9 +4,12 @@ package com.kiss.kissnest.util;
 import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.status.NestStatusCode;
+import com.offbytwo.jenkins.JenkinsServer;
 import entity.Guest;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabBranchCommit;
 import org.gitlab.api.models.GitlabGroup;
 import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,22 +104,62 @@ public class GitlabApiUtil {
         }
     }
 
+    public List<GitlabBranch> getBranches (Integer projectId,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            List<GitlabBranch> gitlabBranches = gitlabAPI.getBranches(projectId);
+
+            return gitlabBranches;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getBranchVersion(Integer projectId,String branch,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabBranch gitlabBranch = gitlabAPI.getBranch(projectId,branch);
+
+            return gitlabBranch.getCommit().getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static void main(String[] args) throws Exception {
         Map<String,Object> map = new HashMap<>();
         map.put("grant_type","password");
-        map.put("username","qrl758");
-        map.put("password","57zlrschzaxwgm57");
-        String resp = HttpUtil.doPost("https://gitlab.com/oauth/token",JSONObject.toJSONString(map));
+        map.put("username","xiaoyue");
+        map.put("password","12345678");
+        String resp = HttpUtil.doPost("http://192.168.99.100:32769/oauth/token",JSONObject.toJSONString(map));
         String token = JSONObject.parseObject(resp).getString("access_token");
         System.out.println(token);
 //        GitlabAPI gitlabAPI = GitlabAPI.connect("https://gitlab.com",token,TokenType.ACCESS_TOKEN);
 //        GitlabGroup gitlabGroup = gitlabAPI.getGroup("gitApi");
 //        GitlabGroup gitlabGroup1 = gitlabAPI.createGroup("gitApi1","gitApi1",null,null,null,gitlabGroup.getId());
 //        System.out.println("hello");
-        GitlabAPI gitlabAPI = GitlabAPI.connect("https://gitlab.com",token,TokenType.ACCESS_TOKEN);
+        GitlabAPI gitlabAPI = GitlabAPI.connect("http://192.168.99.100:32769",token,TokenType.ACCESS_TOKEN);
 
 //        GitlabProject gitlabProject = gitlabAPI.getProject(9219426);
-        gitlabAPI.addProjectHook(9219426,"http://10.100.10.11:8920/kiss/nest/note",true,false,true,true,true);
-        System.out.println();
+//        gitlabAPI.addProjectHook(9219426,"http://10.100.10.11:8920/kiss/nest/note",true,false,true,true,true);
+//        System.out.println();
+//        List<GitlabBranch> gitlabBranches = gitlabAPI.getBranches(9003472);
+
+
+//        for (GitlabBranch gitlabBranch : gitlabBranches) {
+//            System.out.println(gitlabBranch.getName());
+//        }
+        GitlabProject gitlabProject = gitlabAPI.createProject("bis");
+        GitlabBranch gitlabBranch = gitlabAPI.getBranch("2","master");
+        GitlabBranchCommit gitlabBranchCommit = gitlabBranch.getCommit();
+
+//        gitlabProject.getId();
+//        gitlabProject.getCreatedAt();
+//        gitlabProject.getName();
+//        gitlabProject.getSshUrl();
+//        gitlabProject.getHttpUrl();
+
+        System.out.println("");
     }
 }

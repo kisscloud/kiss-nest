@@ -25,7 +25,17 @@
     <builders>
         <hudson.tasks.Shell>
             <command>
-%s
+&#x000A;
+%s&#x000A;
+a=`git log|grep 'commit'|head -1`&#x000A;
+b=`echo ${a##*commit}`&#x000A;
+cd /opt/src/target&#x000A;
+name=%s-$b&#x000A;
+rename *.jar $name.jar&#x000A;
+tar -zcvf $name.tar.gz *.jar&#x000A;
+rsync -v $name.tar.gz root@%s:/root/&#x000A;
+echo "versionStart="$b"=versionEnd"&#x000A;
+echo "jarNameStart="$name"=jarNameEnd"&#x000A;
             </command>
         </hudson.tasks.Shell>
     </builders>

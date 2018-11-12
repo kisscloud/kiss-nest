@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.DeployLogMapper">
     <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog">
-        insert into deploylogs (serverIds,branch,version,projectId,remark,status,operationId,operatorName)
+        insert into deploylogs (teamId,jobName,serverIds,branch,number,version,projectId,remark,status,output,operatorId,operatorName,deployAt)
         value
-        (#{serverIds},#{branch},#{version},#{projectId},#{remark},#{status},#{operationId},#{operatorName})
+        (#{teamId},#{jobName},#{serverIds},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName},#{deployAt})
     </insert>
 
     <delete id="deleteDeployLogById" parameterType="java.lang.Integer">

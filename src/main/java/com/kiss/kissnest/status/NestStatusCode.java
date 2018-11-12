@@ -10,6 +10,14 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer TEAM_NOT_EXIST = 1003;
     public static final Integer UPDATE_TEAM_FAILED = 1004;
     public static final Integer CREATE_TEAM_REPOSITORY_FAILED = 1004;
+    public static final Integer TEAM_NAME_IS_EMPTY = 1005;
+    public static final Integer TEAM_NAME_EXIST = 1006;
+    public static final Integer TEAMID_IS_EMPTY = 1007;
+    public static final Integer TEAMID_EXIST = 1008;
+    public static final Integer TEAM_SLUG_IS_EMPTY = 1009;
+
+
+
 
     public static final Integer CREATE_TEAMGROUP_FAILED = 2002;
     public static final Integer GROUP_NOT_EXIST = 2003;
@@ -35,6 +43,7 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer PROJECT_SLUG_EMPTY= 5005;
     public static final Integer CREATE_PROJECT_REPOSITORY_FAILED = 5006;
     public static final Integer PROJECT_ID_IS_EMPTY = 5006;
+    public static final Integer PROJECT_REPOSITORY_EXIST = 5006;
 
 
 
@@ -62,6 +71,27 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer SHELL_IS_EMPTY = 10003;
     public static final Integer TYPE_IS_EMPTY = 10004;
     public static final Integer BRANCH_IS_EMPTY = 10005;
+    public static final Integer DEPLOY_JENKINS_JOB_ERROR = 10006;
+
+
+    public static final Integer PAGE_IS_EMPTY = 11001;
+    public static final Integer PAGE_IS_ERROR = 11002;
+    public static final Integer SIZE_IS_EMPTY = 11003;
+    public static final Integer SIZE_IS_ERROR = 11004;
+
+    public static final Integer SERVER_ENVIRONMENT_CREATE_FAILED = 12001;
+    public static final Integer SERVER_CREATE_FAILED = 12002;
+    public static final Integer SERVER_ENVIRONMENT_NAME_IS_EMPTY = 12003;
+    public static final Integer SERVER_ENVIRONMENT_TYPE_IS_EMPTY = 12004;
+    public static final Integer SERVER_SERVER_NAME_IS_EMPTY = 12003;
+    public static final Integer SERVER_SERVER_NAME_EXIST = 12003;
+
+    public static final Integer SERVER_ENVID_IS_EMPTY = 12003;
+    public static final Integer SERVER_ENVID_NOT_EXIST = 12003;
+    public static final Integer SERVER_INNERIP_IS_EMPTY = 12003;
+    public static final Integer SERVERID_IS_EMPTY = 12003;
+    public static final Integer SERVER_NOT_EXIST = 12003;
+    public static final Integer SERVER_UPDATE_FAILED = 12003;
 
 
     public static final Integer SERVICE_ERROR = 3001;

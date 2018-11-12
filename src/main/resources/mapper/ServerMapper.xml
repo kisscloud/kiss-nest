@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ServerMapper">
 
     <insert id="createServer" parameterType="com.kiss.kissnest.entity.Server">
-        insert into servers (ip,operatorId,operatorName)
+        insert into servers (name,envId,innerIp,outerIp,operatorId,operatorName)
         value
-        (#{ip},#{operatorId},#{operatorName})
+        (#{name},#{envId},#{innerIp},#{outerIp},#{operatorId},#{operatorName})
     </insert>
 
     <delete id="deleteServerById" parameterType="java.lang.Integer">
@@ -20,8 +20,20 @@
         update servers
         set
         id = #{id}
-        <if test="ip != null">
-            ,ip = #{ip}
+        <if test="teamId != null">
+            ,teamId = #{teamId}
+        </if>
+        <if test="name != null">
+            ,name = #{name}
+        </if>
+        <if test="envId != null">
+            ,envId = #{envId}
+        </if>
+        <if test="innerIp != null">
+            ,innerIp = #{innerIp}
+        </if>
+        <if test="outerIp != null">
+            ,outerIp = #{outerIp}
         </if>
         <if test="parameters != null">
             ,parameters = #{parameters}
@@ -47,5 +59,24 @@
 
     <select id="getServers" resultType="com.kiss.kissnest.entity.Server">
         select * from servers;
+    </select>
+    
+    <select id="getServerByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where teamId = #{teamId} and name = #{name} limit 0,1;
+    </select>
+    
+    <select id="getServersByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where teamId = #{teamId}
+        <if test="start != null">
+            limit #{start},#{size}
+        </if>
+    </select>
+    
+    <select id="getServersByEnvironment" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where teamId = #{teamId} and envId = #{envId};
+    </select>
+    
+    <select id="getServerInnerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">
+        select innerIp from servers where id in (#{ids});
     </select>
 </mapper>

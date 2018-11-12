@@ -9,6 +9,8 @@ public class BuildLog {
 
     private Integer id;
 
+    private Integer teamId;
+
     private String jobName;
 
     private String branch;
@@ -25,9 +27,13 @@ public class BuildLog {
 
     private String output;
 
+    private String jarName;
+
     private Integer operatorId;
 
     private String operatorName;
+
+    private Long buildAt;
 
     private Date createdAt;
 
