@@ -17,4 +17,6 @@ public interface BuildLogDao {
     List<BuildLog> getBuildLogs();
 
     BuildLog getLastBuildByJobNameAndProjectId(String jobName,Integer projectId);
+
+    List<BuildLog> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size);
 }

@@ -7,16 +7,31 @@
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
     <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job">
-        insert into Jobs (projectId,jobName,shell,type)
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,status,number)
         value
-        (#{projectId},#{jobName},#{shell},#{type})
+        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{status},#{number})
     </insert>
 
     <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
-        select * from Jobs where projectId = #{projectId};
+        select * from jobs where projectId = #{projectId};
     </select>
 
     <select id="getJobByProjectIdAndType" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
-        select * from Jobs where projectId = #{projectId} and type = #{type} limit 0,1;
+        select * from jobs where projectId = #{projectId} and type = #{type} limit 0,1;
     </select>
+    
+    <update id="updateJobStatus" parameterType="java.util.Map">
+        update jobs
+        set
+        status = #{newStatus}
+        where projectId = #{projectId} and type = #{type} and status = #{status}
+    </update>
+
+    <update id="updateJobStatusAndNumber" parameterType="java.util.Map">
+        update jobs
+        set
+        status = #{newStatus},
+        number = #{number}
+        where projectId = #{projectId} and type = #{type} and status = #{status}
+    </update>
 </mapper>

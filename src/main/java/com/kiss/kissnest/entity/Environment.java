@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class Server {
+public class Environment {
 
     private Integer id;
 
@@ -13,24 +13,13 @@ public class Server {
 
     private String name;
 
-    private Integer envId;
-
-    private String innerIp;
-
-    private String outerIp;
-
-    private String parameters;
-
-    private Integer runTime;
+    private Integer type;
 
     private Integer operatorId;
 
     private String operatorName;
 
-    private Date lastDeployedAt;
-
     private Date createdAt;
 
     private Date updatedAt;
 }
-

@@ -3,11 +3,13 @@ package com.kiss.kissnest.input;
 import lombok.Data;
 
 @Data
-public class BuildJobInput {
+public class DeployJobInput {
 
     private Integer projectId;
 
     private String branch;
+
+    private String tag;
 
     private String remark;
 }

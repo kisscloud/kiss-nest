@@ -84,4 +84,16 @@ public class ProjectDaoImpl implements ProjectDao {
 
         return projectMapper.getProjectByRepositoryId(repositoryId);
     }
+
+    @Override
+    public List<Project> getProjectsWithoutBuildJob(Integer teamId) {
+
+        return projectMapper.getProjectsWithoutBuildJob(teamId);
+    }
+
+    @Override
+    public List<Project> getProjectsWithBuildJob(Integer teamId) {
+
+        return projectMapper.getProjectsWithBuildJob(teamId);
+    }
 }

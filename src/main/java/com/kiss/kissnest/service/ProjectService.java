@@ -3,21 +3,26 @@ package com.kiss.kissnest.service;
 import com.kiss.kissnest.dao.GroupDao;
 import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.ThreadLocalUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,9 +40,12 @@ public class ProjectService {
     @Autowired
     private MemberDao memberDao;
 
+    @Autowired
+    private ProjectRepositoryDao projectRepositoryDao;
+
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
-        Project project = (Project) BeanCopyUtil.copy(createProjectInput,Project.class);
+        Project project = (Project) BeanCopyUtil.copy(createProjectInput, Project.class);
 
         Integer count = projectDao.createProject(project);
 
@@ -45,7 +53,7 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project,ProjectOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
 
     public ResultOutput deleteProject(Integer id) {
@@ -73,56 +81,87 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_PROJECT_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project,ProjectOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
 
     public ResultOutput getProjectById(Integer id) {
 
         Project project = projectDao.getProjectById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project,ProjectOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
 
     public ResultOutput getProjects(Integer teamId) {
 
         List<Project> projects = projectDao.getProjects(teamId);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(projects,ProjectOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copyList(projects, ProjectOutput.class));
     }
 
-    public ResultOutput createProjectRepository(Integer projectId) {
+    public ResultOutput getProjectBranches(Integer projectId) {
 
-        Project project = projectDao.getProjectById(projectId);
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        if (project == null) {
+        if (projectRepository == null || projectRepository.getRepositoryId() == null) {
             return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
-        if (StringUtils.isEmpty(project.getSlug())) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
-        }
-
-        Group group = groupDao.getGroupById(project.getGroupId());
-
-        if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_MASTER_GROUP_NOT_EXIST);
-        }
-
-        if (group.getRepositoryId() == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_REPOSITORYID_NOT_EXIST);
-        }
-
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
-        GitlabProject gitlabProject =gitlabApiUtil.createProjectForGroup(project.getSlug(),group.getRepositoryId(),accessToken);
+        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(projectRepository.getRepositoryId(), accessToken);
+        List<String> branches = new ArrayList<>();
 
-        if (gitlabProject == null) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_REPOSITORY_FAILED);
+        if (gitlabBranches != null) {
+
+            for (GitlabBranch gitlabBranch : gitlabBranches) {
+
+                if (!StringUtils.isEmpty(gitlabBranch.getName())) {
+                    branches.add(gitlabBranch.getName());
+                }
+            }
         }
 
-        project.setRepositoryId(gitlabProject.getId());
+        return ResultOutputUtil.success(branches);
+    }
 
-        projectDao.addRepositoryIdById(project);
+    public ResultOutput getProjectsWithoutBuildJob(Integer teamId) {
 
-        return ResultOutputUtil.success();
+        List<Project> projects = projectDao.getProjectsWithoutBuildJob(teamId);
+        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class);
+
+        return ResultOutputUtil.success(projectOutputs);
+    }
+
+    public ResultOutput getBuildProjects(Integer teamId) {
+
+        List<Project> projects = projectDao.getProjectsWithBuildJob(teamId);
+        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class);
+
+
+//        if (projects != null && projects.size() != 0) {
+//            String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+//
+//            if (!StringUtils.isEmpty(accessToken)) {
+//                List<String> branches = new ArrayList<>();
+//
+//                for (Project project : projects) {
+//                    Integer repositoryId = project.getRepositoryId();
+//
+//                    if (repositoryId != null) {
+//                        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(repositoryId, accessToken);
+//
+//                        for (GitlabBranch gitlabBranch : gitlabBranches) {
+//                            branches.add(gitlabBranch.getName());
+//                        }
+//                    }
+//
+//                    ProjectOutput projectOutput = new ProjectOutput();
+//                    projectOutput.setId(project.getId());
+//                    projectOutput.setBranches(branches);
+//                    projectOutput.setName(project.getName());
+//                    projectOutputs.add(projectOutput);
+//                }
+//            }
+//        }
+        return ResultOutputUtil.success(projectOutputs);
     }
 }

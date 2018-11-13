@@ -1,15 +1,13 @@
-package com.kiss.kissnest.entity;
+package com.kiss.kissnest.output;
 
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class Server {
+public class ServerOutput {
 
     private Integer id;
-
-    private Integer teamId;
 
     private String name;
 
@@ -33,4 +31,3 @@ public class Server {
 
     private Date updatedAt;
 }
-

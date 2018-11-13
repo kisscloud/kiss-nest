@@ -4,6 +4,7 @@ import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.input.UpdateTeamInput;
+import com.kiss.kissnest.status.NestStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -41,28 +42,28 @@ public class TeamValidaor implements Validator {
     public void validateName (String name,Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name","","团队名字不能为空");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.TEAM_NAME_IS_EMPTY),"团队名字不能为空");
             return;
         }
 
         Team team = teamDao.getTeamByName(name);
 
         if (team != null) {
-            errors.rejectValue("name","","团队名字已经存在");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.TEAM_NAME_EXIST),"团队名字已经存在");
         }
     }
 
     public boolean validateId (Integer id,String idName,Errors errors) {
 
         if (id == null) {
-            errors.rejectValue(idName,"","团队id不能为空");
+            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAMID_IS_EMPTY),"团队id不能为空");
             return false;
         }
 
         Team team = teamDao.getTeamById(id);
 
         if (team == null) {
-            errors.rejectValue(idName,"","团队id不存在");
+            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAMID_EXIST),"团队id不存在");
             return false;
         }
 
@@ -72,7 +73,7 @@ public class TeamValidaor implements Validator {
     public void validateSlug (String slug,Errors errors) {
 
         if (StringUtils.isEmpty(slug)) {
-            errors.rejectValue("slug","","项目路径不能为空");
+            errors.rejectValue("slug",String.valueOf(NestStatusCode.TEAM_SLUG_IS_EMPTY),"项目路径不能为空");
         }
     }
 }

@@ -7,11 +7,21 @@ public class Job {
 
     private Integer id;
 
+    private Integer teamId;
+
     private Integer projectId;
 
     private String jobName;
 
-    private String shell;
+    private String script;
 
     private Integer type;
+
+    private Integer envId;
+
+    private String serverIds;
+
+    private Integer status;
+
+    private Integer number;
 }

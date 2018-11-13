@@ -27,4 +27,9 @@ public interface ProjectDao {
     Integer addRepositoryIdById(Project project);
 
     Project getProjectByRepositoryId(Integer repositoryId);
+
+    List<Project> getProjectsWithoutBuildJob(Integer teamId);
+
+    List<Project> getProjectsWithBuildJob(Integer teamId);
+
 }

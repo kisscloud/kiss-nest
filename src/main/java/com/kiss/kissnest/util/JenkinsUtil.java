@@ -1,12 +1,14 @@
 package com.kiss.kissnest.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.kiss.kissnest.entity.CrumbEntity;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.*;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -15,18 +17,20 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.util.encoders.Base64;
+import org.json.HTTP;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import utils.ThreadLocalUtil;
@@ -43,12 +47,6 @@ import java.util.Map;
 @Slf4j
 public class JenkinsUtil {
 
-//    @Value("${jenkins.account}")
-//    private String account;
-//
-//    @Value("${jenkins.password}")
-//    private String password;
-
     @Value("${jenkins.url}")
     private String jenkinsUrl;
 
@@ -60,6 +58,12 @@ public class JenkinsUtil {
 
     @Value("${jenkins.generateTokenUrl}")
     private String generateTokenUrl;
+
+    @Value("${jenkins.bin.ip}")
+    private String jenkinBinIp;
+
+    @Value("${jenkins.crumbPath}")
+    private String jenkinsCrumbPath;
 
     public boolean createJob (String jobName,String configPath,String account,String passwordOrToken) {
 
@@ -91,7 +95,8 @@ public class JenkinsUtil {
         try {
             server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
             StringBuilder builder = readFileFromClassPath();
-            String script = String.format(builder.toString(),shell);
+            String formatShell = StringEscapeUtils.escapeHtml(shell);
+            String script = String.format(builder.toString(),formatShell,jobName,jenkinBinIp);
 
             if (builder == null) {
                 return false;
@@ -178,7 +183,6 @@ public class JenkinsUtil {
         try {
             server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
 
-
             FolderJob folderJob = new FolderJob(jobName,jenkinsUrl);
 //            folderJob.createFolder("http://localhost:8060");
             JobWithDetails jobWithDetails = server.getJob(folderJob,jobName);
@@ -244,11 +248,9 @@ public class JenkinsUtil {
         }
     }
 
-    public Build getLastBuild (String jobName,String account,String passwordOrToken) {
-        JenkinsServer server = null;
+    public Build getLastBuild (String jobName,JenkinsServer server) {
 
         try {
-            server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
             JobWithDetails jobWithDetails = server.getJob(jobName);
             Build build = jobWithDetails.getLastBuild();
 
@@ -256,10 +258,6 @@ public class JenkinsUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            if (server != null) {
-                server.close();
-            }
         }
     }
 
@@ -303,7 +301,7 @@ public class JenkinsUtil {
 
         return builder;
     }
-    private String authorizationExecute(Map<String, String> params,String url,String account,String passwordOrToken) throws IOException {
+    public String authorizationExecute(Map<String, String> params,String url,String account,String passwordOrToken) throws IOException {
 
         URI uri = URI.create(url);
         HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
@@ -329,8 +327,9 @@ public class JenkinsUtil {
         HttpClientContext localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
         HttpResponse response = null;
-
+        CrumbEntity crumbEntity = getCrumb(jenkinsUrl,jenkinsCrumbPath,account,passwordOrToken);
         try {
+            httpPost.addHeader(crumbEntity.getCrumbRequestField(),crumbEntity.getCrumb());
             response = httpClient.execute(host, httpPost, localContext);
 
 //            log.info(EntityUtils.toString(response.getEntity()));
@@ -355,6 +354,22 @@ public class JenkinsUtil {
             httpClient.close();
         }
 
+    }
+
+    public CrumbEntity getCrumb(String uri,String path,String username,String password){
+        JenkinsHttpClient jenkinsHttpClient = null;
+        try {
+            jenkinsHttpClient = new JenkinsHttpClient(new URI(uri),username,password);
+            String jsonResult = jenkinsHttpClient.get(path);
+            CrumbEntity crumbEntity=JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
+
+            return crumbEntity;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            jenkinsHttpClient.close();
+        }
+        return null;
     }
 
     public static void main(String[] args) throws Exception {
@@ -399,13 +414,27 @@ public class JenkinsUtil {
 //            httpPost.releaseConnection();
 //            httpClient.close();
 //        }
-//        JenkinsServer server = new JenkinsServer(new URI("http://localhost:8060"),"qrl758","11a74babd53344e010bdd2a60dccea45cf");
+//        JenkinsServer server = new JenkinsServer(new URI("http://localhost:8060"),"xiaoyue","11eeeddf7afeb80418ae6cd2e9576d9786");
 //
+//        InputStream in = JenkinsUtil.class.getResourceAsStream("/config.xml");
+//        StringBuilder builder = new StringBuilder();
+//        InputStreamReader reader = new InputStreamReader(in);
+//        BufferedReader bufferedReader = new BufferedReader(reader);
+//        String lineTxt = null;
+//        while ((lineTxt = bufferedReader.readLine()) != null) {
+//            builder.append(lineTxt);
+//        }
+//
+////        String script = String.format(builder.toString(),"aaa");
+//
+//        server.createJob("test11",builder.toString(),false);
+//        System.out.println();
+//        authorizationExecute(null,"http://build.kisscloud.io/user/xiaohu/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken","xiaohu","12345678");
 //        JobWithDetails jobWithDetails = server.getJob("guyue");
-        String url = "http://localhost:8080/jenkins/job/guyue/34/";
-        URL url1 = new URL(url);
-
-        System.out.println(url1.getPath().replace("jenkins/",""));
+//        Build build = jobWithDetails.getLastBuild();
+//        JenkinsHttpConnection client = build.getClient();
+//        BuildWithDetails buildWithDetails = client.get("http://localhost:8060/job/guyue/1000",BuildWithDetails.class);
+//        System.out.println();
 //        URI uri = URI.create(urlString);
 //        HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 //        CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -424,5 +453,10 @@ public class JenkinsUtil {
 //        HttpResponse response = httpClient.execute(host, httpGet);
 
 //        System.out.println(EntityUtils.toString(response.getEntity()));
+
+        JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"),"xiaowang","12345678");
+        String str = jenkinsHttpClient.get("/crumbIssuer/api/json");
+
+        System.out.println(str);
     }
 }

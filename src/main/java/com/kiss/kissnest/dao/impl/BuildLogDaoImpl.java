@@ -55,4 +55,15 @@ public class BuildLogDaoImpl implements BuildLogDao {
 
         return buildLogMapper.getLastBuildByJobNameAndProjectId(params);
     }
+
+    @Override
+    public List<BuildLog> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("start",start);
+        params.put("size",size);
+
+        return buildLogMapper.getBuildLogsByTeamId(params);
+    }
 }

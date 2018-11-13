@@ -2,6 +2,7 @@ package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.service.BuildService;
 import com.kiss.kissnest.service.GroupService;
+import com.kiss.kissnest.service.ProjectRepositoryService;
 import com.kiss.kissnest.service.ProjectService;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import io.swagger.annotations.Api;
@@ -27,7 +28,11 @@ public class PageController {
     private ProjectService projectService;
 
     @Autowired
-    private BuildService buildLogService;
+    private BuildService buildService;
+
+    @Autowired
+    private ProjectRepositoryService projectRepositoryService;
+
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
@@ -61,10 +66,12 @@ public class PageController {
     @GetMapping("/build")
     public ResultOutput GetPageBuildParams(Integer teamId) {
 
-        ResultOutput projects = projectService.getProjects(teamId);
+        ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
+        ResultOutput buildProjects = projectService.getBuildProjects(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
+        result.put("build",buildProjects.getData());
 
         return ResultOutputUtil.success(result);
     }
@@ -74,9 +81,10 @@ public class PageController {
     public ResultOutput GetPageRepositoriesParams(Integer teamId) {
 
         ResultOutput projects = projectService.getProjects(teamId);
-
+        ResultOutput repositories = projectRepositoryService.getProjectRepositoryByTeamId(teamId);
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
+        result.put("repositories",repositories.getData());
 
         return ResultOutputUtil.success(result);
     }

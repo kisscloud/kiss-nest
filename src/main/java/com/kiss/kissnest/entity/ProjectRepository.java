@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class Server {
+public class ProjectRepository {
 
     private Integer id;
 
@@ -13,24 +13,27 @@ public class Server {
 
     private String name;
 
-    private Integer envId;
+    private Integer projectId;
 
-    private String innerIp;
+    private Integer repositoryId;
 
-    private String outerIp;
+    private String sshUrl;
 
-    private String parameters;
+    private String httpUrl;
 
-    private Integer runTime;
+    private String lastCommit;
+
+    private Integer commitCount;
+
+    private Integer branchCount;
+
+    private Integer memberCount;
 
     private Integer operatorId;
 
     private String operatorName;
 
-    private Date lastDeployedAt;
-
     private Date createdAt;
 
     private Date updatedAt;
 }
-
