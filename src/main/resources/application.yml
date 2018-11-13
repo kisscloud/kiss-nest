@@ -18,13 +18,11 @@ logging:
   level:
     com.kiss.kissnest.mapper: debug
 jenkins:
-  url: http://localhost:8060
-#  account: admin
-#  password: e20e6ba9448f468fb39dec3529984cfc
-  buildUrl: http://localhost:8060/job/%s/build
-  buildWithParameterUrl: http://localhost:8060/job/%s/buildWithParameters
-  generateTokenUrl: http://localhost:8060/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
-  buildLogUrl: http://localhost:8060/job/%s/%s
+  url: http://build.kisscloud.io
+  buildUrl: http://build.kisscloud.io/job/%s/build
+  buildWithParameterUrl: http://build.kisscloud.io/job/%s/buildWithParameters
+  generateTokenUrl: http://build.kisscloud.io/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
+  buildLogUrl: http://build.kisscloud.io/job/%s/%s
   buildOutputPath: /logText/progressiveHtml
 
 kiss:
@@ -37,8 +35,14 @@ kiss:
 
 gitlab:
   server:
-    url: http://192.168.99.100:327920
+    url: http://git.kisscloud.io
     token:
       path: /oauth/token
 
-#http://localhost:8080/jenkins/job/guyue/43/
+feign:
+  httpclient:
+    connection-timeout: 60000
+
+ribbon:
+  ConnectTimeout: 60000
+  ReadTimeout: 60000
