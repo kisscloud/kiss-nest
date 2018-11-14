@@ -13,6 +13,7 @@ import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import entity.Guest;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,9 @@ import output.ResultOutput;
 import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProjectService {
@@ -46,12 +49,21 @@ public class ProjectService {
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
         Project project = (Project) BeanCopyUtil.copy(createProjectInput, Project.class);
-
+        Guest guest = ThreadLocalUtil.getGuest();
+        project.setMembersCount(1);
+        project.setOperatorId(guest.getId());
+        project.setOperatorName(guest.getName());
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
         }
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("id",project.getGroupId());
+        params.put("teamId",project.getTeamId());
+        params.put("type","projects");
+        groupDao.addCount(params);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }

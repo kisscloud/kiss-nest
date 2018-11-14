@@ -43,7 +43,9 @@ public class TeamService {
     public ResultOutput createTeam(CreateTeamInput teamInput) {
 
         Team team = (Team) BeanCopyUtil.copy(teamInput,Team.class);
-
+        Guest guest = ThreadLocalUtil.getGuest();
+        team.setOperatorId(guest.getId());
+        team.setOperatorName(guest.getName());
         Integer count = teamDao.createTeam(team);
 
         if (count == 0) {

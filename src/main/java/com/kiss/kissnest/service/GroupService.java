@@ -8,11 +8,13 @@ import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.GroupProject;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateGroupInput;
+import com.kiss.kissnest.input.UpdateGroupInput;
 import com.kiss.kissnest.output.GroupOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import entity.Guest;
 import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,10 @@ public class GroupService {
     public ResultOutput createGroup(CreateGroupInput createGroupInput) {
 
         Group group = (Group) BeanCopyUtil.copy(createGroupInput,Group.class);
-
+        Guest guest = ThreadLocalUtil.getGuest();
+        group.setMembersCount(1);
+        group.setOperatorId(guest.getId());
+        group.setOperatorName(guest.getName());
         Integer count = groupDao.createGroup(group);
 
         if (count == 0) {
@@ -95,8 +100,12 @@ public class GroupService {
         return ResultOutputUtil.success();
     }
 
-    public ResultOutput updateGroup(Group group) {
+    public ResultOutput updateGroup(UpdateGroupInput updateGroupInput) {
 
+        Group group = (Group) BeanCopyUtil.copy(updateGroupInput,Group.class);
+        Guest guest = ThreadLocalUtil.getGuest();
+        group.setOperatorId(guest.getId());
+        group.setOperatorName(guest.getName());
         Integer count = groupDao.updateGroupById(group);
 
         if (count == 0) {

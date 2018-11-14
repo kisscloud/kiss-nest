@@ -65,7 +65,7 @@ public class GroupController {
     @ApiOperation(value = "更新组织")
     public ResultOutput updateGroup (@Validated @RequestBody UpdateGroupInput updateGroupInput) {
 
-        return groupService.updateGroup((Group) BeanCopyUtil.copy(updateGroupInput,Group.class));
+        return groupService.updateGroup(updateGroupInput);
     }
 
     @GetMapping("/groups")

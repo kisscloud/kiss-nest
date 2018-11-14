@@ -12,4 +12,6 @@ public class UpdateProjectInput {
     private Integer teamId;
 
     private Integer groupId;
+
+    private Integer type;
 }

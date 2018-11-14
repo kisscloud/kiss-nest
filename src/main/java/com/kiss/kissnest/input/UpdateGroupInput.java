@@ -10,4 +10,6 @@ public class UpdateGroupInput {
     private String name;
 
     private Integer teamId;
+
+    private Integer status;
 }

@@ -57,6 +57,7 @@ public class ProjectValidator implements Validator {
 
             groupValidator.validateId(updateProjectInput.getGroupId(),"groupId",errors);
             validateId(updateProjectInput.getId(),errors);
+            validateType(updateProjectInput.getType(),errors);
         }
     }
 
