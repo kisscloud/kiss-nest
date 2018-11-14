@@ -28,4 +28,6 @@ public interface MemberMapper {
     String getAccessTokenByAccountId(Integer accountId);
 
     Integer updateApiTokenByAccountId(Map params);
+
+    Integer getMemberDefaultTeamId(Integer accountId);
 }

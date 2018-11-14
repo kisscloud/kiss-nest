@@ -196,4 +196,13 @@ public class MemberService {
 
         }
     }
+
+    public ResultOutput getMemberDefaultTeamId(Integer accountId) {
+
+        Integer teamId = memberDao.getMemberDefaultTeamId(accountId);
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+
+        return ResultOutputUtil.success(params);
+    }
 }

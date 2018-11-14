@@ -26,4 +26,6 @@ public interface MemberDao {
     String getAccessTokenByAccountId(Integer accountId);
 
     Integer updateApiTokenByAccountId(Integer accountId,String apiToken);
+
+    Integer getMemberDefaultTeamId(Integer accountId);
 }

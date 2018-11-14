@@ -89,14 +89,14 @@ public class JenkinsUtil {
         }
     }
 
-    public boolean createJobByShell (String jobName,String shell,String account,String passwordOrToken) {
+    public boolean createJobByShell (String jobName,String shell,String sshUrl,String account,String passwordOrToken) {
         JenkinsServer server = null;
 
         try {
             server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
             StringBuilder builder = readFileFromClassPath();
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(),formatShell,jobName,jenkinBinIp);
+            String script = String.format(builder.toString(),sshUrl,formatShell,jobName,jenkinBinIp);
 
             if (builder == null) {
                 return false;
@@ -454,9 +454,33 @@ public class JenkinsUtil {
 
 //        System.out.println(EntityUtils.toString(response.getEntity()));
 
-        JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"),"xiaowang","12345678");
-        String str = jenkinsHttpClient.get("/crumbIssuer/api/json");
+//        JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"),"xiaowang","12345678");
+////        String str = jenkinsHttpClient.get("/crumbIssuer/api/json");
+////
+////        System.out.println(str);
+        JenkinsServer server = null;
 
-        System.out.println(str);
+        try {
+            server = new JenkinsServer(new URI("http://build.kisscloud.io"),"xiaohu","1156f50033ef17fb469f7d945da1e246d4");
+            InputStream in = JenkinsUtil.class.getResourceAsStream("/config.xml");
+            StringBuilder builder = new StringBuilder();
+            InputStreamReader reader = new InputStreamReader(in);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String lineTxt = null;
+            while ((lineTxt = bufferedReader.readLine()) != null) {
+                builder.append(lineTxt);
+            }
+            String formatShell = StringEscapeUtils.escapeHtml("abc");
+            String script = String.format(builder.toString(),"git@git.kisscloud.io:facebit/facebitgroup/kiss-eureka-server.git",formatShell,"face3","192.168.0.192");
+
+            server.createJob("face3",script,false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (server != null) {
+                server.close();
+            }
+        }
     }
 }
