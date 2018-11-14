@@ -53,9 +53,9 @@ public class TeamController {
 
     @GetMapping("/teams")
     @ApiOperation(value = "获取团队")
-    public ResultOutput getTeams () {
+    public ResultOutput getTeams (@RequestParam("accountId") Integer accountId) {
 
-        return teamService.getTeams();
+        return teamService.getTeams(accountId);
     }
 
     @GetMapping("/team/change")

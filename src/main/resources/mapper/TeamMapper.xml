@@ -43,8 +43,8 @@
         select * from teams where id = #{id};
     </select>
 
-    <select id="getTeams" resultType="com.kiss.kissnest.entity.Team">
-        select * from teams;
+    <select id="getTeams" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Team">
+        select te.* from teams te left join members me on te.id = me.teamId where me.accountId = #{accountId};
     </select>
     
     <select id="getTeamByName" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Team">

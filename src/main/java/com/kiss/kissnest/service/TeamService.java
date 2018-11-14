@@ -118,9 +118,9 @@ public class TeamService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(team,TeamOutput.class));
     }
 
-    public ResultOutput getTeams () {
+    public ResultOutput getTeams (Integer accountId) {
 
-        List<Team> teams = teamDao.getTeams();
+        List<Team> teams = teamDao.getTeams(accountId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(teams,TeamOutput.class));
     }
