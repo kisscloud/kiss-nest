@@ -42,27 +42,25 @@
             <command>
 &#x000A;
 #!/bin/bash&#x000A;
-%s&#x000A;
 (git branch -a | grep ${branch}) || (git tag -l | grep ${branch})&#x000A;
 if [ $? -eq 0 ]; then&#x000A;
-  git checkout  $branch &amp;&amp; echo &quot;#Sucess: 源代码已经切换到${branch}分支&quot; || { echo &quot;#Error: 源代码切换${branch}分支失败&quot;; exit ; }&#x000A;
+  git checkout  $branch &amp;&amp; echo &quot;#Sucess: source codes had checkout to ${branch} branch&quot; || { echo &quot;#Error: source codes failed to checkout to ${branch} branch&quot;; exit ; }&#x000A;
 else&#x000A;
-  echo &quot;#Error:源代码${branch}分支不存在请检查！&quot;; exit ;&#x000A;
+  echo &quot;#Error: source codes ${branch} branch does not exist！&quot;; exit ;&#x000A;
 fi&#x000A;
-mvn install -Dmaven.test.skip=true&#x000A;
-mvn package -Dmaven.test.skip=true&#x000A;
 a=`git log|grep 'commit'|head -1`&#x000A;
 b=`echo ${a##*commit}`&#x000A;
-cd target/&#x000A;
 slug=%s&#x000A;
 binIp=%s&#x000A;
 name=$slug-$b&#x000A;
+echo "versionStart="$b"=versionEnd"&#x000A;
+echo "jarNameStart="$name"=jarNameEnd"&#x000A;
+%s&#x000A;
+cd target/&#x000A;
 rename *.jar $name.jar&#x000A;
 tar -zcvf $name.tar.gz $name.jar&#x000A;
 ansible $binIp -u root -m shell -a "if [ ! -d "/opt/app/$slug" ];then mkdir -p /opt/app/$slug;fi"&#x000A;
 rsync -v $name.tar.gz root@$binIp:/opt/app/$slug/&#x000A;
-echo "versionStart="$b"=versionEnd"&#x000A;
-echo "jarNameStart="$name"=jarNameEnd"&#x000A;
             </command>
         </hudson.tasks.Shell>
     </builders>

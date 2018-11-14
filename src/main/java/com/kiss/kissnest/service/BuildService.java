@@ -271,64 +271,73 @@ public class BuildService {
         @Override
         public void run() {
             Build build = null;
-            JenkinsServer jenkinsServer = jenkinsUtil.getJenkinsServer(account, passwordOrToken);
+            JenkinsServer jenkinsServer = null;
+            Integer newNumber = -1;
+            try {
+                jenkinsServer = jenkinsUtil.getJenkinsServer(account, passwordOrToken);
 
-            if (jenkinsServer == null) {
-                return;
-            }
-            //获取最后一个任务num
-            Build lastBuild = jenkinsUtil.getLastBuild(jobName, jenkinsServer);
-            if (lastBuild == null) {
-                return;
-            }
+                if (jenkinsServer == null) {
+                    return;
+                }
 
-            Integer last = lastBuild.getNumber();
-            Integer newNumber = number;
+                Thread.sleep(5000);
+                //获取最后一个任务num
+                Build lastBuild = jenkinsUtil.getLastBuild(jobName, jenkinsServer);
+                if (lastBuild == null) {
+                    return;
+                }
 
-            if (last < number) {
-                //num < number 等待
-                for (int i = 0; i < 10; i++) {
+                Integer last = lastBuild.getNumber();
+                newNumber = number;
 
-                    try {
+                if (last < number) {
+                    //num < number 等待
+                    for (int i = 0; i < 10; i++) {
+
                         Thread.sleep(6000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                        build = jenkinsUtil.getBuild(jobName, jenkinsServer, number);
 
-                    build = jenkinsUtil.getBuild(jobName, jenkinsServer, number);
+                        if (build != null) {
+                            break;
+                        }
+                    }
 
                     if (build != null) {
-                        break;
+                        saveBuildLog(build, teamId, jobName, operatorId, account, projectId, number);
+                    }
+                } else if (last == number) {
+                    //num = number 将num插入数据库
+                    saveBuildLog(lastBuild, teamId, jobName, operatorId, account, projectId, number);
+                } else {
+                    //num > number 查询number-num的所有任务
+
+                    for (int i = number; i <= last; i++) {
+                        build = jenkinsUtil.getBuild(jobName, jenkinsServer, i);
+
+                        if (build != null) {
+                            saveBuildLog(build, teamId, jobName, operatorId, account, projectId, i);
+                        }
+                    }
+
+                    newNumber = last;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (jenkinsServer != null) {
+                    jenkinsUtil.close(jenkinsServer);
+                }
+
+                if (newNumber != -1) {
+                    Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
+
+                    if (count == 0) {
+                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, number, newNumber);
                     }
                 }
-
-                if (build != null) {
-                    saveBuildLog(build, teamId, jobName, operatorId, account, projectId, number);
-                }
-            } else if (last == number) {
-                //num = number 将num插入数据库
-                saveBuildLog(lastBuild, teamId, jobName, operatorId, account, projectId, number);
-            } else {
-                //num > number 查询number-num的所有任务
-
-                for (int i = number; i <= last; i++) {
-                    build = jenkinsUtil.getBuild(jobName, jenkinsServer, i);
-
-                    if (build != null) {
-                        saveBuildLog(build, teamId, jobName, operatorId, account, projectId, i);
-                    }
-                }
-
-                newNumber = last;
             }
 
-            Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
-
-            if (count == 0) {
-                log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, number, newNumber);
-            }
-
-            jenkinsUtil.close(jenkinsServer);
         }
     }
 
