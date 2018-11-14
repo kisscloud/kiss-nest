@@ -203,7 +203,7 @@ public class MemberService {
         Team team = memberDao.getMemberDefaultTeamId(accountId);
         Map<String,Object> params = new HashMap<>();
         params.put("teamId",team.getId());
-        params.put("name",team.getName());
+        params.put("teamName",team.getName());
         return ResultOutputUtil.success(params);
     }
 }
