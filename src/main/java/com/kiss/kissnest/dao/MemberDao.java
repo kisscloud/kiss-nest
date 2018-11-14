@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.Team;
 
 import java.util.List;
 import java.util.Map;
@@ -27,5 +28,5 @@ public interface MemberDao {
 
     Integer updateApiTokenByAccountId(Integer accountId,String apiToken);
 
-    Integer getMemberDefaultTeamId(Integer accountId);
+    Team getMemberDefaultTeamId(Integer accountId);
 }
