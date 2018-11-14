@@ -22,4 +22,6 @@ public interface BuildLogMapper {
     BuildLog getLastBuildByJobNameAndProjectId(Map params);
 
     List<BuildLog> getBuildLogsByTeamId(Map params);
+
+    List<BuildLog> getBuildRecentLogs(Map params);
 }

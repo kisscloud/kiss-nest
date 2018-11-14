@@ -49,21 +49,32 @@ public class BuildLogDaoImpl implements BuildLogDao {
     @Override
     public BuildLog getLastBuildByJobNameAndProjectId(String jobName, Integer projectId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("jobName",jobName);
-        params.put("projectId",projectId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("jobName", jobName);
+        params.put("projectId", projectId);
 
         return buildLogMapper.getLastBuildByJobNameAndProjectId(params);
     }
 
     @Override
-    public List<BuildLog> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size) {
+    public List<BuildLog> getBuildLogsByTeamId(Integer teamId, Integer start, Integer size) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("start",start);
-        params.put("size",size);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("start", start);
+        params.put("size", size);
 
         return buildLogMapper.getBuildLogsByTeamId(params);
+    }
+
+    @Override
+    public List<BuildLog> getBuildRecentLogs(Integer teamId, Integer projectId, Long timestamp) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("projectId", projectId);
+        params.put("timestamp", timestamp);
+
+        return buildLogMapper.getBuildRecentLogs(params);
     }
 }

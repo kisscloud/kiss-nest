@@ -10,11 +10,11 @@
         value
         (#{teamId},#{jobName},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{jarName},#{operatorId},#{operatorName},#{buildAt})
     </insert>
-    
+
     <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
         delete from buildlogs where id = #{id}
     </delete>
-    
+
     <update id="updateBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
         update buildlogs
         set
@@ -45,7 +45,7 @@
         </if>
         where id = #{id}
     </update>
-    
+
     <select id="getBuildLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs where id = #{id};
     </select>
@@ -53,15 +53,20 @@
     <select id="getBuildLogs" resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs;
     </select>
-    
-    <select id="getLastBuildByJobNameAndProjectId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.BuildLog">
+
+    <select id="getLastBuildByJobNameAndProjectId" parameterType="java.util.Map"
+            resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs where jobName=#{jobName} and projectId=#{projectId} order by number desc limit 0,1;
     </select>
-    
+
     <select id="getBuildLogsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
-        select * from buildlogs where teamId = #{teamId}
+        select * from buildlogs where teamId = #{teamId} order by buildAt desc
         <if test="start != null">
             limit #{start},#{size}
         </if>
+    </select>
+
+    <select id="getBuildRecentLogs" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs where teamId = #{teamId} and projectId = #{projectId} and buildAt > #{timestamp} order by buildAt desc;
     </select>
 </mapper>

@@ -239,6 +239,13 @@ public class BuildService {
         return ResultOutputUtil.success(buildLogOutputs);
     }
 
+    public ResultOutput getBuildRecentLogs(Integer teamId,Integer projectId,Long timestamp) {
+
+        List<BuildLog> buildLogs = buildLogDao.getBuildRecentLogs(teamId,projectId,timestamp);
+
+        return ResultOutputUtil.success(buildLogs);
+    }
+
     class BuildLogRunnable implements Runnable {
 
         private String jobName;
