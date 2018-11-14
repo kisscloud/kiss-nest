@@ -56,9 +56,9 @@ name=$slug-$b&#x000A;
 echo "versionStart="$b"=versionEnd"&#x000A;
 echo "jarNameStart="$name"=jarNameEnd"&#x000A;
 %s&#x000A;
-cd target/&#x000A;
-rename *.jar $name.jar&#x000A;
-tar -zcvf $name.tar.gz $name.jar&#x000A;
+default=`ls package*`&#x000A;
+mv package* `echo $name`echo ${a##package}``&#x000A;
+tar -zcvf $name.tar.gz $name*&#x000A;
 ansible $binIp -u root -m shell -a "if [ ! -d "/opt/app/$slug" ];then mkdir -p /opt/app/$slug;fi"&#x000A;
 rsync -v $name.tar.gz root@$binIp:/opt/app/$slug/&#x000A;
             </command>
