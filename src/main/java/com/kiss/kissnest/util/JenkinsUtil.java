@@ -96,7 +96,7 @@ public class JenkinsUtil {
             server = new JenkinsServer(new URI(jenkinsUrl),account,passwordOrToken);
             StringBuilder builder = readFileFromClassPath();
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(),sshUrl,formatShell,jobName,jenkinBinIp);
+            String script = String.format(builder.toString(),sshUrl,jobName,jenkinBinIp,formatShell);
 
             if (builder == null) {
                 return false;
@@ -471,9 +471,9 @@ public class JenkinsUtil {
                 builder.append(lineTxt);
             }
             String formatShell = StringEscapeUtils.escapeHtml("abc");
-            String script = String.format(builder.toString(),"git@git.kisscloud.io:facebit/facebitgroup/kiss-eureka-server.git",formatShell,"face3","192.168.0.192");
+            String script = String.format(builder.toString(),"git@git.kisscloud.io:facebit/facebitgroup/kiss-eureka-server.git","face3","192.168.0.192",formatShell);
 
-            server.createJob("face3",script,false);
+            server.createJob("face4",script,false);
 
         } catch (Exception e) {
             e.printStackTrace();
