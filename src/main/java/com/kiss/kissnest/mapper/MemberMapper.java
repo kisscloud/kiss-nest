@@ -1,6 +1,7 @@
 package com.kiss.kissnest.mapper;
 
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.Team;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -29,5 +30,5 @@ public interface MemberMapper {
 
     Integer updateApiTokenByAccountId(Map params);
 
-    Integer getMemberDefaultTeamId(Integer accountId);
+    Team getMemberDefaultTeamId(Integer accountId);
 }

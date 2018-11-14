@@ -2,6 +2,7 @@ package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateMemberAccessInput;
 import com.kiss.kissnest.output.MemberOutput;
 import com.kiss.kissnest.status.NestStatusCode;
@@ -199,10 +200,10 @@ public class MemberService {
 
     public ResultOutput getMemberDefaultTeamId(Integer accountId) {
 
-        Integer teamId = memberDao.getMemberDefaultTeamId(accountId);
+        Team team = memberDao.getMemberDefaultTeamId(accountId);
         Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-
+        params.put("teamId",team.getId());
+        params.put("name",team.getName());
         return ResultOutputUtil.success(params);
     }
 }

@@ -2,6 +2,7 @@ package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.mapper.MemberMapper;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.ResultOutputUtil;
@@ -91,7 +92,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Integer getMemberDefaultTeamId(Integer accountId) {
+    public Team getMemberDefaultTeamId(Integer accountId) {
 
         return memberMapper.getMemberDefaultTeamId(accountId);
     }

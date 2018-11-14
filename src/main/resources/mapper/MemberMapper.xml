@@ -83,7 +83,7 @@
         where accountId = #{accountId}
     </update>
     
-    <select id="getMemberDefaultTeamId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        select teamId from members where accountId = #{accountId} limit 0,1;
+    <select id="getMemberDefaultTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Team">
+        select te.id,te.name from members me left join teams te on me.teamId = te.id where me.accountId = #{accountId} limit 0,1;
     </select>
 </mapper>
