@@ -133,6 +133,12 @@
             <artifactId>java-gitlab-api</artifactId>
             <version>4.0.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.suse.saltstack/saltstack-netapi-client -->
+        <dependency>
+            <groupId>com.suse.saltstack</groupId>
+            <artifactId>saltstack-netapi-client</artifactId>
+            <version>0.6.0</version>
+        </dependency>
 
 
 

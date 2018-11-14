@@ -82,4 +82,8 @@
         apiToken = #{apiToken}
         where accountId = #{accountId}
     </update>
+    
+    <select id="getMemberDefaultTeamId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select teamId from members where accountId = #{accountId} limit 0,1;
+    </select>
 </mapper>

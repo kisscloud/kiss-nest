@@ -15,7 +15,22 @@
             </parameterDefinitions>
         </hudson.model.ParametersDefinitionProperty>
     </properties>
-    <scm class="hudson.scm.NullSCM"/>
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+        <configVersion>2</configVersion>
+        <userRemoteConfigs>
+            <hudson.plugins.git.UserRemoteConfig>
+                <url>%s</url>
+            </hudson.plugins.git.UserRemoteConfig>
+        </userRemoteConfigs>
+        <branches>
+            <hudson.plugins.git.BranchSpec>
+                <name>*/master</name>
+            </hudson.plugins.git.BranchSpec>
+        </branches>
+        <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+        <submoduleCfg class="list"/>
+        <extensions/>
+    </scm>
     <canRoam>true</canRoam>
     <disabled>false</disabled>
     <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -26,14 +41,26 @@
         <hudson.tasks.Shell>
             <command>
 &#x000A;
+#!/bin/bash&#x000A;
 %s&#x000A;
+(git branch -a | grep ${branch}) || (git tag -l | grep ${branch})&#x000A;
+if [ $? -eq 0 ]; then&#x000A;
+  git checkout  $branch &amp;&amp; echo &quot;#Sucess: 源代码已经切换到${branch}分支&quot; || { echo &quot;#Error: 源代码切换${branch}分支失败&quot;; exit ; }&#x000A;
+else&#x000A;
+  echo &quot;#Error:源代码${branch}分支不存在请检查！&quot;; exit ;&#x000A;
+fi&#x000A;
+mvn install -Dmaven.test.skip=true&#x000A;
+mvn package -Dmaven.test.skip=true&#x000A;
 a=`git log|grep 'commit'|head -1`&#x000A;
 b=`echo ${a##*commit}`&#x000A;
-cd /opt/src/target&#x000A;
-name=%s-$b&#x000A;
+cd target/&#x000A;
+slug=%s&#x000A;
+binIp=%s&#x000A;
+name=$slug-$b&#x000A;
 rename *.jar $name.jar&#x000A;
-tar -zcvf $name.tar.gz *.jar&#x000A;
-rsync -v $name.tar.gz root@%s:/root/&#x000A;
+tar -zcvf $name.tar.gz $name.jar&#x000A;
+ansible $binIp -u root -m shell -a "if [ ! -d "/opt/app/$slug" ];then mkdir -p /opt/app/$slug;fi"&#x000A;
+rsync -v $name.tar.gz root@$binIp:/opt/app/$slug/&#x000A;
 echo "versionStart="$b"=versionEnd"&#x000A;
 echo "jarNameStart="$name"=jarNameEnd"&#x000A;
             </command>

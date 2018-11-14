@@ -1,23 +1,24 @@
 package com.kiss.kissnest.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
-import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
-import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
+import com.suse.saltstack.netapi.AuthModule;
+import com.suse.saltstack.netapi.calls.LocalCall;
+import com.suse.saltstack.netapi.client.SaltStackClient;
+import com.suse.saltstack.netapi.datatypes.Token;
+import com.suse.saltstack.netapi.exception.SaltStackException;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
-import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,8 @@ import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.ThreadLocalUtil;
 
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,9 @@ public class BuildService {
     @Autowired
     private DeployLogDao deployLogDao;
 
+    @Autowired
+    private ProjectRepositoryDao projectRepositoryDao;
+
     public static Map<String,String> buildRemarks = new HashMap<>();
 
     public static Map<String,String> deployRemarks = new HashMap<>();
@@ -87,7 +92,9 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), guest.getName(), member.getApiToken());
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(),projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -133,7 +140,7 @@ public class BuildService {
             script = script + ansibleScript;
         }
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(),null, guest.getName(), member.getApiToken());
 
         if (!success) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);

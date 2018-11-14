@@ -89,4 +89,10 @@ public class MemberDaoImpl implements MemberDao {
 
         return count;
     }
+
+    @Override
+    public Integer getMemberDefaultTeamId(Integer accountId) {
+
+        return memberMapper.getMemberDefaultTeamId(accountId);
+    }
 }
