@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import output.ResultOutput;
 
@@ -49,9 +50,9 @@ public class PageController {
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/projects")
-    public ResultOutput GetPageProjectsParams(Integer teamId) {
+    public ResultOutput GetPageProjectsParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
-        ResultOutput projects = projectService.getProjects(teamId);
+        ResultOutput projects = projectService.getProjects(teamId, groupId);
         ResultOutput groups = groupService.getGroups(teamId);
 
         Map<String, Object> result = new HashMap<>();
@@ -71,20 +72,20 @@ public class PageController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
-        result.put("build",buildProjects.getData());
+        result.put("build", buildProjects.getData());
 
         return ResultOutputUtil.success(result);
     }
 
     @ApiOperation(value = "获取仓库页面参数")
     @GetMapping("/repositories")
-    public ResultOutput GetPageRepositoriesParams(Integer teamId) {
+    public ResultOutput GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
-        ResultOutput projects = projectService.getProjects(teamId);
+        ResultOutput projects = projectService.getProjects(teamId, groupId);
         ResultOutput repositories = projectRepositoryService.getProjectRepositoryByTeamId(teamId);
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
-        result.put("repositories",repositories.getData());
+        result.put("repositories", repositories.getData());
 
         return ResultOutputUtil.success(result);
     }

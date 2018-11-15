@@ -20,7 +20,7 @@ public interface ProjectMapper {
 
     Project getProjectById(Integer id);
 
-    List<Project> getProjects(Integer teamId);
+    List<Project> getProjects(Map params);
 
     Project getProjectByNameAndTeamId(Map params);
 

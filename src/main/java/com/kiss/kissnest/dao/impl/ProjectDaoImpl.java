@@ -4,6 +4,7 @@ import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.mapper.ProjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,9 +49,13 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
-    public List<Project> getProjects(Integer teamId) {
+    public List<Project> getProjects(Integer teamId,Integer groupId) {
 
-        return projectMapper.getProjects(teamId);
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("groupId",groupId);
+
+        return projectMapper.getProjects(params);
     }
 
     @Override

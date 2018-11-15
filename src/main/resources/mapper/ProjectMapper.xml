@@ -64,7 +64,12 @@
     </select>
 
     <select id="getProjects" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
-        select * from projects where teamId = #{teamId}
+        select * from projects
+        where
+        teamId = #{teamId}
+        <if test="groupId != null">
+            and groupId = #{groupId}
+        </if>
     </select>
 
     <select id="getProjectByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">

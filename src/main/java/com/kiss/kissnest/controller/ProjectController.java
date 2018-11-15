@@ -36,41 +36,41 @@ public class ProjectController {
 
     @PostMapping("/project")
     @ApiOperation(value = "添加项目")
-    public ResultOutput createProject (@Validated @RequestBody CreateProjectInput createProjectInput) {
+    public ResultOutput createProject(@Validated @RequestBody CreateProjectInput createProjectInput) {
 
         return projectService.createProject(createProjectInput);
     }
 
     @DeleteMapping("/project")
     @ApiOperation(value = "删除项目")
-    public ResultOutput deleteProject (@RequestParam("id") Integer id) {
+    public ResultOutput deleteProject(@RequestParam("id") Integer id) {
 
         return projectService.deleteProject(id);
     }
 
     @PutMapping("/project")
     @ApiOperation(value = "更新项目")
-    public ResultOutput updateProject (@Validated @RequestBody UpdateProjectInput updateProjectInput) {
+    public ResultOutput updateProject(@Validated @RequestBody UpdateProjectInput updateProjectInput) {
 
-        return projectService.updateProject((Project) BeanCopyUtil.copy(updateProjectInput,Project.class));
+        return projectService.updateProject((Project) BeanCopyUtil.copy(updateProjectInput, Project.class));
     }
 
     @GetMapping("/projects")
     @ApiOperation(value = "获取项目")
-    public ResultOutput getProjects (@RequestParam("teamId") Integer teamId) {
+    public ResultOutput getProjects(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
-        return projectService.getProjects(teamId);
+        return projectService.getProjects(teamId, groupId);
     }
 
     @GetMapping("/project/repository")
     @ApiOperation(value = "创建项目仓库")
-    public ResultOutput createProjectRepository (@RequestParam("projectId") Integer projectId) {
+    public ResultOutput createProjectRepository(@RequestParam("projectId") Integer projectId) {
 
         return projectRepositoryService.createProjectRepository(projectId);
     }
 
     @GetMapping("/project/branches")
-    public ResultOutput getProjectBranches (@RequestParam("projectId") Integer projectId) {
+    public ResultOutput getProjectBranches(@RequestParam("projectId") Integer projectId) {
 
         return projectService.getProjectBranches(projectId);
     }

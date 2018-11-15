@@ -99,9 +99,9 @@ public class ProjectService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
 
-    public ResultOutput getProjects(Integer teamId) {
+    public ResultOutput getProjects(Integer teamId,Integer groupId) {
 
-        List<Project> projects = projectDao.getProjects(teamId);
+        List<Project> projects = projectDao.getProjects(teamId,groupId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(projects, ProjectOutput.class));
     }

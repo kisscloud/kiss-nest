@@ -1,11 +1,8 @@
 package com.kiss.kissnest.filter;
 
-import entity.Guest;
 import filter.GuestFilter;
 import filter.InnerFilterChain;
 import org.springframework.stereotype.Component;
-import utils.GuestUtil;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;

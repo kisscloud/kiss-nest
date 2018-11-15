@@ -13,6 +13,8 @@ public class ProjectOutput {
 
     private Integer teamId;
 
+    private Integer groupId;
+
     private Integer membersCount;
 
     private Integer needsCount;
