@@ -18,6 +18,7 @@ import entity.Guest;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -49,6 +50,9 @@ public class ProjectService {
 
     @Autowired
     private CodeUtil codeUtil;
+
+    @Value("${project.type}")
+    private String projectTypes;
 
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
@@ -178,5 +182,16 @@ public class ProjectService {
 //            }
 //        }
         return ResultOutputUtil.success(projectOutputs);
+    }
+
+    public ResultOutput getProjectTypes () {
+        String[] types = projectTypes.split(",");
+        List<String> typeList = new ArrayList<>();
+
+        for (String type : types) {
+            typeList.add(codeUtil.getEnumsMessage("project.type",type));
+        }
+
+        return ResultOutputUtil.success(typeList);
     }
 }

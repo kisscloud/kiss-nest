@@ -90,7 +90,7 @@ public class ProjectRepositoryService {
 
         projectRepositoryDao.createProjectRepository(projectRepository);
 
-        return ResultOutputUtil.success();
+        return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository,ProjectRepositoryOutput.class));
     }
 
     public ResultOutput getProjectRepositoryByTeamId(Integer teamId) {

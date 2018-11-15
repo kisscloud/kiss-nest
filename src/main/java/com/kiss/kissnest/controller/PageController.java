@@ -54,10 +54,12 @@ public class PageController {
 
         ResultOutput projects = projectService.getProjects(teamId, groupId);
         ResultOutput groups = groupService.getGroups(teamId);
+        ResultOutput types = projectService.getProjectTypes();
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
         result.put("groups", groups.getData());
+        result.put("types",types.getData());
 
         return ResultOutputUtil.success(result);
     }
