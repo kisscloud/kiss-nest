@@ -6,6 +6,7 @@ import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.status.NestStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -64,49 +65,49 @@ public class ProjectValidator implements Validator {
     public void validateName (String name,Integer teamId,Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name","","项目名称不能为空");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.PROJECT_NAME_IS_EMPTY),"项目名称不能为空");
             return;
         }
 
         Project project = projectDao.getProjectByNameAndTeamId(name,teamId);
 
         if (project != null) {
-            errors.rejectValue("name","","项目名称已存在");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.PROJECT_NAME_EXIST),"项目名称已存在");
         }
     }
 
     public void validateType (Integer type,Errors errors) {
 
         if (type == null) {
-            errors.rejectValue("type","","项目类型不能为空");
+            errors.rejectValue("type",String.valueOf(NestStatusCode.PROJECT_TYPE_IS_EMPTY),"项目类型不能为空");
         }
     }
 
     public void validateSlug (String slug,Integer teamId,Errors errors) {
 
         if (StringUtils.isEmpty(slug)) {
-            errors.rejectValue("slug","","项目路径不能为空");
+            errors.rejectValue("slug",String.valueOf(NestStatusCode.PROJECT_SLUG_EMPTY),"项目路径不能为空");
             return;
         }
 
         Project project = projectDao.getProjectBySlugAndTeamId(slug,teamId);
 
         if (project != null) {
-            errors.rejectValue("slug","","项目路径已存在");
+            errors.rejectValue("slug",String.valueOf(NestStatusCode.PROJECT_SLUG_IS_EXIST),"项目路径已存在");
         }
     }
 
     public void validateId (Integer id,Errors errors) {
 
         if (id == null) {
-            errors.rejectValue("id","","项目id不能为空");
+            errors.rejectValue("id",String.valueOf(NestStatusCode.PROJECT_ID_IS_EMPTY),"项目id不能为空");
             return;
         }
 
         Project project = projectDao.getProjectById(id);
 
         if (project == null) {
-            errors.rejectValue("id","","项目id不存在");
+            errors.rejectValue("id",String.valueOf(NestStatusCode.PROJECT_ID_NOT_EXIST),"项目id不存在");
         }
     }
 }

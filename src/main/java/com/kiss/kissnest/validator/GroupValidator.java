@@ -9,6 +9,7 @@ import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
+import com.kiss.kissnest.status.NestStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -76,42 +77,42 @@ public class GroupValidator implements Validator {
     public void validateName(String name,Integer teamId,Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name","","项目组名不能为空");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.GROUP_NAME_IS_EMPTY),"项目组名不能为空");
             return;
         }
 
         Group group = groupDao.getGroupByNameAndTeamId(name,teamId);
 
         if (group != null) {
-            errors.rejectValue("name","","项目组名已存在");
+            errors.rejectValue("name",String.valueOf(NestStatusCode.GROUP_NAME_EXIST),"项目组名已存在");
         }
     }
 
     public void validateId (Integer id,String idName,Errors errors) {
 
         if (id == null) {
-            errors.rejectValue(idName,"","项目组id不能为空");
+            errors.rejectValue(idName,String.valueOf(NestStatusCode.GROUP_ID_IS_EMPTY),"项目组id不能为空");
             return;
         }
 
         Group group = groupDao.getGroupById(id);
 
         if (group == null) {
-            errors.rejectValue(idName,"","项目组id不存在");
+            errors.rejectValue(idName,String.valueOf(NestStatusCode.GROUP_ID_NOT_EXIST),"项目组id不存在");
         }
     }
 
     public void validateStatus (Integer status,Errors errors) {
 
         if (status == null) {
-            errors.rejectValue("status","","项目组状态不能为空");
+            errors.rejectValue("status",String.valueOf(NestStatusCode.GROUP_STATUS_IS_EMPTY),"项目组状态不能为空");
         }
     }
 
     public void validateProjectIds (List<Integer> projectIds,Errors errors) {
 
         if (projectIds == null || projectIds.size() == 0) {
-            errors.rejectValue("projectIds","","项目id不能为空");
+            errors.rejectValue("projectIds",String.valueOf(NestStatusCode.PROJECT_ID_IS_EMPTY),"项目id不能为空");
             return;
         }
 
@@ -119,7 +120,7 @@ public class GroupValidator implements Validator {
             Project project = projectDao.getProjectById(projectId);
 
             if (project == null) {
-                errors.rejectValue("projectIds","","项目id不存在");
+                errors.rejectValue("projectIds",String.valueOf(NestStatusCode.PROJECT_ID_NOT_EXIST),"项目id不存在");
                 return;
             }
         }
@@ -129,13 +130,13 @@ public class GroupValidator implements Validator {
     public void validateSlug (String slug,Integer teamId,Errors errors) {
 
         if (StringUtils.isEmpty(slug)) {
-            errors.rejectValue("slug","","项目路径不能为空");
+            errors.rejectValue("slug",String.valueOf(NestStatusCode.GROUP_SLUG_IS_EMPTY),"项目路径不能为空");
         }
 
         Group group = groupDao.getGroupBySlugAndTeamId(slug,teamId);
 
         if (group != null) {
-            errors.rejectValue("slug","","项目路径已存在");
+            errors.rejectValue("slug",String.valueOf(NestStatusCode.GROUP_SLUG_IS_EXIST),"项目路径已存在");
         }
     }
 }

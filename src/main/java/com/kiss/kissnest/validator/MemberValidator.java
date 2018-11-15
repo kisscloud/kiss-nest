@@ -4,6 +4,7 @@ import com.kiss.account.input.ValidateAccountInput;
 import com.kiss.kissnest.feign.AccountServiceFeign;
 import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.CreateMemberAccessInput;
+import com.kiss.kissnest.status.NestStatusCode;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,7 @@ public class MemberValidator implements Validator {
         validateAccountInput.setPassword(password);
         ResultOutput resultOutput = accountServiceFeign.validateAccount(validateAccountInput);
         if (resultOutput.getCode() != 200) {
-            errors.rejectValue("password","","密码错误");
+            errors.rejectValue("password",String.valueOf(NestStatusCode.MEMBER_PASSWORD_ERROR),"密码错误");
         }
     }
 }
