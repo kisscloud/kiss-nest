@@ -6,6 +6,7 @@ import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import com.offbytwo.jenkins.JenkinsServer;
@@ -53,6 +54,9 @@ public class BuildService {
 
     @Autowired
     private ServerDao serverDao;
+
+    @Autowired
+    private CodeUtil codeUtil;
 
     @Value("${jenkins.buildLogUrl}")
     private String jenkinsBuildLogUrl;
@@ -235,6 +239,9 @@ public class BuildService {
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         List<BuildLog> buildLogs = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(),(buildLogsInput.getPage() - 1) * pageSize, pageSize);
         List<BuildLogOutput> buildLogOutputs = (List) BeanCopyUtil.copyList(buildLogs, BuildLogOutput.class);
+
+        buildLogOutputs.forEach(buildLogOutput -> buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus()))));
+
 
         return ResultOutputUtil.success(buildLogOutputs);
     }

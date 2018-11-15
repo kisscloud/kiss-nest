@@ -11,6 +11,7 @@ import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
@@ -45,6 +46,9 @@ public class ProjectService {
 
     @Autowired
     private ProjectRepositoryDao projectRepositoryDao;
+
+    @Autowired
+    private CodeUtil codeUtil;
 
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
@@ -102,8 +106,11 @@ public class ProjectService {
     public ResultOutput getProjects(Integer teamId,Integer groupId) {
 
         List<Project> projects = projectDao.getProjects(teamId,groupId);
+        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class,BeanCopyUtil.defaultFieldNames);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(projects, ProjectOutput.class));
+        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type",String.valueOf(projectOutput.getType())))));
+
+        return ResultOutputUtil.success(projectOutputs);
     }
 
     public ResultOutput getProjectBranches(Integer projectId) {

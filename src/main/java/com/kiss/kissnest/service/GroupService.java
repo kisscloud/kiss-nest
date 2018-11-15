@@ -12,6 +12,7 @@ import com.kiss.kissnest.input.UpdateGroupInput;
 import com.kiss.kissnest.output.GroupOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
+import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
@@ -41,6 +42,9 @@ public class GroupService {
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
+
+    @Autowired
+    private CodeUtil codeUtil;
 
     @Transactional
     public ResultOutput createGroup(CreateGroupInput createGroupInput) {
@@ -132,6 +136,10 @@ public class GroupService {
 
         List<Group> groups = groupDao.getGroups(teamId);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(groups,GroupOutput.class));
+        List<GroupOutput> groupOutputs = (List) BeanCopyUtil.copyList(groups,GroupOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        groupOutputs.forEach(groupOutput -> groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus()))));
+
+        return ResultOutputUtil.success(groupOutputs);
     }
 }

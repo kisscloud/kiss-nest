@@ -29,7 +29,9 @@ public class GroupOutput {
 
     private Integer status;
 
-    private Date createdAt;
+    private String statusText;
 
-    private Date updatedAt;
+    private Long createdAt;
+
+    private Long updatedAt;
 }

@@ -23,6 +23,8 @@ public class BuildLogOutput {
 
     private Integer status;
 
+    private String statusText;
+
     private String output;
 
     private Integer operatorId;

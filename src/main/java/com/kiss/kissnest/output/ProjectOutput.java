@@ -27,9 +27,11 @@ public class ProjectOutput {
 
     private Integer type;
 
+    private String typeText;
+
     private String slug;
 
-    private Date createdAt;
+    private Long createdAt;
 
-    private Date updatedAt;
+    private Long updatedAt;
 }
