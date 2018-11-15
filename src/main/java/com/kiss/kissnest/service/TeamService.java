@@ -1,9 +1,11 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.MemberDao;
+import com.kiss.kissnest.dao.MemberTeamDao;
 import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.dao.TeamGroupDao;
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.MemberTeam;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.entity.TeamGroup;
 import com.kiss.kissnest.exception.TransactionalException;
@@ -17,6 +19,7 @@ import entity.Guest;
 import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import output.ResultOutput;
@@ -35,6 +38,9 @@ public class TeamService {
 
     @Autowired
     private MemberDao memberDao;
+
+    @Autowired
+    private MemberTeamDao memberTeamDao;
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
@@ -58,7 +64,15 @@ public class TeamService {
             throw new TransactionalException(NestStatusCode.BIND_ACCOUNT_TEAM_FAILED);
         }
 
-        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        Member member = memberDao.getMemberByAccountId(guest.getId());
+        MemberTeam memberTeam = generateMemberTeam(member.getId(),team.getId());
+        Integer memberCount = memberTeamDao.createMemberTeam(memberTeam);
+
+        if (memberCount == 0) {
+            throw new TransactionalException(NestStatusCode.CREATE_MEMBER_TEAM_FAILED);
+        }
+
+        String accessToken = memberDao.getAccessTokenByAccountId(guest.getId());
         GitlabGroup gitlabGroup = gitlabApiUtil.createGroup(team.getSlug(),accessToken);
 
         if (gitlabGroup == null) {
@@ -68,8 +82,7 @@ public class TeamService {
         team.setRepositoryId(gitlabGroup.getId());
         teamDao.addRepositoryIdById(team);
 
-        TeamOutput teamOutput = new TeamOutput();
-        BeanUtils.copyProperties(team,teamOutput);
+        TeamOutput teamOutput = (TeamOutput) BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
     }
@@ -107,8 +120,7 @@ public class TeamService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_TEAM_FAILED);
         }
 
-        TeamOutput teamOutput = new TeamOutput();
-        BeanUtils.copyProperties(team,teamOutput);
+        TeamOutput teamOutput = (TeamOutput) BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
     }
@@ -117,14 +129,7 @@ public class TeamService {
 
         Team team = teamDao.getTeamById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(team,TeamOutput.class));
-    }
-
-    public ResultOutput getTeams (Integer accountId) {
-
-        List<Team> teams = teamDao.getTeams(accountId);
-
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(teams,TeamOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames));
     }
 
     public ResultOutput changeTeam(Integer teamId) {
@@ -159,5 +164,16 @@ public class TeamService {
         Integer count = memberDao.createMember(member);
 
         return count;
+    }
+
+    public MemberTeam generateMemberTeam(Integer memberId,Integer teamId) {
+        MemberTeam memberTeam = new MemberTeam();
+        Guest guest = ThreadLocalUtil.getGuest();
+        memberTeam.setMemberId(memberId);
+        memberTeam.setTeamId(teamId);
+        memberTeam.setOperatorId(guest.getId());
+        memberTeam.setOperatorName(guest.getName());
+
+        return memberTeam;
     }
 }

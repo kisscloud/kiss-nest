@@ -35,7 +35,13 @@ public class GroupDaoImpl implements GroupDao {
     }
 
     @Override
-    public Integer addCount(Map params) {
+    public Integer addCount(Integer teamId,Integer id,String type,Integer increment) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("id",id);
+        params.put("teamId",teamId);
+        params.put("type",type);
+        params.put("increment",increment);
 
         return groupMapper.addCount(params);
     }

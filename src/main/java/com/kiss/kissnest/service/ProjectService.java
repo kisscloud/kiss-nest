@@ -59,11 +59,7 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
         }
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("id",project.getGroupId());
-        params.put("teamId",project.getTeamId());
-        params.put("type","projects");
-        groupDao.addCount(params);
+        groupDao.addCount(project.getTeamId(),project.getGroupId(),"projects",1);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }

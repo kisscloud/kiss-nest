@@ -59,4 +59,10 @@ public class MemberController {
 
         return memberService.getMemberDefaultTeamId(accountId);
     }
+
+    @GetMapping("/member/teams")
+    public ResultOutput getMemberTeamsByAccountId(@RequestParam("accountId") Integer accountId) {
+
+        return memberService.getMemberTeamsByAccountId(accountId);
+    }
 }

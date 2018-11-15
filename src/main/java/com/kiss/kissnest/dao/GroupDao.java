@@ -13,7 +13,7 @@ public interface GroupDao {
 
     Integer updateGroupById(Group group);
 
-    Integer addCount(Map params);
+    Integer addCount(Integer teamId,Integer id,String type,Integer increment);
 
     Group getGroupById(Integer id);
 

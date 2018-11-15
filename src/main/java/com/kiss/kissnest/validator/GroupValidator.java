@@ -50,7 +50,7 @@ public class GroupValidator implements Validator {
                 validateSlug(createGroupInput.getSlug(),teamId,errors);
             }
 
-            validateStatus(createGroupInput.getStatus(),errors);
+//            validateStatus(createGroupInput.getStatus(),errors);
         } else if (UpdateGroupInput.class.isInstance(target)) {
             UpdateGroupInput updateGroupInput = (UpdateGroupInput) target;
             Integer teamId = updateGroupInput.getTeamId();
@@ -62,7 +62,7 @@ public class GroupValidator implements Validator {
             }
 
             validateId(updateGroupInput.getId(),"id",errors);
-            validateStatus(updateGroupInput.getStatus(),errors);
+//            validateStatus(updateGroupInput.getStatus(),errors);
         } else if (BindGroupProjectsInput.class.isInstance(target)) {
             BindGroupProjectsInput bindGroupProjectsInput = (BindGroupProjectsInput) target;
             validateId(bindGroupProjectsInput.getGroupId(),"groupId",errors);

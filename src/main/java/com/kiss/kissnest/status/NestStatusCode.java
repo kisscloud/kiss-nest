@@ -59,6 +59,8 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
 
     public static final Integer BIND_ACCOUNT_TEAM_FAILED = 8001;
+    public static final Integer CREATE_MEMBER_TEAM_FAILED = 8002;
+
 
     public static final Integer CREATE_MEMBER_ACCESS_FAILED = 9001;
     public static final Integer UPDATE_MEMBER_ACCESS_FAILED = 9002;

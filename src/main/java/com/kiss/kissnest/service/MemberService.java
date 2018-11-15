@@ -1,10 +1,13 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.MemberDao;
+import com.kiss.kissnest.dao.MemberTeamDao;
 import com.kiss.kissnest.entity.Member;
+import com.kiss.kissnest.entity.MemberTeam;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateMemberAccessInput;
 import com.kiss.kissnest.output.MemberOutput;
+import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -27,6 +30,9 @@ public class MemberService {
 
     @Autowired
     private MemberDao memberDao;
+
+    @Autowired
+    private MemberTeamDao memberTeamDao;
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
@@ -205,5 +211,13 @@ public class MemberService {
         params.put("teamId",team.getId());
         params.put("teamName",team.getName());
         return ResultOutputUtil.success(params);
+    }
+
+    public ResultOutput getMemberTeamsByAccountId(Integer accountId) {
+
+        List<Team> memberTeams = memberTeamDao.getMemberTeams(accountId);
+        List<TeamOutput> memberTeamOutputs = (List) BeanCopyUtil.copyList(memberTeams,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(memberTeamOutputs);
     }
 }

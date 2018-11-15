@@ -45,12 +45,6 @@ public class TeamDaoImpl implements TeamDao {
     }
 
     @Override
-    public List<Team> getTeams(Integer accountId) {
-
-        return teamMapper.getTeams(accountId);
-    }
-
-    @Override
     public Team getTeamByName(String name) {
 
         return teamMapper.getTeamByName(name);

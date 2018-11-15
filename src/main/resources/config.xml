@@ -48,19 +48,23 @@ if [ $? -eq 0 ]; then&#x000A;
 else&#x000A;
   echo &quot;#Error: source codes ${branch} branch does not exist！&quot;; exit ;&#x000A;
 fi&#x000A;
-a=`git log|grep 'commit'|head -1`&#x000A;
-b=`echo ${a##*commit}`&#x000A;
+log=`git log|grep 'commit'|head -1`&#x000A;
+version=`echo ${log##*commit}`&#x000A;
 slug=%s&#x000A;
 binIp=%s&#x000A;
-name=$slug-$b&#x000A;
-echo "versionStart="$b"=versionEnd"&#x000A;
+name=$slug-${branch}-$version&#x000A;
+echo "versionStart="$version"=versionEnd"&#x000A;
 echo "jarNameStart="$name"=jarNameEnd"&#x000A;
+&#x000A;
 %s&#x000A;
+&#x000A;
 default=`ls package*`&#x000A;
-mv package* `echo $name`echo ${a##package}``&#x000A;
-tar -zcvf $name.tar.gz $name*&#x000A;
-ansible $binIp -u root -m shell -a "if [ ! -d "/opt/app/$slug" ];then mkdir -p /opt/app/$slug;fi"&#x000A;
-rsync -v $name.tar.gz root@$binIp:/opt/app/$slug/&#x000A;
+ts=`date '+%Y-%m-%d-%H-%M-%S'`&#x000A;
+newName=$name-$ts`echo ${default##package}`&#x000A;
+mv package* $newName&#x000A;
+tar -zcvf $newName.tar.gz $newName*&#x000A;
+ansible $binIp -u root -m shell -a "if [ ! -d "/opt/apps/$slug" ];then mkdir -p /opt/apps/$slug;fi"&#x000A;
+rsync -v $newName.tar.gz root@$binIp:/opt/apps/$slug/&#x000A;
             </command>
         </hudson.tasks.Shell>
     </builders>

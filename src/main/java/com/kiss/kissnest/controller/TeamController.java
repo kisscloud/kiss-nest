@@ -51,13 +51,6 @@ public class TeamController {
         return teamService.updateTeam((Team) BeanCopyUtil.copy(teamInput,Team.class));
     }
 
-    @GetMapping("/teams")
-    @ApiOperation(value = "获取团队")
-    public ResultOutput getTeams (@RequestParam("accountId") Integer accountId) {
-
-        return teamService.getTeams(accountId);
-    }
-
     @GetMapping("/team/change")
     @ApiOperation(value = "切换团队")
     public ResultOutput changeTeam (@RequestParam("teamId") Integer teamId) {

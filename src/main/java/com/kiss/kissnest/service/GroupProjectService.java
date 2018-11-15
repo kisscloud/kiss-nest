@@ -79,11 +79,7 @@ public class GroupProjectService {
             return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
         }
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("type","projects");
-        params.put("increment",count);
-        params.put("id",groupId);
-        groupDao.addCount(params);
+        groupDao.addCount(group.getTeamId(),groupId,"projects",count);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(groupProjects,BindGroupProjectsOutput.class));
     }
