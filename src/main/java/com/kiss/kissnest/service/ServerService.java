@@ -56,7 +56,7 @@ public class ServerService {
         return ResultOutputUtil.success(environmentOutput);
     }
 
-    public ResultOutput getEnvironmentByTeamId(Integer teamId) {
+    public ResultOutput getEnvironmentsByTeamId(Integer teamId) {
 
         List<Environment> environment = environmentDao.getEnvironmentsByTeamId(teamId);
 

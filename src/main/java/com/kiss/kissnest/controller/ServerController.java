@@ -36,11 +36,11 @@ public class ServerController {
         return serverService.createEnvironment(environmentInput);
     }
 
-    @GetMapping("/server/environment")
+    @GetMapping("/server/environments")
     @ApiOperation(value = "获取服务器环境")
     public ResultOutput getEnvironmentByTeamId(@RequestParam("teamId") Integer teamId) {
 
-        return serverService.getEnvironmentByTeamId(teamId);
+        return serverService.getEnvironmentsByTeamId(teamId);
     }
 
     @PostMapping("/server")
