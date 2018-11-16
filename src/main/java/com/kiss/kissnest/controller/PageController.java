@@ -1,9 +1,6 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.service.BuildService;
-import com.kiss.kissnest.service.GroupService;
-import com.kiss.kissnest.service.ProjectRepositoryService;
-import com.kiss.kissnest.service.ProjectService;
+import com.kiss.kissnest.service.*;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +30,9 @@ public class PageController {
 
     @Autowired
     private ProjectRepositoryService projectRepositoryService;
+
+    @Autowired
+    private LinkService linkService;
 
 
     @ApiOperation(value = "获取项目组页面参数")
@@ -92,4 +92,16 @@ public class PageController {
         return ResultOutputUtil.success(result);
     }
 
+
+    @ApiOperation(value = "获取设置页面参数")
+    @GetMapping("/setting")
+    public ResultOutput GetPageSettingParams(@RequestParam("teamId") Integer teamId) {
+
+        ResultOutput links = linkService.getLinks(teamId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("links", links.getData());
+
+        return ResultOutputUtil.success(result);
+    }
 }
