@@ -17,8 +17,6 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer TEAM_SLUG_IS_EMPTY = 1009;
 
 
-
-
     public static final Integer CREATE_TEAMGROUP_FAILED = 2002;
     public static final Integer GROUP_NOT_EXIST = 2003;
 
@@ -40,15 +38,12 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer GROUP_SLUG_IS_EXIST = 4016;
 
 
-
-
-
     public static final Integer PROJECT_NAME_EXIST = 5001;
     public static final Integer CREATE_PROJECT_FAILED = 5002;
     public static final Integer PROJECT_NOT_EXIST = 5003;
     public static final Integer DELETE_PROJECT_FAILED = 5004;
     public static final Integer UPDATE_PROJECT_FAILED = 5005;
-    public static final Integer PROJECT_SLUG_EMPTY= 5006;
+    public static final Integer PROJECT_SLUG_EMPTY = 5006;
     public static final Integer CREATE_PROJECT_REPOSITORY_FAILED = 5007;
     public static final Integer PROJECT_ID_IS_EMPTY = 5008;
     public static final Integer PROJECT_REPOSITORY_EXIST = 5009;
@@ -58,27 +53,22 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer PROJECT_SLUG_IS_EXIST = 5013;
 
 
-
-
-
     public static final Integer MEMBER_NAME_EXIST = 6001;
     public static final Integer CREATE_MEMBER_FAILED = 6002;
     public static final Integer MEMBER_NOT_EXIST = 6003;
     public static final Integer DELETE_MEMBER_FAILED = 6004;
     public static final Integer UPDATE_MEMBER_FAILED = 6005;
     public static final Integer MEMBER_DEFAULT_TEAM_DEFECT = 6006;
-    public static final Integer MEMBER_PASSWORD_ERROR= 6007;
-    public static final Integer MEMBER_CLIENTID_IS_EMPTY= 6008;
-    public static final Integer MEMBER_NAME_IS_EMPTY= 6009;
-    public static final Integer MEMBER_ACCOUNT_ID_IS_EMPTY= 6010;
-    public static final Integer MEMBER_LIST_IS_EMPTY= 6011;
-    public static final Integer CREATE_MEMBER_GROUP_FAILED= 6012;
-    public static final Integer GROUP_MEMBER_IS_EXIST= 6013;
-    public static final Integer TEAM_MEMBER_IS_EXIST= 6014;
-    public static final Integer CREATE_MEMBER_PROJECT_FAILED= 6015;
-    public static final Integer PROJCET_MEMBER_IS_EXIST= 6016;
-
-
+    public static final Integer MEMBER_PASSWORD_ERROR = 6007;
+    public static final Integer MEMBER_CLIENTID_IS_EMPTY = 6008;
+    public static final Integer MEMBER_NAME_IS_EMPTY = 6009;
+    public static final Integer MEMBER_ACCOUNT_ID_IS_EMPTY = 6010;
+    public static final Integer MEMBER_LIST_IS_EMPTY = 6011;
+    public static final Integer CREATE_MEMBER_GROUP_FAILED = 6012;
+    public static final Integer GROUP_MEMBER_IS_EXIST = 6013;
+    public static final Integer TEAM_MEMBER_IS_EXIST = 6014;
+    public static final Integer CREATE_MEMBER_PROJECT_FAILED = 6015;
+    public static final Integer PROJCET_MEMBER_IS_EXIST = 6016;
 
 
     public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
@@ -119,6 +109,11 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer SERVERID_IS_EMPTY = 13004;
     public static final Integer SERVER_NOT_EXIST = 13005;
     public static final Integer SERVER_UPDATE_FAILED = 13006;
+
+
+    public static final Integer TEAM_ID_IS_EMPTY = 14001;
+    public static final Integer LINK_TITLE_IS_EMPTY = 14002;
+    public static final Integer LINK_URL_IS_EMPTY = 14003;
 
 
     public static final Integer SERVICE_ERROR = 3001;
