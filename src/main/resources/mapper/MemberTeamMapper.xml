@@ -16,7 +16,7 @@
         insert into memberTeams (memberId,teamId,role,operatorId,operatorName)
         values
         <foreach collection="list" separator="," item="m">
-            (#{memberId},#{teamId},#{role},#{operatorId},#{operatorName})
+            (#{m.memberId},#{m.teamId},#{m.role},#{m.operatorId},#{m.operatorName})
         </foreach>
     </insert>
 

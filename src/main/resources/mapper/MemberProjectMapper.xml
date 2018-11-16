@@ -19,7 +19,7 @@
         </foreach>
     </insert>
 
-    <select id="getMemberProjects" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
+    <select id="getMemberProject" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
         select * from memberprojects where teamId = #{teamId} and projectId = #{projectId};
     </select>
 

@@ -248,6 +248,7 @@ public class MemberService {
         List<Member> members = new ArrayList<>();
         List<MemberTeam> memberTeams = new ArrayList<>();
         List<MemberInput> memberInputs = createMemberTeamInput.getMemberInputs();
+        Map<Integer,Integer> memberAccount = new HashMap<>();
 
         for (MemberInput memberInput : memberInputs) {
 
@@ -260,13 +261,30 @@ public class MemberService {
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 members.add(member);
+            } else {
+                memberAccount.put(member.getAccountId(),member.getId());
+            }
+        }
+
+        if (members.size() != 0) {
+            Integer count = memberDao.createMembers(members);
+
+            if (count != members.size()) {
+                throw new TransactionalException(NestStatusCode.CREATE_MEMBER_FAILED);
             }
 
-            MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(),member.getId());
+            for (Member member : members) {
+                memberAccount.put(member.getAccountId(),member.getId());
+            }
+        }
+
+        for (MemberInput memberInput : memberInputs) {
+            Integer memberId = memberAccount.get(memberInput.getId());
+            MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(),memberId);
 
             if (memberTeam == null) {
                 memberTeam = new MemberTeam();
-                memberTeam.setMemberId(member.getId());
+                memberTeam.setMemberId(memberId);
                 memberTeam.setTeamId(createMemberTeamInput.getTeamId());
                 memberTeam.setRole(memberInput.getRole());
                 memberTeam.setOperatorId(guest.getId());
@@ -275,14 +293,8 @@ public class MemberService {
             }
         }
 
-        Integer count = memberDao.createMembers(members);
-
-        if (count != members.size()) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_FAILED);
-        }
-
         if (memberTeams.size() != 0) {
-            count = memberTeamDao.createMemberTeams(memberTeams);
+            Integer count = memberTeamDao.createMemberTeams(memberTeams);
 
             if (count != memberTeams.size()) {
                 throw new TransactionalException(NestStatusCode.CREATE_MEMBER_TEAM_FAILED);
@@ -311,6 +323,7 @@ public class MemberService {
                 memberGroup.setRole(memberGroupInput.getRole());
                 memberGroup.setOperatorId(guest.getId());
                 memberGroup.setOperatorName(guest.getName());
+                memberGroup.setGroupId(bindMemberGroupInput.getGroupId());
                 memberGroups.add(memberGroup);
             }
         }
@@ -346,6 +359,7 @@ public class MemberService {
                 memberProject.setRole(memberProjectInput.getRole());
                 memberProject.setOperatorId(guest.getId());
                 memberProject.setOperatorName(guest.getName());
+                memberProject.setProjectId(bindMemberProjectInput.getProjectId());
                 memberProjects.add(memberProject);
             }
         }

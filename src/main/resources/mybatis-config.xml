@@ -44,5 +44,7 @@
         <mapper resource="mapper/ProjectRepositoryMapper.xml"/>
         <mapper resource="mapper/EnvironmentMapper.xml"/>
         <mapper resource="mapper/MemberTeamMapper.xml"/>
+        <mapper resource="mapper/MemberGroupMapper.xml"/>
+        <mapper resource="mapper/MemberProjectMapper.xml"/>
     </mappers>
 </configuration>
