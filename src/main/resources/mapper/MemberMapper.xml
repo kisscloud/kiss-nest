@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.MemberMapper">
 
-    <insert id="createMember" parameterType="com.kiss.kissnest.entity.Member">
+    <insert id="createMember" parameterType="com.kiss.kissnest.entity.Member" keyProperty="id" useGeneratedKeys="true">
         insert into members (accountId,teamId,accessToken,operatorId,operatorName)
         value
         (#{accountId},#{teamId},#{accessToken},#{operatorId},#{operatorName})
@@ -86,4 +86,12 @@
     <select id="getMemberDefaultTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Team">
         select te.id,te.name from members me left join teams te on me.teamId = te.id where me.accountId = #{accountId} limit 0,1;
     </select>
+
+    <insert id="createMembers" parameterType="java.util.List" keyProperty="id" useGeneratedKeys="true">
+        insert into members (accountId,teamId,accessToken,operatorId,operatorName)
+        values
+        <foreach collection="list" item="m" separator=",">
+            (#{m.accountId},#{m.teamId},#{m.accessToken},#{m.operatorId},#{m.operatorName})
+        </foreach>
+    </insert>
 </mapper>

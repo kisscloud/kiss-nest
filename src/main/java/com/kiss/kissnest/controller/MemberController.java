@@ -1,7 +1,9 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.input.CreateMemberAccessInput;
+import com.kiss.kissnest.input.*;
+import com.kiss.kissnest.output.BindGroupProjectsOutput;
 import com.kiss.kissnest.service.MemberService;
+import com.kiss.kissnest.util.ResultOutputUtil;
 import com.kiss.kissnest.validator.MemberValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
+
+import java.util.List;
 
 @RestController
 @Api(tags = "Member", description = "成员相关接口")
@@ -64,5 +68,29 @@ public class MemberController {
     public ResultOutput getMemberTeamsByAccountId(@RequestParam("accountId") Integer accountId) {
 
         return memberService.getMemberTeamsByAccountId(accountId);
+    }
+
+    @PostMapping("/member/client")
+    public ResultOutput getMembersByClientId(@RequestBody MemberClientInput memberClientInput) {
+
+        return memberService.getMembersByClientId(memberClientInput);
+    }
+
+    @PostMapping("/member/team")
+    public ResultOutput createMemberTeam(@RequestBody CreateMemberTeamInput createMemberTeamInput) {
+
+        return memberService.createMemberTeam(createMemberTeamInput);
+    }
+
+    @PostMapping("/member/group")
+    public ResultOutput bindMemberGroup(@RequestBody BindMemberGroupInput bindMemberGroupInput) {
+
+        return memberService.createMemberGroup(bindMemberGroupInput);
+    }
+
+    @PostMapping("/member/project")
+    public ResultOutput bindMemberGroup(@RequestBody BindMemberProjectInput bindMemberProjectInput) {
+
+        return memberService.createMemberProject(bindMemberProjectInput);
     }
 }

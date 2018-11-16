@@ -2,25 +2,21 @@ package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.GroupDao;
 import com.kiss.kissnest.dao.GroupProjectDao;
-import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.GroupProject;
-import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.output.BindGroupProjectsOutput;
 import com.kiss.kissnest.output.GroupProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class GroupProjectService {

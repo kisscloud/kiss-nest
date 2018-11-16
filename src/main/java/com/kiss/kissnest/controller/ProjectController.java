@@ -5,7 +5,6 @@ import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.service.ProjectRepositoryService;
 import com.kiss.kissnest.service.ProjectService;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.validator.ProjectValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 
 @RestController
 @Api(tags = "Project", description = "项目相关接口")
@@ -52,7 +52,7 @@ public class ProjectController {
     @ApiOperation(value = "更新项目")
     public ResultOutput updateProject(@Validated @RequestBody UpdateProjectInput updateProjectInput) {
 
-        return projectService.updateProject((Project) BeanCopyUtil.copy(updateProjectInput, Project.class));
+        return projectService.updateProject(updateProjectInput);
     }
 
     @GetMapping("/projects")

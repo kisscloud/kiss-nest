@@ -5,7 +5,6 @@ import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
@@ -13,11 +12,6 @@ import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
-import com.suse.saltstack.netapi.AuthModule;
-import com.suse.saltstack.netapi.calls.LocalCall;
-import com.suse.saltstack.netapi.client.SaltStackClient;
-import com.suse.saltstack.netapi.datatypes.Token;
-import com.suse.saltstack.netapi.exception.SaltStackException;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +68,9 @@ public class BuildService {
     @Autowired
     private ProjectRepositoryDao projectRepositoryDao;
 
+    @Autowired
+    private OperationLogService operationLogService;
+
     public static Map<String,String> buildRemarks = new HashMap<>();
 
     public static Map<String,String> deployRemarks = new HashMap<>();
@@ -115,6 +110,7 @@ public class BuildService {
 
         jobDao.createJob(job);
 
+//        operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
         return ResultOutputUtil.success();
     }
 
@@ -188,6 +184,8 @@ public class BuildService {
             thread.start();
             buildRemarks.put(buildJobInput.getProjectId() + "" + number,buildJobInput.getRemark());
         }
+
+//        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
 
         return ResultOutputUtil.success();
     }

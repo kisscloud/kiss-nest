@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface OperateLogMapper {
+public interface OperationLogMapper {
 
-    Integer createOperateLog(OperationLog operateLog);
+    Integer createOperationLog(OperationLog operateLog);
 
-    List<OperationLog> getOperateLogsByTeamId(Integer teamId);
+    List<OperationLog> getOperationLogsByTeamId(Integer teamId);
 }

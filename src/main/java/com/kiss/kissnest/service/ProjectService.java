@@ -4,31 +4,28 @@ import com.kiss.kissnest.dao.GroupDao;
 import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
-import com.kiss.kissnest.entity.Group;
+import com.kiss.kissnest.entity.OperationTargetType;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.input.CreateProjectInput;
+import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.gitlab.api.models.GitlabBranch;
-import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ProjectService {
@@ -54,6 +51,9 @@ public class ProjectService {
     @Value("${project.type}")
     private String projectTypes;
 
+    @Autowired
+    private OperationLogService operationLogService;
+
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
         Project project = (Project) BeanCopyUtil.copy(createProjectInput, Project.class);
@@ -67,9 +67,11 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
         }
 
-        groupDao.addCount(project.getTeamId(),project.getGroupId(),"projects",1);
-
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
+        groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
+        ProjectOutput projectOutput = (ProjectOutput) BeanCopyUtil.copy(project, ProjectOutput.class);
+        projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
+//        operationLogService.saveOperationLog(project.getTeamId(),guest,null,project,"id",OperationTargetType.TYPE_CREATE_PROJECT);
+        return ResultOutputUtil.success(projectOutput);
     }
 
     public ResultOutput deleteProject(Integer id) {
@@ -86,16 +88,25 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.DELETE_PROJECT_FAILED);
         }
 
+//        operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);
+
         return ResultOutputUtil.success();
     }
 
-    public ResultOutput updateProject(Project project) {
+    public ResultOutput updateProject(UpdateProjectInput updateProjectInput) {
 
+        Project project = (Project) BeanCopyUtil.copy(updateProjectInput, Project.class);
+        Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
+        Guest guest = ThreadLocalUtil.getGuest();
+        project.setOperatorId(guest.getId());
+        project.setOperatorName(guest.getName());
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_PROJECT_FAILED);
         }
+
+//        operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
@@ -107,12 +118,12 @@ public class ProjectService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
     }
 
-    public ResultOutput getProjects(Integer teamId,Integer groupId) {
+    public ResultOutput getProjects(Integer teamId, Integer groupId) {
 
-        List<Project> projects = projectDao.getProjects(teamId,groupId);
-        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<Project> projects = projectDao.getProjects(teamId, groupId);
+        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class, BeanCopyUtil.defaultFieldNames);
 
-        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type",String.valueOf(projectOutput.getType())))));
+        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
 
         return ResultOutputUtil.success(projectOutputs);
     }
@@ -184,12 +195,12 @@ public class ProjectService {
         return ResultOutputUtil.success(projectOutputs);
     }
 
-    public ResultOutput getProjectTypes () {
+    public ResultOutput getProjectTypes() {
         String[] types = projectTypes.split(",");
         List<String> typeList = new ArrayList<>();
 
         for (String type : types) {
-            typeList.add(codeUtil.getEnumsMessage("project.type",type));
+            typeList.add(codeUtil.getEnumsMessage("project.type", type));
         }
 
         return ResultOutputUtil.success(typeList);

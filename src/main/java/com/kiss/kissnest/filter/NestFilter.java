@@ -1,8 +1,11 @@
 package com.kiss.kissnest.filter;
 
+import entity.Guest;
 import filter.GuestFilter;
 import filter.InnerFilterChain;
 import org.springframework.stereotype.Component;
+import utils.GuestUtil;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +35,10 @@ public class NestFilter implements Filter {
 
         preFilterChain.doFilter(httpServletRequest, httpServletResponse, preFilterChain);
 
-//        Guest operator = new Guest();
-//        operator.setId(103);
-//        operator.setName("qrl758");
-//        GuestUtil.setGuest(operator);
+        Guest operator = new Guest();
+        operator.setId(103);
+        operator.setName("qrl758");
+        GuestUtil.setGuest(operator);
 
         chain.doFilter(httpServletRequest,httpServletResponse);
     }

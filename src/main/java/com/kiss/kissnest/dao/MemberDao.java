@@ -29,4 +29,6 @@ public interface MemberDao {
     Integer updateApiTokenByAccountId(Integer accountId,String apiToken);
 
     Team getMemberDefaultTeamId(Integer accountId);
+
+    Integer createMembers(List<Member> members);
 }

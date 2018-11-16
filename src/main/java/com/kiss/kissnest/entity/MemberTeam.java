@@ -13,6 +13,8 @@ public class MemberTeam {
 
     private Integer teamId;
 
+    private Integer role;
+
     private Integer operatorId;
 
     private String operatorName;

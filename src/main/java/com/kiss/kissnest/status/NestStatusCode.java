@@ -68,6 +68,16 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer UPDATE_MEMBER_FAILED = 6005;
     public static final Integer MEMBER_DEFAULT_TEAM_DEFECT = 6006;
     public static final Integer MEMBER_PASSWORD_ERROR= 6007;
+    public static final Integer MEMBER_CLIENTID_IS_EMPTY= 6008;
+    public static final Integer MEMBER_NAME_IS_EMPTY= 6009;
+    public static final Integer MEMBER_ACCOUNT_ID_IS_EMPTY= 6010;
+    public static final Integer MEMBER_LIST_IS_EMPTY= 6011;
+    public static final Integer CREATE_MEMBER_GROUP_FAILED= 6012;
+    public static final Integer GROUP_MEMBER_IS_EXIST= 6013;
+    public static final Integer TEAM_MEMBER_IS_EXIST= 6014;
+    public static final Integer CREATE_MEMBER_PROJECT_FAILED= 6015;
+    public static final Integer PROJCET_MEMBER_IS_EXIST= 6016;
+
 
 
 

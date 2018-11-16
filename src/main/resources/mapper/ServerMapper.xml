@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.ServerMapper">
 
-    <insert id="createServer" parameterType="com.kiss.kissnest.entity.Server">
+    <insert id="createServer" parameterType="com.kiss.kissnest.entity.Server" keyProperty="id" useGeneratedKeys="true">
         insert into servers (name,envId,innerIp,outerIp,operatorId,operatorName)
         value
         (#{name},#{envId},#{innerIp},#{outerIp},#{operatorId},#{operatorName})

@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.ProjectMapper">
 
-    <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project">
+    <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project" keyProperty="id" useGeneratedKeys="true">
         insert into projects (name,teamId,groupId,slug,membersCount,operatorId,operatorName,type)
         value
         (#{name},#{teamId},#{groupId},#{slug},#{membersCount},#{operatorId},#{operatorName},#{type})

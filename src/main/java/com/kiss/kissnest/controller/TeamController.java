@@ -1,10 +1,8 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.input.UpdateTeamInput;
 import com.kiss.kissnest.service.TeamService;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.validator.TeamValidaor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,9 +44,9 @@ public class TeamController {
 
     @PutMapping("/team")
     @ApiOperation(value = "更新团队")
-    public ResultOutput updateTeam (@Validated @RequestBody UpdateTeamInput teamInput) {
+    public ResultOutput updateTeam (@Validated @RequestBody UpdateTeamInput updateTeamInput) {
 
-        return teamService.updateTeam((Team) BeanCopyUtil.copy(teamInput,Team.class));
+        return teamService.updateTeam(updateTeamInput);
     }
 
     @GetMapping("/team/change")

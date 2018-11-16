@@ -31,4 +31,6 @@ public interface MemberMapper {
     Integer updateApiTokenByAccountId(Map params);
 
     Team getMemberDefaultTeamId(Integer accountId);
+
+    Integer createMembers(List<Member> members);
 }

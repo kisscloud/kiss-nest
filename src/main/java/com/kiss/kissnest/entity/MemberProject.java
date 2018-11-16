@@ -5,27 +5,21 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class OperationLog {
+public class MemberProject {
 
     private Integer id;
 
     private Integer teamId;
 
-    private Integer type;
+    private Integer projectId;
 
-    private Integer targetId;
+    private Integer memberId;
 
-    private Integer targetType;
-
-    private String beforeValue;
-
-    private String afterValue;
+    private Integer role;
 
     private Integer operatorId;
 
     private String operatorName;
-
-    private Date recoveredAt;
 
     private Date createdAt;
 

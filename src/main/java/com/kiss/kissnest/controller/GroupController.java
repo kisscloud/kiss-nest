@@ -1,15 +1,10 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.entity.Group;
-import com.kiss.kissnest.entity.GroupProject;
-import com.kiss.kissnest.entity.TeamGroup;
 import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
 import com.kiss.kissnest.service.GroupProjectService;
 import com.kiss.kissnest.service.GroupService;
-import com.kiss.kissnest.service.TeamGroupService;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.validator.GroupValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

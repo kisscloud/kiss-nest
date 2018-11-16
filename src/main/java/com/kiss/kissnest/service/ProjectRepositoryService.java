@@ -9,7 +9,6 @@ import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.output.ProjectRepositoryOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import org.gitlab.api.models.GitlabProject;
@@ -17,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

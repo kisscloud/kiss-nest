@@ -4,25 +4,21 @@ import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.MemberTeamDao;
 import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.dao.TeamGroupDao;
-import com.kiss.kissnest.entity.Member;
-import com.kiss.kissnest.entity.MemberTeam;
-import com.kiss.kissnest.entity.Team;
-import com.kiss.kissnest.entity.TeamGroup;
+import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateTeamInput;
+import com.kiss.kissnest.input.UpdateTeamInput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.gitlab.api.models.GitlabGroup;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
 import java.util.List;
@@ -44,6 +40,9 @@ public class TeamService {
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
+
+    @Autowired
+    private OperationLogService operationLogService;
 
     @Transactional
     public ResultOutput createTeam(CreateTeamInput teamInput) {
@@ -81,7 +80,7 @@ public class TeamService {
 
         team.setRepositoryId(gitlabGroup.getId());
         teamDao.addRepositoryIdById(team);
-
+//        operationLogService.saveOperationLog(team.getId(),guest,null,team,"id",OperationTargetType.TYPE_CREATE_TEAM);
         TeamOutput teamOutput = (TeamOutput) BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
@@ -106,7 +105,9 @@ public class TeamService {
         return ResultOutputUtil.success();
     }
 
-    public ResultOutput updateTeam(Team team) {
+    public ResultOutput updateTeam(UpdateTeamInput updateTeamInput) {
+
+        Team team = (Team) BeanCopyUtil.copy(updateTeamInput,Team.class);
 
         Team exist = teamDao.getTeamById(team.getId());
 
@@ -148,11 +149,13 @@ public class TeamService {
         Guest guest = ThreadLocalUtil.getGuest();
         Integer accountId = guest.getId();
         Member member = memberDao.getMemberByAccountId(accountId);
+        Member before = (Member) BeanCopyUtil.copy(member,Member.class);
 
         if (member != null) {
             //更新
             member.setTeamId(teamId);
             Integer count = memberDao.updateMember(member);
+//            operationLogService.saveOperationLog(teamId,guest,before,member,"id",OperationTargetType.TYPE_CHANGE_TEAM);
             return count;
         }
 
@@ -162,7 +165,7 @@ public class TeamService {
         member.setOperatorId(accountId);
         member.setOperatorName(guest.getName());
         Integer count = memberDao.createMember(member);
-
+//        operationLogService.saveOperationLog(teamId,guest,null,member,"id",OperationTargetType.TYPE_CHANGE_TEAM);
         return count;
     }
 

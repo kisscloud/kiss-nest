@@ -10,5 +10,9 @@ public interface MemberTeamDao {
 
     Integer createMemberTeam(MemberTeam memberTeam);
 
+    Integer createMemberTeams(List<MemberTeam> memberTeams);
+
     List<Team> getMemberTeams(Integer accountId);
+
+    MemberTeam getMemberTeam(Integer teamId,Integer memberId);
 }

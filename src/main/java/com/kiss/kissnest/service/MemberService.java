@@ -1,26 +1,30 @@
 package com.kiss.kissnest.service;
 
+import com.kiss.account.input.ClientAccountInput;
 import com.kiss.kissnest.dao.MemberDao;
+import com.kiss.kissnest.dao.MemberGroupDao;
+import com.kiss.kissnest.dao.MemberProjectDao;
 import com.kiss.kissnest.dao.MemberTeamDao;
-import com.kiss.kissnest.entity.Member;
-import com.kiss.kissnest.entity.MemberTeam;
-import com.kiss.kissnest.entity.Team;
-import com.kiss.kissnest.input.CreateMemberAccessInput;
+import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.exception.TransactionalException;
+import com.kiss.kissnest.feign.ClientServiceFeign;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.MemberOutput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.BeanCopyUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
+import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +39,19 @@ public class MemberService {
     private MemberTeamDao memberTeamDao;
 
     @Autowired
+    private MemberGroupDao memberGroupDao;
+
+    @Autowired
+    private MemberProjectDao memberProjectDao;
+
+    @Autowired
     private GitlabApiUtil gitlabApiUtil;
 
     @Autowired
     private JenkinsUtil jenkinsUtil;
+
+    @Autowired
+    private ClientServiceFeign clientServiceFeign;
 
     public ResultOutput createMember(Member member) {
 
@@ -219,5 +232,135 @@ public class MemberService {
         List<TeamOutput> memberTeamOutputs = (List) BeanCopyUtil.copyList(memberTeams,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(memberTeamOutputs);
+    }
+
+    public ResultOutput getMembersByClientId(MemberClientInput memberClientInput) {
+
+        ClientAccountInput clientAccountInput = (ClientAccountInput) BeanCopyUtil.copy(memberClientInput,ClientAccountInput.class);
+
+        return clientServiceFeign.getClientAccounts(clientAccountInput);
+    }
+
+    @Transactional
+    public ResultOutput createMemberTeam(CreateMemberTeamInput createMemberTeamInput) {
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        List<Member> members = new ArrayList<>();
+        List<MemberTeam> memberTeams = new ArrayList<>();
+        List<MemberInput> memberInputs = createMemberTeamInput.getMemberInputs();
+
+        for (MemberInput memberInput : memberInputs) {
+
+            Member member = memberDao.getMemberByAccountId(memberInput.getId());
+
+            if (member == null) {
+                member = new Member();
+                member.setAccountId(memberInput.getId());
+                member.setTeamId(createMemberTeamInput.getTeamId());
+                member.setOperatorId(guest.getId());
+                member.setOperatorName(guest.getName());
+                members.add(member);
+            }
+
+            MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(),member.getId());
+
+            if (memberTeam == null) {
+                memberTeam = new MemberTeam();
+                memberTeam.setMemberId(member.getId());
+                memberTeam.setTeamId(createMemberTeamInput.getTeamId());
+                memberTeam.setRole(memberInput.getRole());
+                memberTeam.setOperatorId(guest.getId());
+                memberTeam.setOperatorName(guest.getName());
+                memberTeams.add(memberTeam);
+            }
+        }
+
+        Integer count = memberDao.createMembers(members);
+
+        if (count != members.size()) {
+            return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_FAILED);
+        }
+
+        if (memberTeams.size() != 0) {
+            count = memberTeamDao.createMemberTeams(memberTeams);
+
+            if (count != memberTeams.size()) {
+                throw new TransactionalException(NestStatusCode.CREATE_MEMBER_TEAM_FAILED);
+            }
+        } else {
+            return ResultOutputUtil.error(NestStatusCode.TEAM_MEMBER_IS_EXIST);
+        }
+
+        return ResultOutputUtil.success();
+    }
+
+    @Transactional
+    public ResultOutput createMemberGroup(BindMemberGroupInput bindMemberGroupInput) {
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        List<MemberGroup> memberGroups = new ArrayList<>();
+        List<MemberGroupInput> memberGroupInputs = bindMemberGroupInput.getMemberGroupInputs();
+
+        for (MemberGroupInput memberGroupInput : memberGroupInputs) {
+            MemberGroup memberGroup = memberGroupDao.getMemberGroup(bindMemberGroupInput.getTeamId(),bindMemberGroupInput.getGroupId(),memberGroupInput.getMemberId());
+
+            if (memberGroup == null) {
+                memberGroup = new MemberGroup();
+                memberGroup.setMemberId(memberGroupInput.getMemberId());
+                memberGroup.setTeamId(bindMemberGroupInput.getTeamId());
+                memberGroup.setRole(memberGroupInput.getRole());
+                memberGroup.setOperatorId(guest.getId());
+                memberGroup.setOperatorName(guest.getName());
+                memberGroups.add(memberGroup);
+            }
+        }
+
+        if (memberGroups.size() != 0) {
+
+            Integer count = memberGroupDao.createMemberGroups(memberGroups);
+
+            if (count != memberGroups.size()) {
+                throw new TransactionalException(NestStatusCode.CREATE_MEMBER_GROUP_FAILED);
+            }
+        } else {
+            return ResultOutputUtil.error(NestStatusCode.GROUP_MEMBER_IS_EXIST);
+        }
+
+        return ResultOutputUtil.success();
+    }
+
+    @Transactional
+    public ResultOutput createMemberProject(BindMemberProjectInput bindMemberProjectInput) {
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        List<MemberProject> memberProjects = new ArrayList<>();
+        List<MemberProjectInput> memberProjectInputs = bindMemberProjectInput.getMemberProjectInputs();
+
+        for (MemberProjectInput memberProjectInput : memberProjectInputs) {
+            MemberProject memberProject = memberProjectDao.getMemberProject(bindMemberProjectInput.getTeamId(),bindMemberProjectInput.getProjectId(),memberProjectInput.getMemberId());
+
+            if (memberProject == null) {
+                memberProject = new MemberProject();
+                memberProject.setMemberId(memberProjectInput.getMemberId());
+                memberProject.setTeamId(bindMemberProjectInput.getTeamId());
+                memberProject.setRole(memberProjectInput.getRole());
+                memberProject.setOperatorId(guest.getId());
+                memberProject.setOperatorName(guest.getName());
+                memberProjects.add(memberProject);
+            }
+        }
+
+        if (memberProjects.size() != 0) {
+
+            Integer count = memberProjectDao.createMemberProjects(memberProjects);
+
+            if (count != memberProjects.size()) {
+                throw new TransactionalException(NestStatusCode.CREATE_MEMBER_PROJECT_FAILED);
+            }
+        } else {
+            return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
+        }
+
+        return ResultOutputUtil.success();
     }
 }

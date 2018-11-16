@@ -3,11 +3,12 @@ package com.kiss.kissnest.input;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class CreateMemberInput {
+public class CreateMemberTeamInput {
 
-    private Integer id;
+    private Integer teamId;
 
-    private Integer accountId;
-
+    private List<MemberInput> memberInputs;
 }

@@ -6,10 +6,18 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.MemberTeamMapper">
 
-    <insert id="createMemberTeam" parameterType="com.kiss.kissnest.entity.MemberTeam">
-        insert into memberTeams (memberId,teamId,operatorId,operatorName)
+    <insert id="createMemberTeam" parameterType="com.kiss.kissnest.entity.MemberTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into memberTeams (memberId,teamId,role,operatorId,operatorName)
         value
-        (#{memberId},#{teamId},#{operatorId},#{operatorName})
+          (#{memberId},#{teamId},#{role},#{operatorId},#{operatorName})
+    </insert>
+
+    <insert id="createMemberTeams" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into memberTeams (memberId,teamId,role,operatorId,operatorName)
+        values
+        <foreach collection="list" separator="," item="m">
+            (#{memberId},#{teamId},#{role},#{operatorId},#{operatorName})
+        </foreach>
     </insert>
 
     <select id="getMemberTeams" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Team">
@@ -19,5 +27,9 @@
         left join teams te
         on mt.teamId = te.id
         where me.accountId = #{accountId};
+    </select>
+    
+    <select id="getMemberTeam" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberTeam">
+        select * from memberTeams where teamId = #{teamId} and memberId = #{memberId};
     </select>
 </mapper>

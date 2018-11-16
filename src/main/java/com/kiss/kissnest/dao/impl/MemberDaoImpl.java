@@ -96,4 +96,10 @@ public class MemberDaoImpl implements MemberDao {
 
         return memberMapper.getMemberDefaultTeamId(accountId);
     }
+
+    @Override
+    public Integer createMembers(List<Member> members) {
+
+        return memberMapper.createMembers(members);
+    }
 }

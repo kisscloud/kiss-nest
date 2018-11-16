@@ -4,9 +4,9 @@ import com.kiss.kissnest.entity.OperationLog;
 
 import java.util.List;
 
-public interface OperateLogDao {
+public interface OperationLogDao {
 
-    Integer createOperateLog(OperationLog operateLog);
+    Integer createOperationLog(OperationLog operateLog);
 
-    List<OperationLog> getOperateLogsByTeamId(Integer teamId);
+    List<OperationLog> getOperationLogsByTeamId(Integer teamId);
 }
