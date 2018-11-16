@@ -59,7 +59,7 @@ echo "jarNameStart="$name"=jarNameEnd"&#x000A;
 %s&#x000A;
 &#x000A;
 default=`ls __PACKAGE__*`&#x000A;
-ts=`date '+%Y-%m-%d-%H-%M-%S'`&#x000A;
+ts=`date '+%%Y-%%m-%%d-%%H-%%M-%%S'`&#x000A;
 newName=$name-$ts`echo ${default##__PACKAGE__}`&#x000A;
 mv __PACKAGE__* $newName&#x000A;
 tar -zcvf $newName.tar.gz $newName*&#x000A;

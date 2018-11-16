@@ -471,10 +471,9 @@ public class JenkinsUtil {
                 builder.append(lineTxt);
             }
             String formatShell = StringEscapeUtils.escapeHtml("abc");
-            String script = String.format(builder.toString(),"git@git.kisscloud.io:facebit/facebitgroup/kiss-eureka-server.git","face3","192.168.0.192",formatShell);
+            String script = String.format(builder.toString(),"git@git.kisscloud.io:facebit/facebitgroup/kiss-eureka-server.git","face5","192.168.0.192",formatShell);
 
-            server.createJob("face4",script,false);
-
+            server.createJob("face5",script,false);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
