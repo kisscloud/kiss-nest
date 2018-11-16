@@ -151,8 +151,9 @@ public class GitlabApiUtil {
 //        GitlabBranch gitlabBranch = gitlabAPI.getBranch("2","master");
 //        GitlabBranchCommit gitlabBranchCommit = gitlabBranch.getCommit();
 
-        GitlabProjectHook gitlabProjectHook = gitlabAPI.addProjectHook(2,"http://localhost:8920/kiss/nest/note",true,false,true,true,true);
-
+//        GitlabProjectHook gitlabProjectHook = gitlabAPI.addProjectHook(2,"http://localhost:8920/kiss/nest/note",true,false,true,true,true);
+        GitlabProject gitlabProject = gitlabAPI.getProject(9);
+        System.out.println(gitlabProject.getPathWithNamespace());
 //        gitlabProject.getId();
 //        gitlabProject.getCreatedAt();
 //        gitlabProject.getName();

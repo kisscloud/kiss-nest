@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.BuildLog;
+import com.kiss.kissnest.output.BuildLogOutput;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface BuildLogDao {
 
     BuildLog getLastBuildByJobNameAndProjectId(String jobName,Integer projectId);
 
-    List<BuildLog> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size);
+    List<BuildLogOutput> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size);
 
-    List<BuildLog> getBuildRecentLogs(Integer teamId,Integer projectId,Long timestamp);
+    BuildLogOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId);
 }

@@ -3,6 +3,7 @@ package com.kiss.kissnest.dao.impl;
 import com.kiss.kissnest.dao.BuildLogDao;
 import com.kiss.kissnest.entity.BuildLog;
 import com.kiss.kissnest.mapper.BuildLogMapper;
+import com.kiss.kissnest.output.BuildLogOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,7 @@ public class BuildLogDaoImpl implements BuildLogDao {
     }
 
     @Override
-    public List<BuildLog> getBuildLogsByTeamId(Integer teamId, Integer start, Integer size) {
+    public List<BuildLogOutput> getBuildLogsByTeamId(Integer teamId, Integer start, Integer size) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("teamId", teamId);
@@ -68,13 +69,13 @@ public class BuildLogDaoImpl implements BuildLogDao {
     }
 
     @Override
-    public List<BuildLog> getBuildRecentLogs(Integer teamId, Integer projectId, Long timestamp) {
+    public BuildLogOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("teamId", teamId);
         params.put("projectId", projectId);
-        params.put("timestamp", timestamp);
+        params.put("queueId", queueId);
 
-        return buildLogMapper.getBuildRecentLogs(params);
+        return buildLogMapper.getBuildRecentLog(params);
     }
 }

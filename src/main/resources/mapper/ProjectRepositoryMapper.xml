@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ProjectRepositoryMapper">
 
     <insert id="createProjectRepository" parameterType="com.kiss.kissnest.entity.ProjectRepository">
-        insert into projectrepository (teamId,name,projectId,repositoryId,sshUrl,httpUrl,branchCount,operatorId,operatorName)
+        insert into projectrepository (teamId,name,projectId,repositoryId,sshUrl,httpUrl,pathWithNamespace,branchCount,operatorId,operatorName)
         value
-        (#{teamId},#{name},#{projectId},#{repositoryId},#{sshUrl},#{httpUrl},#{branchCount},#{operatorId},#{operatorName})
+        (#{teamId},#{name},#{projectId},#{repositoryId},#{sshUrl},#{httpUrl},#{pathWithNamespace},#{branchCount},#{operatorId},#{operatorName})
     </insert>
     
     <select id="getProjectRepositoryByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">

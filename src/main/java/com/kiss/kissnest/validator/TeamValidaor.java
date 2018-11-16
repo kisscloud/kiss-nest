@@ -63,7 +63,7 @@ public class TeamValidaor implements Validator {
         Team team = teamDao.getTeamById(id);
 
         if (team == null) {
-            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAMID_EXIST),"团队id不存在");
+            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAM_NOT_EXIST),"团队不存在");
             return false;
         }
 

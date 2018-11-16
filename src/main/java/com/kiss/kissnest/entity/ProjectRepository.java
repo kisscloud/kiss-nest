@@ -21,6 +21,8 @@ public class ProjectRepository {
 
     private String httpUrl;
 
+    private String pathWithNamespace;
+
     private String lastCommit;
 
     private Integer commitCount;

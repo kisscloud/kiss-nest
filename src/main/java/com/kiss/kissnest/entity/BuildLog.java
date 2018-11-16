@@ -17,6 +17,8 @@ public class BuildLog {
 
     private Integer number;
 
+    private Long queueId;
+
     private String version;
 
     private Integer projectId;
@@ -26,6 +28,8 @@ public class BuildLog {
     private Integer status;
 
     private String output;
+
+    private Long duration;
 
     private String jarName;
 

@@ -21,6 +21,8 @@ import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,12 @@ public class BuildService {
     @Value("${code.bin.ip}")
     private String codeIps;
 
+    @Value("${gitlab.server.url}")
+    private String gitlabUrl;
+
+    @Value("${gitlab.server.commitPath}")
+    private String gitlabCommitPath;
+
     @Autowired
     private DeployLogDao deployLogDao;
 
@@ -71,9 +79,9 @@ public class BuildService {
     @Autowired
     private OperationLogService operationLogService;
 
-    public static Map<String,String> buildRemarks = new HashMap<>();
+    public static Map<String, String> buildRemarks = new HashMap<>();
 
-    public static Map<String,String> deployRemarks = new HashMap<>();
+    public static Map<String, String> deployRemarks = new HashMap<>();
 
     public ResultOutput createBuildJob(CreateJobInput createJobInput) {
 
@@ -93,7 +101,7 @@ public class BuildService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(),projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -130,17 +138,17 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        String serverIds = String.join(",",createDeployInput.getServerIds());
+        String serverIds = String.join(",", createDeployInput.getServerIds());
         List<String> serverIps = serverDao.getServerInnerIpsByIds(serverIds);
 
         String script = createDeployInput.getScript();
 
         for (String serverIp : serverIps) {
-            String ansibleScript = "\n./ansible " +codeIps+ " -u root -m shell -a \"rsync -v /opt/app/" +project.getSlug()+ "$name.tar.gz root@" +serverIp+ ":/root/\"\n";
+            String ansibleScript = "\n./ansible " + codeIps + " -u root -m shell -a \"rsync -v /opt/app/" + project.getSlug() + "$name.tar.gz root@" + serverIp + ":/root/\"\n";
             script = script + ansibleScript;
         }
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(),null, guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), null, guest.getName(), member.getApiToken());
 
         if (!success) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -164,43 +172,45 @@ public class BuildService {
 
     public ResultOutput buildJob(BuildJobInput buildJobInput) {
 
-        Job job = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(),1);
+        Job job = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
+        Project project = projectDao.getProjectById(job.getProjectId());
         String jobName = job.getJobName();
 
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
-        boolean success = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
 
-        if (!success) {
+        if (location == null) {
             return ResultOutputUtil.error(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
         }
 
-        Integer count = jobDao.updateJobStatus(buildJobInput.getProjectId(), 1, 0, 1);
+        location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
 
-        if (count == 1) {
-            Integer number = job.getNumber() + 1;
-            Thread thread = new Thread(new BuildLogRunnable(jobName, job.getTeamId(), buildJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), number, 1));
-            thread.start();
-            buildRemarks.put(buildJobInput.getProjectId() + "" + number,buildJobInput.getRemark());
-        }
-
+        Thread thread = new Thread(new BuildLogRunnable(jobName, job.getTeamId(), buildJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), 1, location));
+        thread.start();
+        buildRemarks.put(location, buildJobInput.getRemark());
 //        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
-
-        return ResultOutputUtil.success();
+        String[] urlStr = location.split("/");
+        Map<String, Object> result = new HashMap<>();
+        result.put("queueId", Long.valueOf(urlStr[urlStr.length - 1]));
+        result.put("projectName", project.getName());
+        result.put("branch", buildJobInput.getBranch());
+        result.put("remark", buildJobInput.getRemark());
+        return ResultOutputUtil.success(result);
     }
 
     public ResultOutput deployJob(DeployJobInput deployJobInput) {
-        Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(),2);
+        Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(), 2);
         String jobName = job.getJobName();
 
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         String branch = deployJobInput.getBranch() == null ? deployJobInput.getTag() : deployJobInput.getBranch();
-        boolean success = jenkinsUtil.buildJob(jobName, branch, guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, branch, guest.getName(), member.getApiToken());
 
-        if (!success) {
+        if (location == null) {
             return ResultOutputUtil.error(NestStatusCode.DEPLOY_JENKINS_JOB_ERROR);
         }
 
@@ -208,9 +218,9 @@ public class BuildService {
 
         if (count == 1) {
             Integer number = job.getNumber() + 1;
-            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), number, 2,job.getServerIds()));
+            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), number, 2, job.getServerIds()));
             thread.start();
-            deployRemarks.put(deployJobInput.getProjectId() + "" + number,deployJobInput.getRemark());
+            deployRemarks.put(deployJobInput.getProjectId() + "" + number, deployJobInput.getRemark());
         }
 
         return ResultOutputUtil.success();
@@ -235,20 +245,30 @@ public class BuildService {
         Integer maxSize = Integer.parseInt(buildLogSize);
         Integer size = buildLogsInput.getSize();
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
-        List<BuildLog> buildLogs = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(),(buildLogsInput.getPage() - 1) * pageSize, pageSize);
-        List<BuildLogOutput> buildLogOutputs = (List) BeanCopyUtil.copyList(buildLogs, BuildLogOutput.class);
+        Integer start = buildLogsInput.getPage() == 0 ? null : (buildLogsInput.getPage() - 1) * pageSize;
+        List<BuildLogOutput> buildLogOutputs = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
 
-        buildLogOutputs.forEach(buildLogOutput -> buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus()))));
-
+        buildLogOutputs.forEach(buildLogOutput -> {
+            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
+            String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
+            buildLogOutput.setCommitPath(commitPath);
+        });
 
         return ResultOutputUtil.success(buildLogOutputs);
     }
 
-    public ResultOutput getBuildRecentLogs(Integer teamId,Integer projectId,Long timestamp) {
+    public ResultOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId) {
 
-        List<BuildLog> buildLogs = buildLogDao.getBuildRecentLogs(teamId,projectId,timestamp);
+        BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(teamId, projectId, queueId);
 
-        return ResultOutputUtil.success(buildLogs);
+        if (buildLogOutput == null) {
+            return ResultOutputUtil.success(buildLogOutput);
+        }
+
+        String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
+        buildLogOutput.setCommitPath(commitPath);
+
+        return ResultOutputUtil.success(buildLogOutput);
     }
 
     class BuildLogRunnable implements Runnable {
@@ -265,19 +285,19 @@ public class BuildService {
 
         private Integer operatorId;
 
-        private Integer number;
-
         private Integer type;
 
-        public BuildLogRunnable(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer number, Integer type) {
+        private String location;
+
+        public BuildLogRunnable(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer type, String location) {
             this.jobName = jobName;
             this.projectId = projectId;
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.operatorId = operatorId;
-            this.number = number;
             this.type = type;
             this.teamId = teamId;
+            this.location = location;
         }
 
         @Override
@@ -292,47 +312,21 @@ public class BuildService {
                     return;
                 }
 
-                Thread.sleep(5000);
-                //获取最后一个任务num
-                Build lastBuild = jenkinsUtil.getLastBuild(jobName, jenkinsServer);
-                if (lastBuild == null) {
+                for (int i = 0; i < 300; i++) {
+                    build = jenkinsUtil.getBuild(jenkinsServer, location);
+
+                    if (build != null) {
+                        break;
+                    }
+
+                    Thread.sleep(1000);
+                }
+
+                if (build == null) {
                     return;
                 }
 
-                Integer last = lastBuild.getNumber();
-                newNumber = number;
-
-                if (last < number) {
-                    //num < number 等待
-                    for (int i = 0; i < 10; i++) {
-
-                        Thread.sleep(6000);
-                        build = jenkinsUtil.getBuild(jobName, jenkinsServer, number);
-
-                        if (build != null) {
-                            break;
-                        }
-                    }
-
-                    if (build != null) {
-                        saveBuildLog(build, teamId, jobName, operatorId, account, projectId, number);
-                    }
-                } else if (last == number) {
-                    //num = number 将num插入数据库
-                    saveBuildLog(lastBuild, teamId, jobName, operatorId, account, projectId, number);
-                } else {
-                    //num > number 查询number-num的所有任务
-
-                    for (int i = number; i <= last; i++) {
-                        build = jenkinsUtil.getBuild(jobName, jenkinsServer, i);
-
-                        if (build != null) {
-                            saveBuildLog(build, teamId, jobName, operatorId, account, projectId, i);
-                        }
-                    }
-
-                    newNumber = last;
-                }
+                saveBuildLog(build, teamId, jobName, operatorId, account, projectId, location);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -345,7 +339,7 @@ public class BuildService {
                     Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
 
                     if (count == 0) {
-                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, number, newNumber);
+                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, newNumber);
                     }
                 }
             }
@@ -353,14 +347,26 @@ public class BuildService {
         }
     }
 
-    public void saveBuildLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, Integer number) {
+    public void saveBuildLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, String location) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
-        String logUrl = String.format(jenkinsBuildLogUrl, jobName, number);
+        String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
         BuildWithDetails buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client, logUrl);
+
+        for (int i = 0; i < 1000; i++) {
+            buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client, logUrl);
+            boolean run = buildWithDetails.isBuilding();
+            if (run) {
+                Thread.sleep(3000);
+            } else {
+                break;
+            }
+        }
+
         client = buildWithDetails.getClient();
         String output = jenkinsUtil.getConsoleOutputText(client, logUrl + jenkinsBuildOutputPath);
         String result = buildWithDetails.getResult().name();
+        Long duration = buildWithDetails.getDuration();
         Map<String, String> params = buildWithDetails.getParameters();
         String branch = params.get("branch");
         BuildLog buildLog = new BuildLog();
@@ -373,16 +379,19 @@ public class BuildService {
         buildLog.setOutput(output);
         buildLog.setProjectId(projectId);
         buildLog.setBuildAt(buildWithDetails.getTimestamp());
-        buildLog.setRemark(buildRemarks.get(projectId + "" + number));
-        buildRemarks.remove(projectId + "" + number);
+        buildLog.setRemark(buildRemarks.get(location));
+        buildRemarks.remove(location);
+        String[] urlStr = location.split("/");
+        buildLog.setQueueId(Long.valueOf(urlStr[urlStr.length - 1]));
+        buildLog.setDuration(duration);
 
         if (output.indexOf("versionStart") != -1) {
-            String version = output.substring(output.indexOf("versionStart") + 13,output.indexOf("versionEnd") -1);
+            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
             buildLog.setVersion(version);
         }
 
         if (output.indexOf("jarNameStart") != -1) {
-            String jarName = output.substring(output.indexOf("jarNameStart") + 13,output.indexOf("jarNameEnd") -1);
+            String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
             buildLog.setJarName(jarName);
         }
 
@@ -395,7 +404,7 @@ public class BuildService {
         buildLogDao.createBuildLog(buildLog);
     }
 
-    class DeployLogRunner implements Runnable{
+    class DeployLogRunner implements Runnable {
 
         private String jobName;
 
@@ -415,7 +424,7 @@ public class BuildService {
 
         private String serverIds;
 
-        public DeployLogRunner(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer number, Integer type,String serverIds) {
+        public DeployLogRunner(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer number, Integer type, String serverIds) {
             this.jobName = jobName;
             this.projectId = projectId;
             this.account = account;
@@ -462,11 +471,11 @@ public class BuildService {
                 }
 
                 if (build != null) {
-                    saveDeployLog(build, teamId, jobName, operatorId, account, projectId, number,serverIds);
+                    saveDeployLog(build, teamId, jobName, operatorId, account, projectId, number, serverIds);
                 }
             } else if (last == number) {
                 //num = number 将num插入数据库
-                saveDeployLog(lastBuild, teamId, jobName, operatorId, account, projectId, number,serverIds);
+                saveDeployLog(lastBuild, teamId, jobName, operatorId, account, projectId, number, serverIds);
             } else {
                 //num > number 查询number-num的所有任务
 
@@ -474,7 +483,7 @@ public class BuildService {
                     build = jenkinsUtil.getBuild(jobName, jenkinsServer, i);
 
                     if (build != null) {
-                        saveDeployLog(build, teamId, jobName, operatorId, account, projectId, i,serverIds);
+                        saveDeployLog(build, teamId, jobName, operatorId, account, projectId, i, serverIds);
                     }
                 }
 
@@ -491,7 +500,7 @@ public class BuildService {
         }
     }
 
-    public void saveDeployLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, Integer number,String serverIds) {
+    public void saveDeployLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, Integer number, String serverIds) {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, number);
@@ -515,7 +524,7 @@ public class BuildService {
         deployLog.setDeployAt(buildWithDetails.getTimestamp());
 
         if (output.indexOf("versionStart") != -1) {
-            String version = output.substring(output.indexOf("versionStart") + 13,output.indexOf("versionEnd") -1);
+            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
             deployLog.setVersion(version);
         }
 

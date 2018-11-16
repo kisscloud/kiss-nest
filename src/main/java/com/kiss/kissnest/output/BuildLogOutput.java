@@ -27,9 +27,15 @@ public class BuildLogOutput {
 
     private String output;
 
+    private String commitPath;
+
     private Integer operatorId;
 
     private String operatorName;
 
     private Long buildAt;
+
+    private Long createdAt;
+
+    private Long updatedAt;
 }

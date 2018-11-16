@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
     <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
-        insert into buildlogs (teamId,jobName,branch,number,version,projectId,remark,status,output,jarName,operatorId,operatorName,buildAt)
+        insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt)
         value
-        (#{teamId},#{jobName},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{jarName},#{operatorId},#{operatorName},#{buildAt})
+        (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt})
     </insert>
 
     <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
@@ -59,14 +59,20 @@
         select * from buildlogs where jobName=#{jobName} and projectId=#{projectId} order by number desc limit 0,1;
     </select>
 
-    <select id="getBuildLogsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
-        select * from buildlogs where teamId = #{teamId} order by buildAt desc
+    <select id="getBuildLogsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
+        select bu.*,pr.pathWithNamespace as commitPath from buildlogs bu
+        left join projectrepository pr
+        on bu.projectId = pr.projectId and bu.teamId = pr.teamId
+        where bu.teamId = #{teamId} order by bu.buildAt desc
         <if test="start != null">
             limit #{start},#{size}
         </if>
     </select>
 
-    <select id="getBuildRecentLogs" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.BuildLog">
-        select * from buildlogs where teamId = #{teamId} and projectId = #{projectId} and buildAt > #{timestamp} order by buildAt desc;
+    <select id="getBuildRecentLog" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.BuildLogOutput">
+        select bu.*,pr.pathWithNamespace as commitPath from buildlogs bu
+        left join projectrepository pr
+        on bu.projectId = pr.projectId and bu.teamId = pr.teamId
+        where bu.teamId = #{teamId} and bu.projectId = #{projectId} and bu.queueId = #{queueId};
     </select>
 </mapper>
