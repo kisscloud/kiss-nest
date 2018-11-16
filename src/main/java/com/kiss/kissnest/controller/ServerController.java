@@ -57,15 +57,8 @@ public class ServerController {
     }
 
     @GetMapping("/servers")
-    public ResultOutput getServers(@RequestParam("teamId") Integer teamId,@RequestParam("page") Integer page,@RequestParam("size") Integer size) {
+    public ResultOutput getServers(@RequestParam("teamId") Integer teamId,@RequestParam("page") Integer page,@RequestParam("size") Integer size,Integer envId) {
 
-        return serverService.getServersByTeamId(teamId,page,size);
+        return serverService.getServersByTeamId(teamId,page,size,envId);
     }
-
-    @GetMapping("/servers/by/environment")
-    public ResultOutput getServersByEnvironment(@RequestParam("teamId") Integer teamId,@RequestParam("environment") Integer environment) {
-
-        return serverService.getServersByEnvironment(teamId,environment);
-    }
-
 }

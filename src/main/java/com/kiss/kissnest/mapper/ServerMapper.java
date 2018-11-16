@@ -23,7 +23,5 @@ public interface ServerMapper {
 
     List<Server> getServersByTeamId(Map params);
 
-    List<Server> getServersByEnvironment(Map params);
-
     List<String> getServerInnerIpsByIds(String ids);
 }

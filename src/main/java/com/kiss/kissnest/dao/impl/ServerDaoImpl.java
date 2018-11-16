@@ -57,24 +57,15 @@ public class ServerDaoImpl implements ServerDao {
     }
 
     @Override
-    public List<Server> getServersByTeamId(Integer teamId, Integer start, Integer size) {
+    public List<Server> getServersByTeamId(Integer teamId, Integer start, Integer size,Integer envId) {
 
         Map<String,Object> params = new HashMap<>();
         params.put("teamId",teamId);
         params.put("start",start);
         params.put("size",size);
-
-        return serverMapper.getServersByTeamId(params);
-    }
-
-    @Override
-    public List<Server> getServersByEnvironment(Integer teamId, Integer envId) {
-
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
         params.put("envId",envId);
 
-        return serverMapper.getServersByEnvironment(params);
+        return serverMapper.getServersByTeamId(params);
     }
 
     @Override

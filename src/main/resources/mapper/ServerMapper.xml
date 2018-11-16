@@ -67,13 +67,12 @@
     
     <select id="getServersByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
         select * from servers where teamId = #{teamId}
+        <if test="envId != null">
+            and envId = #{envId}
+        </if>
         <if test="start != null">
             limit #{start},#{size}
         </if>
-    </select>
-    
-    <select id="getServersByEnvironment" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
-        select * from servers where teamId = #{teamId} and envId = #{envId};
     </select>
     
     <select id="getServerInnerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">

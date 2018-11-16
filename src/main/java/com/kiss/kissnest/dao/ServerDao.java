@@ -19,9 +19,7 @@ public interface ServerDao {
 
     Server getServerByNameAndTeamId(Integer teamId,String name);
 
-    List<Server> getServersByTeamId(Integer teamId,Integer start,Integer size);
-
-    List<Server> getServersByEnvironment(Integer teamId,Integer envId);
+    List<Server> getServersByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
 
     List<String> getServerInnerIpsByIds(String ids);
 }
