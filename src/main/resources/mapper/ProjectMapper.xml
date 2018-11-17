@@ -111,4 +111,15 @@
         on pr.operatorId = me.accountId
         where pr.id = #{projectId}
     </select>
+    
+    <select id="getProjectNameByServerId" parameterType="java.lang.String" resultType="java.lang.String">
+        select GROUP_CONCAT(re.name) as name from
+        (
+        select pr.name,1 as tmp from jobs jo
+        left join projects pr
+        on jo.projectId = pr.id
+        where jo.serverIds like #{serverId}
+        ) re
+        group by re.tmp;
+    </select>
 </mapper>

@@ -1,6 +1,7 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.EnvironmentDao;
+import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Environment;
 import com.kiss.kissnest.entity.Server;
@@ -33,6 +34,9 @@ public class ServerService {
 
     @Autowired
     private ServerDao serverDao;
+
+    @Autowired
+    private ProjectDao projectDao;
 
     @Autowired
     private OperationLogService operationLogService;
@@ -142,6 +146,12 @@ public class ServerService {
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = page == 0 ? null : (page - 1) * pageSize;
         List<ServerOutput> serverOutputs = serverDao.getServerOutputsByTeamId(teamId, start, pageSize, envId);
+
+        serverOutputs.forEach(serverOutput -> {
+            String projectName = projectDao.getProjectNameByServerId("%" + serverOutput.getId() + "%");
+            serverOutput.setProjectName(projectName);
+            serverOutput.setStatusText(codeUtil.getEnumsMessage("server.status",String.valueOf(serverOutput.getStatus())));
+        });
 
         return ResultOutputUtil.success(serverOutputs);
     }

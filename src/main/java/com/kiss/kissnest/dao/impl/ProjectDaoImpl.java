@@ -107,4 +107,10 @@ public class ProjectDaoImpl implements ProjectDao {
 
         return projectMapper.getProjectOperatorAccessToken(projectId);
     }
+
+    @Override
+    public String getProjectNameByServerId(String serverId) {
+
+        return projectMapper.getProjectNameByServerId(serverId);
+    }
 }

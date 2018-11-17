@@ -35,4 +35,6 @@ public interface ProjectMapper {
     List<Project> getProjectsWithBuildJob(Integer teamId);
 
     String getProjectOperatorAccessToken(Integer projectId);
+
+    String getProjectNameByServerId(String serverId);
 }
