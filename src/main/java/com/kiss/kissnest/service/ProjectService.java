@@ -10,6 +10,7 @@ import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
+import com.kiss.kissnest.output.ProjectTypeOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -26,6 +27,7 @@ import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProjectService {
@@ -197,10 +199,13 @@ public class ProjectService {
 
     public ResultOutput getProjectTypes() {
         String[] types = projectTypes.split(",");
-        List<String> typeList = new ArrayList<>();
+        List<ProjectTypeOutput> typeList = new ArrayList<>();
 
         for (String type : types) {
-            typeList.add(codeUtil.getEnumsMessage("project.type", type));
+            ProjectTypeOutput projectTypeOutput = new ProjectTypeOutput();
+            projectTypeOutput.setId(Integer.valueOf(type));
+            projectTypeOutput.setName(codeUtil.getEnumsMessage("project.type", type));
+            typeList.add(projectTypeOutput);
         }
 
         return ResultOutputUtil.success(typeList);
