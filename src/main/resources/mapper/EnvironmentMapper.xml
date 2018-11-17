@@ -18,4 +18,20 @@
     <select id="getEnvironmentById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
         select * from environments where id = #{id};
     </select>
+    
+    <select id="getEnvironmentByTeamIdAndName" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where teamId = #{teamId} and name = #{name};
+    </select>
+    
+    <update id="updateEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
+        update environments
+        set name = #{name}
+        where id = #{id} and teamId = #{teamId}
+    </update>
+    
+    <update id="addEnvironmentServerCount" parameterType="java.lang.Integer">
+        update environments
+        set serverCount = serverCount + 1
+        where  id = #{id}
+    </update>
 </mapper>

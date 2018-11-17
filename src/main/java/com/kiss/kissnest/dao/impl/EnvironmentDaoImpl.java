@@ -6,7 +6,9 @@ import com.kiss.kissnest.mapper.EnvironmentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class EnvironmentDaoImpl implements EnvironmentDao {
@@ -30,5 +32,27 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
     public Environment getEnvironmentById(Integer id) {
 
         return environmentMapper.getEnvironmentById(id);
+    }
+
+    @Override
+    public Environment getEnvironmentByTeamIdAndName(Integer teamId,String name) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("name",name);
+
+        return environmentMapper.getEnvironmentByTeamIdAndName(params);
+    }
+
+    @Override
+    public Integer updateEnvironment(Environment environment) {
+
+        return environmentMapper.updateEnvironment(environment);
+    }
+
+    @Override
+    public Integer addEnvironmentServerCount(Integer id) {
+
+        return environmentMapper.addEnvironmentServerCount(id);
     }
 }

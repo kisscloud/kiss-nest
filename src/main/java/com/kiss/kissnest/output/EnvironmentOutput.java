@@ -11,6 +11,12 @@ public class EnvironmentOutput {
 
     private String name;
 
+    private Integer type;
+
+    private String typeText;
+
+    private Integer serverCount;
+
     private Integer operatorId;
 
     private String operatorName;

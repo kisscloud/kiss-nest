@@ -15,6 +15,8 @@ public class Environment {
 
     private Integer type;
 
+    private Integer serverCount;
+
     private Integer operatorId;
 
     private String operatorName;

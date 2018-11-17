@@ -3,15 +3,17 @@ package com.kiss.kissnest.service;
 import com.kiss.kissnest.dao.EnvironmentDao;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Environment;
-import com.kiss.kissnest.entity.OperationTargetType;
 import com.kiss.kissnest.entity.Server;
-import com.kiss.kissnest.input.EnvironmentInput;
+import com.kiss.kissnest.input.CreateEnvironmentInput;
 import com.kiss.kissnest.input.CreateServerInput;
+import com.kiss.kissnest.input.UpdateEnvironmentInput;
 import com.kiss.kissnest.input.UpdateServerInput;
 import com.kiss.kissnest.output.EnvironmentOutput;
 import com.kiss.kissnest.output.ServerOutput;
 import com.kiss.kissnest.status.NestStatusCode;
+import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,10 +37,13 @@ public class ServerService {
     @Autowired
     private OperationLogService operationLogService;
 
+    @Autowired
+    private CodeUtil codeUtil;
+
     @Value("${server.maxSize}")
     private String serverSize;
 
-    public ResultOutput createEnvironment(EnvironmentInput environmentInput) {
+    public ResultOutput createEnvironment(CreateEnvironmentInput environmentInput) {
 
         Environment environment = (Environment) BeanCopyUtil.copy(environmentInput, Environment.class);
         Guest guest = ThreadLocalUtil.getGuest();
@@ -56,11 +61,29 @@ public class ServerService {
         return ResultOutputUtil.success(environmentOutput);
     }
 
+    public ResultOutput updateEnvironment(UpdateEnvironmentInput updateEnvironmentInput) {
+
+        Environment environment = (Environment) BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
+        environment.setId(updateEnvironmentInput.getEnvId());
+        Guest guest = ThreadLocalUtil.getGuest();
+        environment.setOperatorId(guest.getId());
+        environment.setOperatorName(guest.getName());
+        Integer count = environmentDao.updateEnvironment(environment);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.UPDATE_SERVER_ENVIRONMENT_FAILED);
+        }
+
+        EnvironmentOutput environmentOutput = (EnvironmentOutput) BeanCopyUtil.copy(environment,EnvironmentOutput.class);
+
+        return ResultOutputUtil.success(environmentOutput);
+    }
+
     public ResultOutput getEnvironmentsByTeamId(Integer teamId) {
 
         List<Environment> environment = environmentDao.getEnvironmentsByTeamId(teamId);
-
         List<EnvironmentOutput> environmentOutputs = (List) BeanCopyUtil.copyList(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
+        environmentOutputs.forEach(environmentOutput -> environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType()))));
 
         return ResultOutputUtil.success(environmentOutputs);
     }
@@ -77,9 +100,9 @@ public class ServerService {
             return ResultOutputUtil.error(NestStatusCode.SERVER_CREATE_FAILED);
         }
 
+        environmentDao.addEnvironmentServerCount(createServerInput.getEnvId());
         ServerOutput serverOutput = (ServerOutput) BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
 //        operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
-
         return ResultOutputUtil.success(serverOutput);
     }
 

@@ -1,7 +1,8 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.input.EnvironmentInput;
+import com.kiss.kissnest.input.CreateEnvironmentInput;
 import com.kiss.kissnest.input.CreateServerInput;
+import com.kiss.kissnest.input.UpdateEnvironmentInput;
 import com.kiss.kissnest.input.UpdateServerInput;
 import com.kiss.kissnest.service.ServerService;
 import com.kiss.kissnest.validator.ServerValidator;
@@ -31,9 +32,16 @@ public class ServerController {
 
     @PostMapping("/server/environment")
     @ApiOperation(value = "创建服务器环境")
-    public ResultOutput createEnvironment(@Validated @RequestBody EnvironmentInput environmentInput) {
+    public ResultOutput createEnvironment(@Validated @RequestBody CreateEnvironmentInput environmentInput) {
 
         return serverService.createEnvironment(environmentInput);
+    }
+
+
+    @PutMapping("/server/environment")
+    public ResultOutput updateEnvironment(@Validated @RequestBody UpdateEnvironmentInput updateEnvironmentInput) {
+
+        return serverService.updateEnvironment(updateEnvironmentInput);
     }
 
     @GetMapping("/server/environments")

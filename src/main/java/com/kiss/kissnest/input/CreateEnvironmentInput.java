@@ -3,7 +3,7 @@ package com.kiss.kissnest.input;
 import lombok.Data;
 
 @Data
-public class EnvironmentInput {
+public class CreateEnvironmentInput {
 
     private Integer teamId;
 

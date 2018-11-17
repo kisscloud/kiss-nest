@@ -4,8 +4,9 @@ import com.kiss.kissnest.dao.EnvironmentDao;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Environment;
 import com.kiss.kissnest.entity.Server;
-import com.kiss.kissnest.input.EnvironmentInput;
+import com.kiss.kissnest.input.CreateEnvironmentInput;
 import com.kiss.kissnest.input.CreateServerInput;
+import com.kiss.kissnest.input.UpdateEnvironmentInput;
 import com.kiss.kissnest.input.UpdateServerInput;
 import com.kiss.kissnest.status.NestStatusCode;
 import org.apache.commons.lang3.StringUtils;
@@ -28,18 +29,23 @@ public class ServerValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(EnvironmentInput.class) ||
+        return clazz.equals(CreateEnvironmentInput.class) ||
                 clazz.equals(CreateServerInput.class) ||
-                clazz.equals(UpdateServerInput.class);
+                clazz.equals(UpdateServerInput.class) ||
+                clazz.equals(UpdateEnvironmentInput.class);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
 
-        if (EnvironmentInput.class.isInstance(target)) {
-            EnvironmentInput environmentInput = (EnvironmentInput) target;
-            teamValidaor.validateId(environmentInput.getTeamId(),"teamId",errors);
-            validateEnvironmentName(environmentInput.getName(),errors);
+        if (CreateEnvironmentInput.class.isInstance(target)) {
+            CreateEnvironmentInput environmentInput = (CreateEnvironmentInput) target;
+            boolean teamVal = teamValidaor.validateId(environmentInput.getTeamId(),"teamId",errors);
+
+            if (teamVal) {
+                validateCreateEnvironmentName(environmentInput.getTeamId(),environmentInput.getName(),errors);
+            }
+
             validateType(environmentInput.getType(),errors);
         } else if (CreateServerInput.class.isInstance(target)) {
             CreateServerInput serverInput = (CreateServerInput) target;
@@ -62,13 +68,27 @@ public class ServerValidator implements Validator {
 
             validateEnvId(updateServerInput.getEnvId(),errors);
             validateInnerIp(updateServerInput.getInnerIp(),errors);
+        } else if (UpdateEnvironmentInput.class.isInstance(target)) {
+            UpdateEnvironmentInput updateEnvironmentInput = (UpdateEnvironmentInput) target;
+            boolean envIdVal = validateEnvId(updateEnvironmentInput.getEnvId(),errors);
+            boolean teamVal = teamValidaor.validateId(updateEnvironmentInput.getTeamId(),"teamId",errors);
+
+            if (teamVal && envIdVal) {
+                validateUpdateEnvironmentName(updateEnvironmentInput.getTeamId(),updateEnvironmentInput.getEnvId(),updateEnvironmentInput.getName(),errors);
+            }
         }
     }
 
-    public void validateEnvironmentName(String name,Errors errors) {
+    public void validateCreateEnvironmentName(Integer teamId,String name,Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
             errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY),"环境名称不能为空");
+        }
+
+        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId,name);
+
+        if (environment != null) {
+            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
         }
     }
 
@@ -105,18 +125,21 @@ public class ServerValidator implements Validator {
         }
     }
 
-    public void validateEnvId(Integer envId,Errors errors) {
+    public boolean validateEnvId(Integer envId,Errors errors) {
 
         if (envId == null) {
             errors.rejectValue("envId",String.valueOf(NestStatusCode.SERVER_ENVID_IS_EMPTY));
-            return;
+            return false;
         }
 
         Environment environment = environmentDao.getEnvironmentById(envId);
 
         if (environment == null) {
             errors.rejectValue("envId",String.valueOf(NestStatusCode.SERVER_ENVID_NOT_EXIST));
+            return false;
         }
+
+        return true;
     }
 
     public void validateInnerIp(String innerIp,Errors errors) {
@@ -143,4 +166,16 @@ public class ServerValidator implements Validator {
         return true;
     }
 
+    public void validateUpdateEnvironmentName(Integer teamId,Integer envId,String name,Errors errors) {
+
+        if (StringUtils.isEmpty(name)) {
+            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY));
+        }
+
+        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId,name);
+
+        if (environment != null && !envId.equals(environment.getId())) {
+            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
+        }
+    }
 }
