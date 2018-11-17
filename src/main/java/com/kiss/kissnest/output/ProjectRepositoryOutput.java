@@ -15,6 +15,8 @@ public class ProjectRepositoryOutput {
 
     private Integer projectId;
 
+    private String projectName;
+
     private Integer repositoryId;
 
     private String sshUrl;

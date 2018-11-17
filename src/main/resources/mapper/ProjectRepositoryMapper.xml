@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ProjectRepositoryMapper">
 
     <insert id="createProjectRepository" parameterType="com.kiss.kissnest.entity.ProjectRepository">
-        insert into projectrepository (teamId,name,projectId,repositoryId,sshUrl,httpUrl,pathWithNamespace,branchCount,operatorId,operatorName)
+        insert into projectrepository (teamId,name,projectId,projectName,repositoryId,sshUrl,httpUrl,pathWithNamespace,branchCount,operatorId,operatorName)
         value
-        (#{teamId},#{name},#{projectId},#{repositoryId},#{sshUrl},#{httpUrl},#{pathWithNamespace},#{branchCount},#{operatorId},#{operatorName})
+        (#{teamId},#{name},#{projectId},#{projectName},#{repositoryId},#{sshUrl},#{httpUrl},#{pathWithNamespace},#{branchCount},#{operatorId},#{operatorName})
     </insert>
     
     <select id="getProjectRepositoryByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
@@ -19,4 +19,20 @@
     <select id="getProjectRepositoryByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
         select * from projectrepository where teamId = #{teamId};
     </select>
+
+    <select id="addCount" parameterType="java.util.Map">
+        update projectrepository
+        <if test="type == 'commit'">
+            commitCount = commitCount + #{increment}
+        </if>
+        <if test="type == 'mergeRequest'">
+            mergeRequestCount = mergeRequestCount + #{increment}
+        </if>
+    </select>
+    
+    <update id="updateProjectRepositoryBranch" parameterType="java.util.Map">
+        update projectrepository
+        set branchCount = #{branchCount}
+        where projectId = #{projectId} and teamId = #{teamId}
+    </update>
 </mapper>

@@ -87,6 +87,7 @@ public class ProjectRepositoryService {
         projectRepository.setOperatorName(ThreadLocalUtil.getGuest().getName());
         projectRepository.setBranchCount(1);
         projectRepository.setPathWithNamespace(gitlabProject.getPathWithNamespace());
+        projectRepository.setProjectName(project.getName());
 
         projectRepositoryDao.createProjectRepository(projectRepository);
 

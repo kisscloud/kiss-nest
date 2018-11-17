@@ -3,14 +3,18 @@ package com.kiss.kissnest.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.dao.TrackDao;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Track;
 import com.kiss.kissnest.output.TrackOutput;
+import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
 
@@ -26,6 +30,13 @@ public class TrackService {
     @Autowired
     private TrackDao trackDao;
 
+    @Autowired
+    private ProjectRepositoryDao projectRepositoryDao;
+
+
+    @Autowired
+    private GitlabApiUtil gitlabApiUtil;
+
     public void createTrack(String hook) {
 
         if (StringUtils.isEmpty(hook)) {
@@ -40,12 +51,15 @@ public class TrackService {
         if ("push".equals(eventName)) {
             track.setType(1);
             push(hookJson,track);
+            projectRepositoryDao.addCount("commit",1);
         } else if ("tag_push".equals(eventName)) {
             track.setType(2);
             push(hookJson,track);
+            projectRepositoryDao.addCount("commit",1);
         } else if ("merge_request".equals(eventName)) {
             track.setType(3);
             merge(hookJson,track);
+            projectRepositoryDao.addCount("mergeRequest",1);
         }
 
         Project project = projectDao.getProjectByRepositoryId(track.getProjectId());
@@ -54,6 +68,7 @@ public class TrackService {
             track.setTeamId(project.getTeamId());
         }
 
+        updateBranch(project.getTeamId(),project.getId());
         trackDao.createTrack(track);
     }
 
@@ -85,6 +100,7 @@ public class TrackService {
                 track.setHash(hookJson.getString("after"));
             }
         }
+
     }
 
     public void merge(JSONObject hookJson, Track track) {
@@ -120,5 +136,20 @@ public class TrackService {
         }
 
         return ResultOutputUtil.success(trackOutputs);
+    }
+
+    public void updateBranch(Integer teamId,Integer projectId) {
+
+        String accessToken = projectDao.getProjectOperatorAccessToken(projectId);
+
+        if (StringUtils.isEmpty(accessToken)) {
+            return;
+        }
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(projectRepository.getRepositoryId(),accessToken);
+        Integer count = gitlabBranches.size();
+
+        projectRepositoryDao.updateProjectRepositoryBranch(teamId,projectId,count);
     }
 }

@@ -104,4 +104,11 @@
         (select projectId from jobs where teamId = #{teamId} and type =1)
         and teamId = #{teamId}
     </select>
+    
+    <select id="getProjectOperatorAccessToken" parameterType="java.lang.String" resultType="java.lang.String">
+        select me.accessToken from projects pr
+        left join members me
+        on pr.operatorId = me.accountId
+        where pr.id = #{projectId}
+    </select>
 </mapper>
