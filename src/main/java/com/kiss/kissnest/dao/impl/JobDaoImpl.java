@@ -62,4 +62,14 @@ public class JobDaoImpl implements JobDao {
 
         return jobMapper.updateJobStatusAndNumber(params);
     }
+
+    @Override
+    public List<Job> getJobByTeamId(Integer teamId, Integer type) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("type",type);
+
+        return jobMapper.getJobByTeamId(params);
+    }
 }

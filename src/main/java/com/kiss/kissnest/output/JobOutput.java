@@ -1,11 +1,9 @@
-package com.kiss.kissnest.entity;
+package com.kiss.kissnest.output;
 
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
-public class Job {
+public class JobOutput {
 
     private Integer id;
 
@@ -23,11 +21,7 @@ public class Job {
 
     private String serverIds;
 
-    private Integer status;
+    private Long createdAt;
 
-    private Integer number;
-
-    private Date createdAt;
-
-    private Date updatedAt;
+    private Long updatedAt;
 }

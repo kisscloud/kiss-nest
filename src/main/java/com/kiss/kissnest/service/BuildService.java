@@ -4,6 +4,7 @@ import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
+import com.kiss.kissnest.output.JobOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
@@ -269,6 +270,14 @@ public class BuildService {
         buildLogOutput.setCommitPath(commitPath);
 
         return ResultOutputUtil.success(buildLogOutput);
+    }
+
+    public ResultOutput getJobByTeamId(Integer teamId,Integer type) {
+
+        List<Job> jobs = jobDao.getJobByTeamId(teamId,type);
+        List<JobOutput> jobOutputs = (List) BeanCopyUtil.copyList(jobs,JobOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(jobOutputs);
     }
 
     class BuildLogRunnable implements Runnable {

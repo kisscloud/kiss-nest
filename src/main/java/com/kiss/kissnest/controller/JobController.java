@@ -76,4 +76,10 @@ public class JobController {
 
         return buildLogService.deployJob(deployJobInput);
     }
+
+    @GetMapping("/job")
+    public ResultOutput getJobByTeamId(@RequestParam("teamId") Integer teamId,@RequestParam("type") Integer type) {
+
+        return buildLogService.getJobByTeamId(teamId,type);
+    }
 }
