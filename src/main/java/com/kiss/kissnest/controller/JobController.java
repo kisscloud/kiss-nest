@@ -16,7 +16,7 @@ import output.ResultOutput;
 import java.io.IOException;
 
 @RestController
-@Api(tags = "Build", description = "构建部署相关接口")
+@Api(tags = "Job", description = "构建部署任务相关接口")
 public class JobController {
 
     @Autowired
