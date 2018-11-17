@@ -27,6 +27,7 @@ public class JobController {
 
     @Autowired
     private JenkinsUtil jenkinsUtil;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
 
