@@ -78,4 +78,17 @@
     <select id="getServerInnerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">
         select innerIp from servers where id in (#{ids});
     </select>
+    
+    <select id="getServerOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.ServerOutput">
+        select se.*,en.name as envName from servers se
+        left join environments en
+        on se.envId = en.id
+        where se.teamId = #{teamId}
+        <if test="envId != null">
+            and se.envId = #{envId}
+        </if>
+        <if test="start != null">
+            limit #{start},#{size}
+        </if>
+    </select>
 </mapper>

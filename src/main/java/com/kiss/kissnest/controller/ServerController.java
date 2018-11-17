@@ -67,6 +67,6 @@ public class ServerController {
     @GetMapping("/servers")
     public ResultOutput getServers(@RequestParam("teamId") Integer teamId,@RequestParam("page") Integer page,@RequestParam("size") Integer size,Integer envId) {
 
-        return serverService.getServersByTeamId(teamId,page,size,envId);
+        return serverService.getServerOutputByTeamId(teamId,page,size,envId);
     }
 }
