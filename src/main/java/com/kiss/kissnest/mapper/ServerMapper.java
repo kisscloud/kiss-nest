@@ -1,6 +1,7 @@
 package com.kiss.kissnest.mapper;
 
 import com.kiss.kissnest.entity.Server;
+import com.kiss.kissnest.output.ServerOutput;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface ServerMapper {
     List<Server> getServersByTeamId(Map params);
 
     List<String> getServerInnerIpsByIds(String ids);
+
+    List<ServerOutput> getServerOutputsByTeamId(Map params);
 }

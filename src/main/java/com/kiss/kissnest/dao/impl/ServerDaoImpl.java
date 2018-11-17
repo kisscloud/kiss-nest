@@ -3,6 +3,7 @@ package com.kiss.kissnest.dao.impl;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Server;
 import com.kiss.kissnest.mapper.ServerMapper;
+import com.kiss.kissnest.output.ServerOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,5 +73,17 @@ public class ServerDaoImpl implements ServerDao {
     public List<String> getServerInnerIpsByIds(String ids) {
 
         return serverMapper.getServerInnerIpsByIds(ids);
+    }
+
+    @Override
+    public List<ServerOutput> getServerOutputsByTeamId(Integer teamId, Integer start, Integer size, Integer envId) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("start",start);
+        params.put("size",size);
+        params.put("envId",envId);
+
+        return serverMapper.getServerOutputsByTeamId(params);
     }
 }

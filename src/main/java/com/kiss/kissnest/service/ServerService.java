@@ -135,4 +135,14 @@ public class ServerService {
 
         return ResultOutputUtil.success(serverOutputs);
     }
+
+    public ResultOutput getServerOutputByTeamId(Integer teamId, Integer page, Integer size, Integer envId) {
+
+        Integer maxSize = Integer.parseInt(serverSize);
+        Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
+        Integer start = page == 0 ? null : (page - 1) * pageSize;
+        List<ServerOutput> serverOutputs = serverDao.getServerOutputsByTeamId(teamId, start, pageSize, envId);
+
+        return ResultOutputUtil.success(serverOutputs);
+    }
 }

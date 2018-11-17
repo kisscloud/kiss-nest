@@ -23,7 +23,7 @@ public class MemberOutput {
 
     private String operatorName;
 
-    private Date createdAt;
+    private Long createdAt;
 
-    private Date updatedAt;
+    private Long updatedAt;
 }

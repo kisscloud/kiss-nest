@@ -13,6 +13,14 @@ public class ServerOutput {
 
     private Integer envId;
 
+    private String envName;
+
+    private Integer projectId;
+
+    private String projectName;
+
+    private Integer status;
+
     private String innerIp;
 
     private String outerIp;
@@ -27,7 +35,7 @@ public class ServerOutput {
 
     private Date lastDeployedAt;
 
-    private Date createdAt;
+    private Long createdAt;
 
-    private Date updatedAt;
+    private Long updatedAt;
 }

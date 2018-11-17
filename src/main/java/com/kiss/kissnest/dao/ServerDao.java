@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.Server;
+import com.kiss.kissnest.output.ServerOutput;
 import io.swagger.models.auth.In;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface ServerDao {
     List<Server> getServersByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
 
     List<String> getServerInnerIpsByIds(String ids);
+
+    List<ServerOutput> getServerOutputsByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
 }
