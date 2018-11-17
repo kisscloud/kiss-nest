@@ -31,7 +31,7 @@ public class TrackOutput {
 
     private Date operatorAt;
 
-    private Date createdAt;
+    private Long createdAt;
 
-    private Date updatedAt;
+    private Long updatedAt;
 }

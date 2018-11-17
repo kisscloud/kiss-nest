@@ -35,7 +35,7 @@
         where projectId = #{projectId} and type = #{type} and status = #{status}
     </update>
     
-    <select id="getJobByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
+    <select id="getJobsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where teamId = #{teamId} and type = #{type};
     </select>
 </mapper>

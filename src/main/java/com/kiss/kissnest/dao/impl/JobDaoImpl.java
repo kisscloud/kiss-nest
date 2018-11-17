@@ -64,12 +64,12 @@ public class JobDaoImpl implements JobDao {
     }
 
     @Override
-    public List<Job> getJobByTeamId(Integer teamId, Integer type) {
+    public List<Job> getJobsByTeamId(Integer teamId, Integer type) {
 
         Map<String,Object> params = new HashMap<>();
         params.put("teamId",teamId);
         params.put("type",type);
 
-        return jobMapper.getJobByTeamId(params);
+        return jobMapper.getJobsByTeamId(params);
     }
 }
