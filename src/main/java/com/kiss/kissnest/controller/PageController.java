@@ -34,6 +34,9 @@ public class PageController {
     @Autowired
     private LinkService linkService;
 
+    @Autowired
+    private ServerService serverService;
+
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
@@ -59,7 +62,7 @@ public class PageController {
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
         result.put("groups", groups.getData());
-        result.put("types",types.getData());
+        result.put("types", types.getData());
 
         return ResultOutputUtil.success(result);
     }
@@ -101,6 +104,21 @@ public class PageController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("links", links.getData());
+
+        return ResultOutputUtil.success(result);
+    }
+
+
+    @ApiOperation(value = "获取服务器页面参数")
+    @GetMapping("/servers")
+    public ResultOutput GetPageServersParams(@RequestParam("teamId") Integer teamId) {
+
+        ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
+        ResultOutput servers = serverService.getServersByTeamId(teamId, 0, null, null);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("envs", envs.getData());
+        result.put("servers", servers.getData());
 
         return ResultOutputUtil.success(result);
     }
