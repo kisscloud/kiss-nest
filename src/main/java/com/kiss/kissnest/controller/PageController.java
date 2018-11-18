@@ -69,8 +69,8 @@ public class PageController {
 
 
     @ApiOperation(value = "获取构建页面参数")
-    @GetMapping("/build")
-    public ResultOutput GetPageBuildParams(Integer teamId) {
+    @GetMapping("/build/logs")
+    public ResultOutput GetPageBuildLogsParams(Integer teamId) {
 
         ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
         ResultOutput buildProjects = projectService.getBuildProjects(teamId);
@@ -81,6 +81,21 @@ public class PageController {
 
         return ResultOutputUtil.success(result);
     }
+
+    @ApiOperation(value = "获取构建页面参数")
+    @GetMapping("/build/jobs")
+    public ResultOutput GetPageBuildJobsParams(Integer teamId) {
+
+        ResultOutput jobs = buildService.getJobsByTeamId(teamId, 1);
+        ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("jobs", jobs.getData());
+        result.put("projects", projects.getData());
+
+        return ResultOutputUtil.success(result);
+    }
+
 
     @ApiOperation(value = "获取仓库页面参数")
     @GetMapping("/repositories")

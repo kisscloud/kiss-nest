@@ -60,7 +60,7 @@ public class JobController {
         return buildLogService.getBuildLogsByTeamId(buildLogsInput);
     }
 
-    @GetMapping("/job/build/recentLog")
+    @GetMapping("/job/build/result")
     public ResultOutput getBuildRecentLog(@RequestParam("teamId") Integer teamId,@RequestParam("projectId") Integer projectId,@RequestParam("queueId") Long queueId) {
 
         return buildLogService.getBuildRecentLog(teamId,projectId,queueId);
