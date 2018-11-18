@@ -72,4 +72,16 @@ public class JobDaoImpl implements JobDao {
 
         return jobMapper.getJobsByTeamId(params);
     }
+
+    @Override
+    public Integer updateJob(Job job) {
+
+        return jobMapper.updateJob(job);
+    }
+
+    @Override
+    public Job getJobById(Integer id) {
+
+        return jobMapper.getJobById(id);
+    }
 }

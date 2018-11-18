@@ -20,7 +20,7 @@ import java.io.IOException;
 public class JobController {
 
     @Autowired
-    private BuildService buildLogService;
+    private BuildService buildService;
 
     @Autowired
     private JobValidator jobValidator;
@@ -37,49 +37,55 @@ public class JobController {
     @ApiOperation(value = "创建构建任务")
     public ResultOutput createBuildJob(@Validated @RequestBody CreateJobInput createJobInput) {
 
-        return buildLogService.createBuildJob(createJobInput);
+        return buildService.createBuildJob(createJobInput);
     }
 
     @PostMapping("/job/build/exec")
     @ApiOperation(value = "执行构建任务")
     public ResultOutput execBuildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
-        return buildLogService.buildJob(buildJobInput);
+        return buildService.buildJob(buildJobInput);
     }
 
     @GetMapping("/job/exist")
     public ResultOutput validateJobExist(@RequestParam("projectId") Integer projectId, @RequestParam("type") Integer type) {
 
-        return buildLogService.validateJobExist(projectId, type);
+        return buildService.validateJobExist(projectId, type);
     }
 
     @PostMapping("/job/build/logs")
     public ResultOutput getBuildLogs(@Validated @RequestBody BuildLogsInput buildLogsInput) {
 
-        return buildLogService.getBuildLogsByTeamId(buildLogsInput);
+        return buildService.getBuildLogsByTeamId(buildLogsInput);
     }
 
     @GetMapping("/job/build/recentLog")
     public ResultOutput getBuildRecentLog(@RequestParam("teamId") Integer teamId,@RequestParam("projectId") Integer projectId,@RequestParam("queueId") Long queueId) {
 
-        return buildLogService.getBuildRecentLog(teamId,projectId,queueId);
+        return buildService.getBuildRecentLog(teamId,projectId,queueId);
     }
 
     @PostMapping("/job/deploy")
     public ResultOutput createDeployJob(@RequestBody CreateDeployInput createDeployInput) {
 
-        return buildLogService.createDeployJob(createDeployInput);
+        return buildService.createDeployJob(createDeployInput);
     }
 
     @PostMapping("/job/deploy/exec")
     public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) {
 
-        return buildLogService.deployJob(deployJobInput);
+        return buildService.deployJob(deployJobInput);
     }
 
     @GetMapping("/jobs")
     public ResultOutput getJobsByTeamId(@RequestParam("teamId") Integer teamId,@RequestParam("type") Integer type) {
 
-        return buildLogService.getJobsByTeamId(teamId,type);
+        return buildService.getJobsByTeamId(teamId,type);
+    }
+
+    @PutMapping("/job")
+    public ResultOutput updateJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
+
+        return buildService.updateJob(updateJobInput);
     }
 }

@@ -49,7 +49,7 @@ public class ServerService {
 
     public ResultOutput createEnvironment(CreateEnvironmentInput environmentInput) {
 
-        Environment environment = (Environment) BeanCopyUtil.copy(environmentInput, Environment.class);
+        Environment environment = BeanCopyUtil.copy(environmentInput, Environment.class);
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
@@ -59,7 +59,7 @@ public class ServerService {
             return ResultOutputUtil.error(NestStatusCode.SERVER_ENVIRONMENT_CREATE_FAILED);
         }
 
-        EnvironmentOutput environmentOutput = (EnvironmentOutput) BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
+        EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
 //        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
 
         return ResultOutputUtil.success(environmentOutput);
@@ -67,7 +67,7 @@ public class ServerService {
 
     public ResultOutput updateEnvironment(UpdateEnvironmentInput updateEnvironmentInput) {
 
-        Environment environment = (Environment) BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
+        Environment environment = BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
         environment.setId(updateEnvironmentInput.getEnvId());
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
@@ -78,7 +78,7 @@ public class ServerService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_SERVER_ENVIRONMENT_FAILED);
         }
 
-        EnvironmentOutput environmentOutput = (EnvironmentOutput) BeanCopyUtil.copy(environment,EnvironmentOutput.class);
+        EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment,EnvironmentOutput.class);
 
         return ResultOutputUtil.success(environmentOutput);
     }
@@ -86,7 +86,7 @@ public class ServerService {
     public ResultOutput getEnvironmentsByTeamId(Integer teamId) {
 
         List<Environment> environment = environmentDao.getEnvironmentsByTeamId(teamId);
-        List<EnvironmentOutput> environmentOutputs = (List) BeanCopyUtil.copyList(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
+        List<EnvironmentOutput> environmentOutputs = BeanCopyUtil.copyList(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
         environmentOutputs.forEach(environmentOutput -> environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType()))));
 
         return ResultOutputUtil.success(environmentOutputs);
@@ -94,7 +94,7 @@ public class ServerService {
 
     public ResultOutput createServer(CreateServerInput createServerInput) {
 
-        Server server = (Server) BeanCopyUtil.copy(createServerInput, Server.class);
+        Server server = BeanCopyUtil.copy(createServerInput, Server.class);
         Guest guest = ThreadLocalUtil.getGuest();
         server.setOperatorId(guest.getId());
         server.setOperatorName(guest.getName());
@@ -105,14 +105,14 @@ public class ServerService {
         }
 
         environmentDao.addEnvironmentServerCount(createServerInput.getEnvId());
-        ServerOutput serverOutput = (ServerOutput) BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
+        ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
 //        operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
         return ResultOutputUtil.success(serverOutput);
     }
 
     public ResultOutput updateServer(UpdateServerInput updateServerInput) {
 
-        Server server = (Server) BeanCopyUtil.copy(updateServerInput, Server.class);
+        Server server = BeanCopyUtil.copy(updateServerInput, Server.class);
         Guest guest = ThreadLocalUtil.getGuest();
         server.setOperatorId(guest.getId());
         server.setOperatorName(guest.getName());
@@ -123,7 +123,7 @@ public class ServerService {
             return ResultOutputUtil.error(NestStatusCode.SERVER_UPDATE_FAILED);
         }
 
-        ServerOutput serverOutput = (ServerOutput) BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
+        ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
 //        operationLogService.saveOperationLog(updateServerInput.getTeamId(),guest,oldValue,server,"id",OperationTargetType.TYPE__UPDATE_SERVER);
 
         return ResultOutputUtil.success(serverOutput);
@@ -135,7 +135,7 @@ public class ServerService {
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = page == 0 ? null : (page - 1) * pageSize;
         List<Server> servers = serverDao.getServersByTeamId(teamId, start, pageSize, envId);
-        List<ServerOutput> serverOutputs = (List) BeanCopyUtil.copyList(servers, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
+        List<ServerOutput> serverOutputs = BeanCopyUtil.copyList(servers, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(serverOutputs);
     }

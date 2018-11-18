@@ -17,4 +17,8 @@ public interface JobDao {
     Integer updateJobStatusAndNumber(Integer projectId, Integer type, Integer status,Integer newStatus,Integer number);
 
     List<Job> getJobsByTeamId(Integer teamId,Integer type);
+
+    Integer updateJob(Job job);
+
+    Job getJobById(Integer id);
 }

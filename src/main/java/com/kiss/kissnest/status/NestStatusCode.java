@@ -89,6 +89,11 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer TYPE_IS_EMPTY = 10004;
     public static final Integer BRANCH_IS_EMPTY = 10005;
     public static final Integer DEPLOY_JENKINS_JOB_ERROR = 10006;
+    public static final Integer UPDATE_JOB_FAILED= 10007;
+    public static final Integer UPDATE_JENKINS_JOB_ERROR = 10008;
+    public static final Integer JOB_ID_IS_EMPTY = 10009;
+    public static final Integer JOB_NOT_EXIST = 10010;
+
 
 
     public static final Integer PAGE_IS_EMPTY = 11001;

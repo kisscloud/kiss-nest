@@ -38,4 +38,17 @@
     <select id="getJobsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where teamId = #{teamId} and type = #{type};
     </select>
+
+    <update id="updateJob" parameterType="com.kiss.kissnest.entity.Job">
+        update jobs set
+        teamId = #{teamId},
+        projectId = #{projectId},
+        script = #{script},
+        type = #{type}
+        where id = #{id}
+    </update>
+
+    <select id="getJobById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where id = #{id};
+    </select>
 </mapper>

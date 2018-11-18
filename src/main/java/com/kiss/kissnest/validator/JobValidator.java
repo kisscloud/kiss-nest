@@ -1,10 +1,13 @@
 package com.kiss.kissnest.validator;
 
+import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.BuildJobInput;
 import com.kiss.kissnest.input.CreateJobInput;
 import com.kiss.kissnest.input.BuildLogsInput;
+import com.kiss.kissnest.input.UpdateJobInput;
 import com.kiss.kissnest.status.NestStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,12 +25,16 @@ public class JobValidator implements Validator {
     @Autowired
     private TeamValidaor teamValidaor;
 
+    @Autowired
+    private JobDao jobDao;
+
     @Override
     public boolean supports(Class<?> clazz) {
 
         return clazz.equals(CreateJobInput.class) ||
                 clazz.equals(BuildJobInput.class) ||
-                clazz.equals(BuildLogsInput.class);
+                clazz.equals(BuildLogsInput.class) ||
+                clazz.equals(UpdateJobInput.class);
     }
 
     @Override
@@ -36,7 +43,7 @@ public class JobValidator implements Validator {
         if (CreateJobInput.class.isInstance(target)) {
             CreateJobInput createJobInput = (CreateJobInput) target;
             validateProjectId(createJobInput.getProjectId(),errors);
-            validateShell(createJobInput.getScript(),errors);
+            validateScript(createJobInput.getScript(),errors);
             validateType(createJobInput.getType(),errors);
         } else if (BuildJobInput.class.isInstance(target)) {
             BuildJobInput buildJobInput = (BuildJobInput) target;
@@ -47,6 +54,13 @@ public class JobValidator implements Validator {
             teamValidaor.validateId(buildLogsInput.getTeamId(),"teamId",errors);
             validatePage(buildLogsInput.getPage(),errors);
 
+        } else if (UpdateJobInput.class.isInstance(target)) {
+            UpdateJobInput updateJobInput = (UpdateJobInput) target;
+            validateJobId(updateJobInput.getId(),errors);
+            teamValidaor.validateId(updateJobInput.getTeamId(),"teamId",errors);
+            validateProjectId(updateJobInput.getProjectId(),errors);
+            validateType(updateJobInput.getType(),errors);
+            validateScript(updateJobInput.getScript(),errors);
         }
     }
 
@@ -64,7 +78,7 @@ public class JobValidator implements Validator {
         }
     }
 
-    public void validateShell (String shell,Errors errors) {
+    public void validateScript (String shell,Errors errors) {
 
         if (StringUtils.isEmpty(shell)) {
             errors.rejectValue("shell",String.valueOf(NestStatusCode.SHELL_IS_EMPTY));
@@ -104,6 +118,20 @@ public class JobValidator implements Validator {
 
         if (size < 0) {
             errors.rejectValue("size",String.valueOf(NestStatusCode.SIZE_IS_ERROR));
+        }
+    }
+
+    public void validateJobId(Integer id,Errors errors) {
+
+        if (id == null) {
+            errors.rejectValue("id",String.valueOf(NestStatusCode.JOB_ID_IS_EMPTY),"任务id为空");
+            return;
+        }
+
+        Job job = jobDao.getJobById(id);
+
+        if (job == null) {
+            errors.rejectValue("id",String.valueOf(NestStatusCode.JOB_NOT_EXIST),"任务不存在");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
 import com.kiss.kissnest.output.JobOutput;
@@ -15,6 +16,7 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,6 @@ import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +106,7 @@ public class BuildService {
         boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
+            throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
         }
 
         Job job = new Job();
@@ -263,21 +264,53 @@ public class BuildService {
         BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(teamId, projectId, queueId);
 
         if (buildLogOutput == null) {
+            buildLogOutput = new BuildLogOutput();
+            buildLogOutput.setStatus(2);
+            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
             return ResultOutputUtil.success(buildLogOutput);
         }
 
         String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
         buildLogOutput.setCommitPath(commitPath);
+        buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
 
         return ResultOutputUtil.success(buildLogOutput);
     }
 
-    public ResultOutput getJobsByTeamId(Integer teamId,Integer type) {
+    public ResultOutput getJobsByTeamId(Integer teamId, Integer type) {
 
-        List<Job> jobs = jobDao.getJobsByTeamId(teamId,type);
-        List<JobOutput> jobOutputs = (List) BeanCopyUtil.copyList(jobs,JobOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<Job> jobs = jobDao.getJobsByTeamId(teamId, type);
+        List<JobOutput> jobOutputs = BeanCopyUtil.copyList(jobs, JobOutput.class, BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(jobOutputs);
+    }
+
+    public ResultOutput updateJob(UpdateJobInput updateJobInput) {
+
+        Job job = BeanCopyUtil.copy(updateJobInput,Job.class);
+        Integer count = jobDao.updateJob(job);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.UPDATE_JOB_FAILED);
+        }
+
+        Job wholeJob = jobDao.getJobById(job.getId());
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(job.getProjectId());
+
+        Guest guest = ThreadLocalUtil.getGuest();
+        Member member = memberDao.getMemberByAccountId(guest.getId());
+
+        if (StringUtils.isEmpty(member.getApiToken())) {
+            return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
+        }
+
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(),updateJobInput.getScript(),projectRepository.getSshUrl(),guest.getName(),member.getApiToken());
+
+        if (!success) {
+            throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
+        }
+
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
     }
 
     class BuildLogRunnable implements Runnable {

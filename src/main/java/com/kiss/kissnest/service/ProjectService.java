@@ -27,7 +27,6 @@ import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ProjectService {
@@ -58,7 +57,7 @@ public class ProjectService {
 
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
-        Project project = (Project) BeanCopyUtil.copy(createProjectInput, Project.class);
+        Project project = BeanCopyUtil.copy(createProjectInput, Project.class);
         Guest guest = ThreadLocalUtil.getGuest();
         project.setMembersCount(1);
         project.setOperatorId(guest.getId());
@@ -70,7 +69,7 @@ public class ProjectService {
         }
 
         groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
-        ProjectOutput projectOutput = (ProjectOutput) BeanCopyUtil.copy(project, ProjectOutput.class);
+        ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
 //        operationLogService.saveOperationLog(project.getTeamId(),guest,null,project,"id",OperationTargetType.TYPE_CREATE_PROJECT);
         return ResultOutputUtil.success(projectOutput);
@@ -97,7 +96,7 @@ public class ProjectService {
 
     public ResultOutput updateProject(UpdateProjectInput updateProjectInput) {
 
-        Project project = (Project) BeanCopyUtil.copy(updateProjectInput, Project.class);
+        Project project = BeanCopyUtil.copy(updateProjectInput, Project.class);
         Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         project.setOperatorId(guest.getId());
@@ -123,7 +122,7 @@ public class ProjectService {
     public ResultOutput getProjects(Integer teamId, Integer groupId) {
 
         List<Project> projects = projectDao.getProjects(teamId, groupId);
-        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class, BeanCopyUtil.defaultFieldNames);
+        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class, BeanCopyUtil.defaultFieldNames);
 
         projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
 
@@ -158,7 +157,7 @@ public class ProjectService {
     public ResultOutput getProjectsWithoutBuildJob(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithoutBuildJob(teamId);
-        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class);
+        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
         return ResultOutputUtil.success(projectOutputs);
     }
@@ -166,7 +165,7 @@ public class ProjectService {
     public ResultOutput getBuildProjects(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithBuildJob(teamId);
-        List<ProjectOutput> projectOutputs = (List) BeanCopyUtil.copyList(projects, ProjectOutput.class);
+        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
 
 //        if (projects != null && projects.size() != 0) {

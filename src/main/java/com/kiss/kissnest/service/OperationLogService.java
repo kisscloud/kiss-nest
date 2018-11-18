@@ -64,7 +64,7 @@ public class OperationLogService {
     public ResultOutput getOperationLogsByTeamId(Integer teamId) {
 
         List<OperationLog> operationLogs = operationLogDao.getOperationLogsByTeamId(teamId);
-        List<OperationLogOutput> operationLogOutputs = (List) BeanCopyUtil.copyList(operationLogs,OperationLogOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<OperationLogOutput> operationLogOutputs = BeanCopyUtil.copyList(operationLogs,OperationLogOutput.class,BeanCopyUtil.defaultFieldNames);
         operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(codeUtil.getEnumsMessage("operation.log",String.valueOf(operationLogOutput.getTargetType()))));
 
         return ResultOutputUtil.success(operationLogOutputs);

@@ -47,7 +47,7 @@ public class TeamService {
     @Transactional
     public ResultOutput createTeam(CreateTeamInput teamInput) {
 
-        Team team = (Team) BeanCopyUtil.copy(teamInput,Team.class);
+        Team team = BeanCopyUtil.copy(teamInput,Team.class);
         Guest guest = ThreadLocalUtil.getGuest();
         team.setOperatorId(guest.getId());
         team.setOperatorName(guest.getName());
@@ -81,7 +81,7 @@ public class TeamService {
         team.setRepositoryId(gitlabGroup.getId());
         teamDao.addRepositoryIdById(team);
 //        operationLogService.saveOperationLog(team.getId(),guest,null,team,"id",OperationTargetType.TYPE_CREATE_TEAM);
-        TeamOutput teamOutput = (TeamOutput) BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
+        TeamOutput teamOutput = BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
     }
@@ -107,7 +107,7 @@ public class TeamService {
 
     public ResultOutput updateTeam(UpdateTeamInput updateTeamInput) {
 
-        Team team = (Team) BeanCopyUtil.copy(updateTeamInput,Team.class);
+        Team team = BeanCopyUtil.copy(updateTeamInput,Team.class);
 
         Team exist = teamDao.getTeamById(team.getId());
 
@@ -121,7 +121,7 @@ public class TeamService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_TEAM_FAILED);
         }
 
-        TeamOutput teamOutput = (TeamOutput) BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
+        TeamOutput teamOutput = BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
     }
@@ -149,7 +149,7 @@ public class TeamService {
         Guest guest = ThreadLocalUtil.getGuest();
         Integer accountId = guest.getId();
         Member member = memberDao.getMemberByAccountId(accountId);
-        Member before = (Member) BeanCopyUtil.copy(member,Member.class);
+        Member before = BeanCopyUtil.copy(member,Member.class);
 
         if (member != null) {
             //更新

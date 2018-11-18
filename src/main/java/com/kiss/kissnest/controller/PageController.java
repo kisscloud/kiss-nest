@@ -114,7 +114,7 @@ public class PageController {
     public ResultOutput GetPageServersParams(@RequestParam("teamId") Integer teamId) {
 
         ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
-        ResultOutput servers = serverService.getServersByTeamId(teamId, 0, null, null);
+        ResultOutput servers = serverService.getServerOutputByTeamId(teamId, 0, null, null);
 
         Map<String, Object> result = new HashMap<>();
         result.put("envs", envs.getData());

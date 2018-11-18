@@ -20,4 +20,8 @@ public interface JobMapper {
     Integer updateJobStatusAndNumber(Map params);
 
     List<Job> getJobsByTeamId(Map params);
+
+    Integer updateJob(Job job);
+
+    Job getJobById(Integer id);
 }

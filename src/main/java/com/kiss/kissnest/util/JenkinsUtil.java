@@ -116,6 +116,33 @@ public class JenkinsUtil {
         }
     }
 
+    public boolean updateJob(String jobName, String shell, String sshUrl, String account, String passwordOrToken) {
+        JenkinsServer server = null;
+
+        try {
+            server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+            StringBuilder builder = readFileFromClassPath();
+            String formatShell = StringEscapeUtils.escapeHtml(shell);
+            String script = String.format(builder.toString(), sshUrl, jobName, jenkinBinIp, formatShell);
+
+            if (builder == null) {
+                return false;
+            }
+
+            server.updateJob(jobName, script, false);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (server != null) {
+                server.close();
+            }
+        }
+    }
+
+
     public String buildJob(String jobName, String branch, String account, String passwordOrToken) {
 
         try {
@@ -574,26 +601,20 @@ public class JenkinsUtil {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+        JenkinsServer server = null;
 
-        String location = "http://build.kisscloud.io/queue/item/62/";
-        location = location.endsWith("/") ? location.substring(0,location.length() - 1) : location;
-        String[] urlStr = location.split("/");
+        try {
+            server = new JenkinsServer(new URI("http://build.kisscloud.io"), "xiaohu", "12345678");
+            QueueReference queueReference = new QueueReference("http://build.kisscloud.io/queue/item/57/api/json");
+            QueueItem queueItem = server.getQueueItem(queueReference);
 
-        System.out.println(Long.valueOf(urlStr[urlStr.length - 1]));
-//        JenkinsServer server = null;
-//
-//        try {
-//            server = new JenkinsServer(new URI("http://build.kisscloud.io"), "xiaohu", "12345678");
-//            QueueReference queueReference = new QueueReference("http://build.kisscloud.io/queue/item/57/api/json");
-//            QueueItem queueItem = server.getQueueItem(queueReference);
-//
-//            Build build = server.getBuild(queueItem);
-//
-//            System.out.println(build);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//        }
+            Build build = server.getBuild(queueItem);
+
+            System.out.println(build);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
 
 
     }

@@ -53,7 +53,7 @@ public class GroupService {
     @Transactional
     public ResultOutput createGroup(CreateGroupInput createGroupInput) {
 
-        Group group = (Group) BeanCopyUtil.copy(createGroupInput, Group.class);
+        Group group = BeanCopyUtil.copy(createGroupInput, Group.class);
         Guest guest = ThreadLocalUtil.getGuest();
         group.setStatus(1);
         group.setMembersCount(1);
@@ -83,7 +83,7 @@ public class GroupService {
         group.setRepositoryId(gitlabGroup.getId());
         groupDao.addRepositoryIdById(group);
 //        operationLogService.saveOperationLog(group.getTeamId(),guest,null,group,"id",OperationTargetType.TYPE_CREATE_GROUP);
-        GroupOutput groupOutput = (GroupOutput) BeanCopyUtil.copy(group, GroupOutput.class);
+        GroupOutput groupOutput = BeanCopyUtil.copy(group, GroupOutput.class);
         groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus())));
 
         return ResultOutputUtil.success(groupOutput);
@@ -115,7 +115,7 @@ public class GroupService {
 
     public ResultOutput updateGroup(UpdateGroupInput updateGroupInput) {
 
-        Group group = (Group) BeanCopyUtil.copy(updateGroupInput, Group.class);
+        Group group = BeanCopyUtil.copy(updateGroupInput, Group.class);
         Guest guest = ThreadLocalUtil.getGuest();
         group.setOperatorId(guest.getId());
         group.setOperatorName(guest.getName());
@@ -147,7 +147,7 @@ public class GroupService {
 
         List<Group> groups = groupDao.getGroups(teamId);
 
-        List<GroupOutput> groupOutputs = (List) BeanCopyUtil.copyList(groups, GroupOutput.class, BeanCopyUtil.defaultFieldNames);
+        List<GroupOutput> groupOutputs = BeanCopyUtil.copyList(groups, GroupOutput.class, BeanCopyUtil.defaultFieldNames);
 
         groupOutputs.forEach(groupOutput -> groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus()))));
 

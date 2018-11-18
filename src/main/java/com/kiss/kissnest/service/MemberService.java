@@ -229,14 +229,14 @@ public class MemberService {
     public ResultOutput getMemberTeamsByAccountId(Integer accountId) {
 
         List<Team> memberTeams = memberTeamDao.getMemberTeams(accountId);
-        List<TeamOutput> memberTeamOutputs = (List) BeanCopyUtil.copyList(memberTeams,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<TeamOutput> memberTeamOutputs = BeanCopyUtil.copyList(memberTeams,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(memberTeamOutputs);
     }
 
     public ResultOutput getMembersByClientId(MemberClientInput memberClientInput) {
 
-        ClientAccountInput clientAccountInput = (ClientAccountInput) BeanCopyUtil.copy(memberClientInput,ClientAccountInput.class);
+        ClientAccountInput clientAccountInput = BeanCopyUtil.copy(memberClientInput,ClientAccountInput.class);
 
         return clientServiceFeign.getClientAccounts(clientAccountInput);
     }

@@ -19,6 +19,8 @@ public class BuildLogOutput {
 
     private Integer projectId;
 
+    private String projectName;
+
     private String remark;
 
     private Integer status;

@@ -131,7 +131,7 @@ public class TrackService {
 
         if (tracks != null) {
             for (Track track : tracks) {
-                trackOutputs.add((TrackOutput) BeanCopyUtil.copy(track, TrackOutput.class));
+                trackOutputs.add(BeanCopyUtil.copy(track, TrackOutput.class));
             }
         }
 
