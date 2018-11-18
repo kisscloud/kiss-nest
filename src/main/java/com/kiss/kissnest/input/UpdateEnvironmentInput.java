@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class UpdateEnvironmentInput {
 
-    private Integer id;
+    private Integer teamId;
 
-    private Integer envId;
+    private Integer id;
 
     private String name;
 }

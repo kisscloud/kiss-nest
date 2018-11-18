@@ -68,7 +68,7 @@ public class ServerService {
     public ResultOutput updateEnvironment(UpdateEnvironmentInput updateEnvironmentInput) {
 
         Environment environment = BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
-        environment.setId(updateEnvironmentInput.getEnvId());
+        environment.setId(updateEnvironmentInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
