@@ -29,9 +29,9 @@ public class ProjectRepositoryDaoImpl implements ProjectRepositoryDao {
     }
 
     @Override
-    public List<ProjectRepository> getProjectRepositoryByTeamId(Integer teamId) {
+    public List<ProjectRepository> getProjectRepositoriesByTeamId(Integer teamId) {
 
-        return projectRepositoryMapper.getProjectRepositoryByTeamId(teamId);
+        return projectRepositoryMapper.getProjectRepositoriesByTeamId(teamId);
     }
 
     @Override
@@ -53,5 +53,11 @@ public class ProjectRepositoryDaoImpl implements ProjectRepositoryDao {
         params.put("branchCount",branchCount);
 
         return projectRepositoryMapper.updateProjectRepositoryBranch(params);
+    }
+
+    @Override
+    public Integer deleteProjectRepositoryById(Integer id) {
+
+        return projectRepositoryMapper.deleteProjectRepositoryById(id);
     }
 }

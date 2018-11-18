@@ -1,12 +1,11 @@
 package com.kiss.kissnest.service;
 
-import com.kiss.kissnest.dao.GroupDao;
-import com.kiss.kissnest.dao.MemberDao;
-import com.kiss.kissnest.dao.ProjectDao;
-import com.kiss.kissnest.dao.ProjectRepositoryDao;
-import com.kiss.kissnest.entity.OperationTargetType;
+import com.kiss.kissnest.dao.*;
+import com.kiss.kissnest.entity.Job;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
+import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
@@ -14,12 +13,14 @@ import com.kiss.kissnest.output.ProjectTypeOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
+import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
@@ -42,6 +43,15 @@ public class ProjectService {
 
     @Autowired
     private MemberDao memberDao;
+
+    @Autowired
+    private JobDao jobDao;
+
+    @Autowired
+    private BuildLogDao buildLogDao;
+
+    @Autowired
+    private JenkinsUtil jenkinsUtil;
 
     @Autowired
     private ProjectRepositoryDao projectRepositoryDao;
@@ -75,6 +85,7 @@ public class ProjectService {
         return ResultOutputUtil.success(projectOutput);
     }
 
+    @Transactional
     public ResultOutput deleteProject(Integer id) {
 
         Project project = projectDao.getProjectById(id);
@@ -87,6 +98,31 @@ public class ProjectService {
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.DELETE_PROJECT_FAILED);
+        }
+
+        buildLogDao.deleteBuildLogsByProjectId(project.getId());
+
+        List<Job> jobs = jobDao.getJobByProjectId(project.getId());
+        Guest guest = ThreadLocalUtil.getGuest();
+        Member member = memberDao.getMemberByAccountId(guest.getId());
+
+        if (jobs != null && jobs.size() != 0) {
+            jobs.forEach(job -> {
+                Integer jobCount = jobDao.deleteJobById(job.getId());
+
+                if (jobCount == 0) {
+                    throw new TransactionalException(NestStatusCode.DELETE_JOB_FAILED);
+                }
+
+                jenkinsUtil.deleteJob(job.getJobName(),guest.getName(),member.getApiToken());
+            });
+        }
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(id);
+
+        if (projectRepository != null) {
+            projectRepositoryDao.deleteProjectRepositoryById(projectRepository.getId());
+            gitlabApiUtil.deleteProject(projectRepository.getRepositoryId(),member.getAccessToken());
         }
 
 //        operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);

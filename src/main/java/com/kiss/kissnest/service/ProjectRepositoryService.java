@@ -7,6 +7,7 @@ import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
+import com.kiss.kissnest.input.CreateProjectRepositoryInput;
 import com.kiss.kissnest.output.ProjectRepositoryOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -41,8 +42,9 @@ public class ProjectRepositoryService {
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
 
-    public ResultOutput createProjectRepository(Integer projectId) {
+    public ResultOutput createProjectRepository(CreateProjectRepositoryInput createProjectRepositoryInput) {
 
+        Integer projectId = createProjectRepositoryInput.getProjectId();
         Project project = projectDao.getProjectById(projectId);
 
         if (project == null) {
@@ -94,9 +96,9 @@ public class ProjectRepositoryService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository,ProjectRepositoryOutput.class));
     }
 
-    public ResultOutput getProjectRepositoryByTeamId(Integer teamId) {
+    public ResultOutput getProjectRepositoriesByTeamId(Integer teamId) {
 
-        List<ProjectRepository> projectRepositoryList = projectRepositoryDao.getProjectRepositoryByTeamId(teamId);
+        List<ProjectRepository> projectRepositoryList = projectRepositoryDao.getProjectRepositoriesByTeamId(teamId);
 
         return ResultOutputUtil.success(BeanCopyUtil.copyList(projectRepositoryList, ProjectRepositoryOutput.class));
     }
@@ -113,5 +115,12 @@ public class ProjectRepositoryService {
         }
 
         return ResultOutputUtil.success(result);
+    }
+
+    public ResultOutput getProjectRepositoryByProjectId(Integer projectId) {
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+
+        return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository, ProjectRepositoryOutput.class,BeanCopyUtil.defaultFieldNames));
     }
 }

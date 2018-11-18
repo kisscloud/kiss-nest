@@ -102,7 +102,7 @@ public class PageController {
     public ResultOutput GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
         ResultOutput projects = projectService.getProjects(teamId, groupId);
-        ResultOutput repositories = projectRepositoryService.getProjectRepositoryByTeamId(teamId);
+        ResultOutput repositories = projectRepositoryService.getProjectRepositoriesByTeamId(teamId);
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
         result.put("repositories", repositories.getData());

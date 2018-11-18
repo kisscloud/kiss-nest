@@ -2,6 +2,7 @@ package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.CreateProjectInput;
+import com.kiss.kissnest.input.CreateProjectRepositoryInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.service.ProjectRepositoryService;
 import com.kiss.kissnest.service.ProjectService;
@@ -62,11 +63,18 @@ public class ProjectController {
         return projectService.getProjects(teamId, groupId);
     }
 
-    @GetMapping("/project/repository")
+    @PostMapping("/project/repository")
     @ApiOperation(value = "创建项目仓库")
-    public ResultOutput createProjectRepository(@RequestParam("projectId") Integer projectId) {
+    public ResultOutput createProjectRepository(@Validated @RequestBody CreateProjectRepositoryInput createProjectRepositoryInput) {
 
-        return projectRepositoryService.createProjectRepository(projectId);
+        return projectRepositoryService.createProjectRepository(createProjectRepositoryInput);
+    }
+
+    @GetMapping("/project/repository")
+    @ApiOperation(value = "查询项目仓库详情")
+    public ResultOutput getProjectRepository(@RequestParam("projectId") Integer projectId) {
+
+        return projectRepositoryService.getProjectRepositoryByProjectId(projectId);
     }
 
     @GetMapping("/project/branches")

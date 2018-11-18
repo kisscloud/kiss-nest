@@ -86,4 +86,14 @@ public class ServerDaoImpl implements ServerDao {
 
         return serverMapper.getServerOutputsByTeamId(params);
     }
+
+    @Override
+    public Integer getServerOutputCount(Integer teamId, Integer envId) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("envId",envId);
+
+        return serverMapper.getServerOutputCount(params);
+    }
 }

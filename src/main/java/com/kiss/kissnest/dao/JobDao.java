@@ -8,7 +8,7 @@ public interface JobDao {
 
     Integer createJob(Job job);
 
-    Job getJobByProjectId(Integer projectId);
+    List<Job> getJobByProjectId(Integer projectId);
 
     Job getJobByProjectIdAndType(Integer projectId, Integer type);
 
@@ -21,4 +21,6 @@ public interface JobDao {
     Integer updateJob(Job job);
 
     Job getJobById(Integer id);
+
+    Integer deleteJobById(Integer id);
 }

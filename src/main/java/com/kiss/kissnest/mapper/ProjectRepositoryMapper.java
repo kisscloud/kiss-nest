@@ -13,9 +13,11 @@ public interface ProjectRepositoryMapper {
 
     ProjectRepository getProjectRepositoryByProjectId(Integer projectId);
 
-    List<ProjectRepository> getProjectRepositoryByTeamId(Integer teamId);
+    List<ProjectRepository> getProjectRepositoriesByTeamId(Integer teamId);
 
     Integer addCount(Map params);
 
     Integer updateProjectRepositoryBranch(Map map);
+
+    Integer deleteProjectRepositoryById(Integer id);
 }

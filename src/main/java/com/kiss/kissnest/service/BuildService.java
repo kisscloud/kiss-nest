@@ -5,6 +5,7 @@ import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
+import com.kiss.kissnest.output.GetBuildLogOutput;
 import com.kiss.kissnest.output.JobOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
@@ -199,6 +200,8 @@ public class BuildService {
         result.put("projectName", project.getName());
         result.put("branch", buildJobInput.getBranch());
         result.put("remark", buildJobInput.getRemark());
+        result.put("status",2);
+        result.put("statusText",codeUtil.getEnumsMessage("build.status",String.valueOf(result.get("status"))));
         return ResultOutputUtil.success(result);
     }
 
@@ -248,13 +251,18 @@ public class BuildService {
         Integer size = buildLogsInput.getSize();
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = buildLogsInput.getPage() == 0 ? null : (buildLogsInput.getPage() - 1) * pageSize;
-        List<BuildLogOutput> buildLogOutputs = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
+        List<BuildLogOutput> buildLogOutputList = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
 
-        buildLogOutputs.forEach(buildLogOutput -> {
+        buildLogOutputList.forEach(buildLogOutput -> {
             buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
             String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
             buildLogOutput.setCommitPath(commitPath);
         });
+
+        Integer count = buildLogDao.getBuildLogCountByTeamId(buildLogsInput.getTeamId());
+        GetBuildLogOutput buildLogOutputs = new GetBuildLogOutput();
+        buildLogOutputs.setBuildLogOutputs(buildLogOutputList);
+        buildLogOutputs.setCount(count);
 
         return ResultOutputUtil.success(buildLogOutputs);
     }
@@ -264,9 +272,12 @@ public class BuildService {
         BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(teamId, projectId, queueId);
 
         if (buildLogOutput == null) {
-            buildLogOutput = new BuildLogOutput();
-            buildLogOutput.setStatus(2);
-            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
+//            buildLogOutput = new BuildLogOutput();
+//            buildLogOutput.setTeamId(teamId);
+//            buildLogOutput.setProjectId(projectId);
+//            buildLogOutput.setQueueId(queueId);
+//            buildLogOutput.setStatus(2);
+//            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
             return ResultOutputUtil.success(buildLogOutput);
         }
 

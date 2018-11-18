@@ -51,4 +51,8 @@
     <select id="getJobById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where id = #{id};
     </select>
+
+    <delete id="deleteJobById" parameterType="java.lang.Integer">
+        delete from jobs where id = #{id}
+    </delete>
 </mapper>

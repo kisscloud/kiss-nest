@@ -35,4 +35,6 @@ public interface ProjectDao {
     String getProjectOperatorAccessToken(Integer projectId);
 
     String getProjectNameByServerId(String serverId);
+
+    List<Project> getProjectsByGroupId(Integer groupId);
 }

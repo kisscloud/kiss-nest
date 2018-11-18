@@ -39,7 +39,7 @@
             ,operatorName = #{operatorName}
         </if>
         <if test="type != null">
-            ,type #{type}
+            ,type = #{type}
         </if>
         where id = #{id}
     </update>
@@ -113,13 +113,20 @@
     </select>
     
     <select id="getProjectNameByServerId" parameterType="java.lang.String" resultType="java.lang.String">
-        select GROUP_CONCAT(re.name) as name from
+        select concat('[',rs.name,']') as name from
         (
-        select pr.name,1 as tmp from jobs jo
+        select GROUP_CONCAT(concat('{',re.id,',',re.name,"}")) as name from
+        (
+        select concat("\"projectName\"",":",pr.name) as name,concat("\"projectId\"",":",pr.id) as id,1 as tmp from jobs jo
         left join projects pr
         on jo.projectId = pr.id
         where jo.serverIds like #{serverId}
         ) re
-        group by re.tmp;
+        group by re.tmp
+        ) rs;
+    </select>
+    
+    <select id="getProjectsByGroupId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where groupId = #{groupId};
     </select>
 </mapper>

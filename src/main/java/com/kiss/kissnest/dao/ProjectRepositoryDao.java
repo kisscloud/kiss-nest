@@ -10,9 +10,11 @@ public interface ProjectRepositoryDao {
 
     ProjectRepository getProjectRepositoryByProjectId(Integer projectId);
 
-    List<ProjectRepository> getProjectRepositoryByTeamId(Integer teamId);
+    List<ProjectRepository> getProjectRepositoriesByTeamId(Integer teamId);
 
     Integer addCount(String type,Integer increment);
 
     Integer updateProjectRepositoryBranch(Integer teamId,Integer projectId,Integer branchCount);
+
+    Integer deleteProjectRepositoryById(Integer id);
 }

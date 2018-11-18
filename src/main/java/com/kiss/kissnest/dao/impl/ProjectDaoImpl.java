@@ -113,4 +113,10 @@ public class ProjectDaoImpl implements ProjectDao {
 
         return projectMapper.getProjectNameByServerId(serverId);
     }
+
+    @Override
+    public List<Project> getProjectsByGroupId(Integer groupId) {
+
+        return projectMapper.getProjectsByGroupId(groupId);
+    }
 }

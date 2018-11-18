@@ -10,6 +10,7 @@ import com.kiss.kissnest.input.CreateServerInput;
 import com.kiss.kissnest.input.UpdateEnvironmentInput;
 import com.kiss.kissnest.input.UpdateServerInput;
 import com.kiss.kissnest.output.EnvironmentOutput;
+import com.kiss.kissnest.output.GetServerOutput;
 import com.kiss.kissnest.output.ServerOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
@@ -146,6 +147,7 @@ public class ServerService {
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = page == 0 ? null : (page - 1) * pageSize;
         List<ServerOutput> serverOutputs = serverDao.getServerOutputsByTeamId(teamId, start, pageSize, envId);
+        Integer count = serverDao.getServerOutputCount(teamId,envId);
 
         serverOutputs.forEach(serverOutput -> {
             String projectName = projectDao.getProjectNameByServerId("%" + serverOutput.getId() + "%");
@@ -153,6 +155,10 @@ public class ServerService {
             serverOutput.setStatusText(codeUtil.getEnumsMessage("server.status",String.valueOf(serverOutput.getStatus())));
         });
 
-        return ResultOutputUtil.success(serverOutputs);
+        GetServerOutput getServerOutput = new GetServerOutput();
+        getServerOutput.setCount(count);
+        getServerOutput.setServerOutputs(serverOutputs);
+
+        return ResultOutputUtil.success(getServerOutput);
     }
 }

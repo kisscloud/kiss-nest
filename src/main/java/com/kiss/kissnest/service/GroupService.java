@@ -1,12 +1,10 @@
 package com.kiss.kissnest.service;
 
-import com.kiss.kissnest.dao.GroupDao;
-import com.kiss.kissnest.dao.GroupProjectDao;
-import com.kiss.kissnest.dao.MemberDao;
-import com.kiss.kissnest.dao.TeamDao;
+import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.GroupProject;
 import com.kiss.kissnest.entity.OperationTargetType;
+import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
@@ -46,6 +44,9 @@ public class GroupService {
 
     @Autowired
     private CodeUtil codeUtil;
+
+    @Autowired
+    private ProjectDao projectDao;
 
     @Autowired
     private OperationLogService operationLogService;
@@ -89,11 +90,18 @@ public class GroupService {
         return ResultOutputUtil.success(groupOutput);
     }
 
+    @Transactional
     public ResultOutput deleteGroup(Integer id) {
 
-        List<GroupProject> groupProjects = groupProjectDao.getGroupProjectsByGroupId(id);
+//        List<GroupProject> groupProjects = groupProjectDao.getGroupProjectsByGroupId(id);
 
-        if (groupProjects != null && groupProjects.size() != 0) {
+//        if (groupProjects != null && groupProjects.size() != 0) {
+//            return ResultOutputUtil.error(NestStatusCode.GROUP_PROJECT_EXIST);
+//        }
+
+        List<Project> projects = projectDao.getProjectsByGroupId(id);
+
+        if (projects != null && projects.size() != 0) {
             return ResultOutputUtil.error(NestStatusCode.GROUP_PROJECT_EXIST);
         }
 
@@ -109,6 +117,12 @@ public class GroupService {
             return ResultOutputUtil.error(NestStatusCode.DELETE_GROUP_FAILED);
         }
 
+        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        boolean flag = gitlabApiUtil.deleteGroup(group.getRepositoryId(),accessToken);
+
+        if (!flag) {
+            throw new TransactionalException(NestStatusCode.DELETE_GROUP_REPOSITORY_FAILED);
+        }
 //        operationLogService.saveOperationLog(group.getTeamId(),ThreadLocalUtil.getGuest(),group,null,"id",OperationTargetType.TYPE_DELETE_GROUP);
         return ResultOutputUtil.success();
     }

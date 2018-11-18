@@ -142,6 +142,24 @@ public class JenkinsUtil {
         }
     }
 
+    public boolean deleteJob(String jobName, String account, String passwordOrToken) {
+        JenkinsServer server = null;
+
+        try {
+            server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+            server.deleteJob(jobName);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (server != null) {
+                server.close();
+            }
+        }
+    }
+
 
     public String buildJob(String jobName, String branch, String account, String passwordOrToken) {
 
@@ -609,7 +627,6 @@ public class JenkinsUtil {
             QueueItem queueItem = server.getQueueItem(queueReference);
 
             Build build = server.getBuild(queueItem);
-
             System.out.println(build);
         } catch (Exception e) {
             e.printStackTrace();

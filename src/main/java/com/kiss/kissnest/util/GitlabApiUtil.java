@@ -66,6 +66,18 @@ public class GitlabApiUtil {
         }
     }
 
+    public boolean deleteGroup(Integer groupId,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            gitlabAPI.deleteGroup(groupId);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public GitlabProject createProject (String projectName,String accessToken) {
 
         try {
@@ -98,6 +110,18 @@ public class GitlabApiUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public boolean deleteProject(Integer projectId,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            gitlabAPI.deleteProject(projectId);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

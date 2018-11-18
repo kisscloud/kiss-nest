@@ -16,7 +16,7 @@
         select * from projectrepository where projectId = #{projectId};
     </select>
 
-    <select id="getProjectRepositoryByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
+    <select id="getProjectRepositoriesByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
         select * from projectrepository where teamId = #{teamId};
     </select>
 
@@ -35,4 +35,8 @@
         set branchCount = #{branchCount}
         where projectId = #{projectId} and teamId = #{teamId}
     </update>
+
+    <delete id="deleteProjectRepositoryById" parameterType="java.lang.Integer">
+        delete from projectrepository where id = #{id}
+    </delete>
 </mapper>

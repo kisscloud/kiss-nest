@@ -22,4 +22,8 @@ public interface BuildLogDao {
     List<BuildLogOutput> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId);
+
+    Integer deleteBuildLogsByProjectId(Integer projectId);
+
+    Integer getBuildLogCountByTeamId(Integer teamId);
 }

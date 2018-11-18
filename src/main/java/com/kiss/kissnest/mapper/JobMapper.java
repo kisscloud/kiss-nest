@@ -11,7 +11,7 @@ public interface JobMapper {
 
     Integer createJob(Job job);
 
-    Job getJobByProjectId(Integer projectId);
+    List<Job> getJobByProjectId(Integer projectId);
 
     Job getJobByProjectIdAndType(Map params);
 
@@ -24,4 +24,6 @@ public interface JobMapper {
     Integer updateJob(Job job);
 
     Job getJobById(Integer id);
+
+    Integer deleteJobById(Integer id);
 }

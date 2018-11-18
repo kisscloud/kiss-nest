@@ -77,4 +77,12 @@
         on bu.projectId = pr.projectId and bu.teamId = pr.teamId
         where bu.teamId = #{teamId} and bu.projectId = #{projectId} and bu.queueId = #{queueId};
     </select>
+
+    <delete id="deleteBuildLogsByProjectId" parameterType="java.lang.Integer">
+        delete from buildlogs where projectId = #{projectId}
+    </delete>
+
+    <select id="getBuildLogCountByTeamId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*) from buildlogs where teamId = #{teamId};
+    </select>
 </mapper>

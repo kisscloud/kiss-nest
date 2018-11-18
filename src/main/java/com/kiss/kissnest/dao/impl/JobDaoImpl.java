@@ -23,7 +23,7 @@ public class JobDaoImpl implements JobDao {
     }
 
     @Override
-    public Job getJobByProjectId(Integer projectId) {
+    public List<Job> getJobByProjectId(Integer projectId) {
 
         return jobMapper.getJobByProjectId(projectId);
     }
@@ -83,5 +83,11 @@ public class JobDaoImpl implements JobDao {
     public Job getJobById(Integer id) {
 
         return jobMapper.getJobById(id);
+    }
+
+    @Override
+    public Integer deleteJobById(Integer id) {
+
+        return jobMapper.deleteJobById(id);
     }
 }

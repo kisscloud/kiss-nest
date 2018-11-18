@@ -78,4 +78,16 @@ public class BuildLogDaoImpl implements BuildLogDao {
 
         return buildLogMapper.getBuildRecentLog(params);
     }
+
+    @Override
+    public Integer deleteBuildLogsByProjectId(Integer projectId) {
+
+        return buildLogMapper.deleteBuildLogsByProjectId(projectId);
+    }
+
+    @Override
+    public Integer getBuildLogCountByTeamId(Integer teamId) {
+
+        return buildLogMapper.getBuildLogCountByTeamId(teamId);
+    }
 }

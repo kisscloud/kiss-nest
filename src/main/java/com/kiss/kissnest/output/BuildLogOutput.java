@@ -9,6 +9,8 @@ public class BuildLogOutput {
 
     private Integer id;
 
+    private Integer teamId;
+
     private String jobName;
 
     private String branch;
@@ -28,6 +30,8 @@ public class BuildLogOutput {
     private String statusText;
 
     private String output;
+
+    private Long queueId;
 
     private String commitPath;
 

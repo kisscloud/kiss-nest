@@ -36,7 +36,7 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer GROUP_STATUS_IS_EMPTY = 4014;
     public static final Integer GROUP_SLUG_IS_EMPTY = 4015;
     public static final Integer GROUP_SLUG_IS_EXIST = 4016;
-
+    public static final Integer DELETE_GROUP_REPOSITORY_FAILED = 4017;
 
     public static final Integer PROJECT_NAME_EXIST = 5001;
     public static final Integer CREATE_PROJECT_FAILED = 5002;
@@ -93,6 +93,7 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer UPDATE_JENKINS_JOB_ERROR = 10008;
     public static final Integer JOB_ID_IS_EMPTY = 10009;
     public static final Integer JOB_NOT_EXIST = 10010;
+    public static final Integer DELETE_JOB_FAILED = 10011;
 
 
 

@@ -27,4 +27,6 @@ public interface ServerMapper {
     List<String> getServerInnerIpsByIds(String ids);
 
     List<ServerOutput> getServerOutputsByTeamId(Map params);
+
+    Integer getServerOutputCount(Map params);
 }
