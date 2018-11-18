@@ -55,4 +55,8 @@
     <delete id="deleteJobById" parameterType="java.lang.Integer">
         delete from jobs where id = #{id}
     </delete>
+    
+    <select id="getJobsByServerIds" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where serverIds like #{serverId};
+    </select>
 </mapper>

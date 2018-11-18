@@ -27,4 +27,6 @@ public interface ServerDao {
     List<ServerOutput> getServerOutputsByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
 
     Integer getServerOutputCount(Integer teamId,Integer envId);
+
+    List<Server> getServersByEnvId(Integer envId);
 }

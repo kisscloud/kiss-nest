@@ -5,6 +5,7 @@ import com.kiss.kissnest.input.CreateServerInput;
 import com.kiss.kissnest.input.UpdateEnvironmentInput;
 import com.kiss.kissnest.input.UpdateServerInput;
 import com.kiss.kissnest.service.ServerService;
+import com.kiss.kissnest.util.ResultOutputUtil;
 import com.kiss.kissnest.validator.ServerValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +45,12 @@ public class ServerController {
         return serverService.updateEnvironment(updateEnvironmentInput);
     }
 
+    @DeleteMapping("/server/environment")
+    public ResultOutput deleteEnvironment(@RequestParam("id") Integer id) {
+
+        return serverService.deleteEnvironmentById(id);
+    }
+
     @GetMapping("/server/environments")
     @ApiOperation(value = "获取服务器环境")
     public ResultOutput getEnvironmentByTeamId(@RequestParam("teamId") Integer teamId) {
@@ -68,5 +75,11 @@ public class ServerController {
     public ResultOutput getServers(@RequestParam("teamId") Integer teamId,@RequestParam("page") Integer page,@RequestParam("size") Integer size,Integer envId) {
 
         return serverService.getServerOutputByTeamId(teamId,page,size,envId);
+    }
+
+    @DeleteMapping("/server")
+    public ResultOutput deleteServers(@RequestParam("id") Integer id) {
+
+        return serverService.deleteServerById(id);
     }
 }

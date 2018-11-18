@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.ServerMapper">
 
     <insert id="createServer" parameterType="com.kiss.kissnest.entity.Server" keyProperty="id" useGeneratedKeys="true">
-        insert into servers (name,envId,innerIp,outerIp,operatorId,operatorName)
+        insert into servers (teamId,name,envId,innerIp,outerIp,operatorId,operatorName)
         value
-        (#{name},#{envId},#{innerIp},#{outerIp},#{operatorId},#{operatorName})
+        (#{teamId},#{name},#{envId},#{innerIp},#{outerIp},#{operatorId},#{operatorName})
     </insert>
 
     <delete id="deleteServerById" parameterType="java.lang.Integer">
@@ -97,5 +97,9 @@
         <if test="envId != null">
             and envId = #{envId}
         </if>
+    </select>
+    
+    <select id="getServersByEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where envId = #{envId};
     </select>
 </mapper>

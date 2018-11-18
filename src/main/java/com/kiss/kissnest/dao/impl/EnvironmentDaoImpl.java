@@ -55,4 +55,10 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
 
         return environmentMapper.addEnvironmentServerCount(id);
     }
+
+    @Override
+    public Integer deleteEnvironmentById(Integer id) {
+
+        return environmentMapper.deleteEnvironmentById(id);
+    }
 }

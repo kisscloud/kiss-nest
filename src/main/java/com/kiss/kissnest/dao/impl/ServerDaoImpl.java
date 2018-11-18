@@ -96,4 +96,10 @@ public class ServerDaoImpl implements ServerDao {
 
         return serverMapper.getServerOutputCount(params);
     }
+
+    @Override
+    public List<Server> getServersByEnvId(Integer envId) {
+
+        return serverMapper.getServersByEnvId(envId);
+    }
 }

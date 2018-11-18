@@ -34,4 +34,8 @@
         set serverCount = serverCount + 1
         where  id = #{id}
     </update>
+
+    <delete id="deleteEnvironmentById" parameterType="java.lang.Integer">
+        delete from environments where id = #{id}
+    </delete>
 </mapper>

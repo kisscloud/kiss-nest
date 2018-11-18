@@ -1,9 +1,11 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.EnvironmentDao;
+import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Environment;
+import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.entity.Server;
 import com.kiss.kissnest.input.CreateEnvironmentInput;
 import com.kiss.kissnest.input.CreateServerInput;
@@ -41,6 +43,9 @@ public class ServerService {
 
     @Autowired
     private OperationLogService operationLogService;
+
+    @Autowired
+    private JobDao jobDao;
 
     @Autowired
     private CodeUtil codeUtil;
@@ -163,5 +168,51 @@ public class ServerService {
         getServerOutput.setServerOutputs(serverOutputs);
 
         return ResultOutputUtil.success(getServerOutput);
+    }
+
+    public ResultOutput deleteEnvironmentById(Integer id) {
+
+        List<Server> servers = serverDao.getServersByEnvId(id);
+
+        if (servers != null && servers.size() != 0) {
+            return ResultOutputUtil.error(NestStatusCode.SERVER_ENVIRONMENT_HAS_SERVERS);
+        }
+
+        Environment environment = environmentDao.getEnvironmentById(id);
+
+        if (environment == null) {
+            return ResultOutputUtil.error(NestStatusCode.SERVER_ENVIRONMENT_NOT_EXIST);
+        }
+
+        Integer count = environmentDao.deleteEnvironmentById(id);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.DELETE_SERVER_ENVIRONMENT_FAILED);
+        }
+
+        return ResultOutputUtil.success();
+    }
+
+    public ResultOutput deleteServerById(Integer id) {
+
+        Server server = serverDao.getServerById(id);
+
+        if (server == null) {
+            return ResultOutputUtil.error(NestStatusCode.SERVER_NOT_EXIST);
+        }
+
+        List<Job> jobs = jobDao.getJobsByServerIds(id);
+
+        if (jobs != null && jobs.size() != 0) {
+            return ResultOutputUtil.error(NestStatusCode.SERVER_HAS_JOB);
+        }
+
+        Integer count = serverDao.deleteServerById(id);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.DELETE_SERVER_FAILED);
+        }
+
+        return ResultOutputUtil.success();
     }
 }

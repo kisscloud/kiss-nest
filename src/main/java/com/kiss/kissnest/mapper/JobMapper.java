@@ -26,4 +26,6 @@ public interface JobMapper {
     Job getJobById(Integer id);
 
     Integer deleteJobById(Integer id);
+
+    List<Job> getJobsByServerIds(String serverId);
 }

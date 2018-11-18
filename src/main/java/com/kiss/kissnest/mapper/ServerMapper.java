@@ -29,4 +29,6 @@ public interface ServerMapper {
     List<ServerOutput> getServerOutputsByTeamId(Map params);
 
     Integer getServerOutputCount(Map params);
+
+    List<Server> getServersByEnvId(Integer envId);
 }

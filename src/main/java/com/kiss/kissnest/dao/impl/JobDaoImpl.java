@@ -90,4 +90,12 @@ public class JobDaoImpl implements JobDao {
 
         return jobMapper.deleteJobById(id);
     }
+
+    @Override
+    public List<Job> getJobsByServerIds(Integer serverId) {
+
+        String idStr = "%" + serverId + "%";
+
+        return jobMapper.getJobsByServerIds(idStr);
+    }
 }

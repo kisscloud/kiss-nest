@@ -18,4 +18,6 @@ public interface EnvironmentDao {
     Integer updateEnvironment(Environment environment);
 
     Integer addEnvironmentServerCount(Integer id);
+
+    Integer deleteEnvironmentById(Integer id);
 }

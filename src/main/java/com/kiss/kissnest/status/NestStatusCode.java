@@ -110,6 +110,9 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer SERVER_SERVER_NAME_EXIST = 12006;
     public static final Integer SERVER_ENVIRONMENT_NAME_IS_EXIST = 12007;
     public static final Integer UPDATE_SERVER_ENVIRONMENT_FAILED = 12008;
+    public static final Integer SERVER_ENVIRONMENT_HAS_SERVERS = 12009;
+    public static final Integer DELETE_SERVER_ENVIRONMENT_FAILED = 12010;
+    public static final Integer SERVER_ENVIRONMENT_NOT_EXIST = 12011;
 
 
     public static final Integer SERVER_ENVID_IS_EMPTY = 13001;
@@ -118,6 +121,9 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer SERVERID_IS_EMPTY = 13004;
     public static final Integer SERVER_NOT_EXIST = 13005;
     public static final Integer SERVER_UPDATE_FAILED = 13006;
+    public static final Integer SERVER_HAS_JOB = 13007;
+    public static final Integer DELETE_SERVER_FAILED = 13008;
+
 
 
     public static final Integer TEAM_ID_IS_EMPTY = 14001;

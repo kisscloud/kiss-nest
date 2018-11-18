@@ -20,4 +20,6 @@ public interface EnvironmentMapper {
     Integer updateEnvironment(Environment environment);
 
     Integer addEnvironmentServerCount(Integer id);
+
+    Integer deleteEnvironmentById(Integer id);
 }

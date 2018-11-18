@@ -23,4 +23,6 @@ public interface JobDao {
     Job getJobById(Integer id);
 
     Integer deleteJobById(Integer id);
+
+    List<Job> getJobsByServerIds(Integer serverId);
 }
