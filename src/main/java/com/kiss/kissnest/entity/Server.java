@@ -23,6 +23,8 @@ public class Server {
 
     private Integer runTime;
 
+    private Integer status;
+
     private Integer operatorId;
 
     private String operatorName;

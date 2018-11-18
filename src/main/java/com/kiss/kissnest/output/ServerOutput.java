@@ -21,6 +21,8 @@ public class ServerOutput {
 
     private Integer status;
 
+    private String statusText;
+
     private String innerIp;
 
     private String outerIp;
@@ -35,7 +37,7 @@ public class ServerOutput {
 
     private Date lastDeployedAt;
 
-    private Long createdAt;
+    private Date createdAt;
 
-    private Long updatedAt;
+    private Date updatedAt;
 }
