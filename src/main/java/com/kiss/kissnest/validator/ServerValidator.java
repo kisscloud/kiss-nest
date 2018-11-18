@@ -70,11 +70,11 @@ public class ServerValidator implements Validator {
             validateInnerIp(updateServerInput.getInnerIp(),errors);
         } else if (UpdateEnvironmentInput.class.isInstance(target)) {
             UpdateEnvironmentInput updateEnvironmentInput = (UpdateEnvironmentInput) target;
-            boolean envIdVal = validateEnvId(updateEnvironmentInput.getEnvId(),errors);
+            boolean envIdVal = validateEnvId(updateEnvironmentInput.getId(),errors);
             boolean teamVal = teamValidaor.validateId(updateEnvironmentInput.getTeamId(),"teamId",errors);
 
             if (teamVal && envIdVal) {
-                validateUpdateEnvironmentName(updateEnvironmentInput.getTeamId(),updateEnvironmentInput.getEnvId(),updateEnvironmentInput.getName(),errors);
+                validateUpdateEnvironmentName(updateEnvironmentInput.getTeamId(),updateEnvironmentInput.getId(),updateEnvironmentInput.getName(),errors);
             }
         }
     }

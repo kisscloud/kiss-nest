@@ -54,6 +54,7 @@ public class ServerService {
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
+        environment.setServerCount(0);
         Integer count = environmentDao.createEnvironment(environment);
 
         if (count == 0) {
@@ -62,6 +63,7 @@ public class ServerService {
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
 //        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+        environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
     }
@@ -69,7 +71,7 @@ public class ServerService {
     public ResultOutput updateEnvironment(UpdateEnvironmentInput updateEnvironmentInput) {
 
         Environment environment = BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
-        environment.setId(updateEnvironmentInput.getEnvId());
+        environment.setId(updateEnvironmentInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
@@ -80,6 +82,7 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment,EnvironmentOutput.class);
+        environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
     }

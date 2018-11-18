@@ -7,7 +7,7 @@ public class UpdateEnvironmentInput {
 
     private Integer teamId;
 
-    private Integer envId;
+    private Integer id;
 
     private String name;
 }

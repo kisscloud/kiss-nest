@@ -11,6 +11,8 @@ public class GroupOutput {
 
     private String name;
 
+    private String slug;
+
     private Integer projectsCount;
 
     private Integer membersCount;
