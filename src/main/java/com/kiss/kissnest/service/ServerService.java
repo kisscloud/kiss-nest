@@ -53,6 +53,7 @@ public class ServerService {
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
+        environment.setServerCount(0);
         Integer count = environmentDao.createEnvironment(environment);
 
         if (count == 0) {
