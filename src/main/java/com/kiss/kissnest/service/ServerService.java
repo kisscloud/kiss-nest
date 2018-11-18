@@ -79,6 +79,7 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment,EnvironmentOutput.class);
+        environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
     }
