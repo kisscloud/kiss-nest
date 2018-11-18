@@ -145,7 +145,10 @@ public class ProjectService {
 
 //        operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
+        ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
+        projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));
+
+        return ResultOutputUtil.success(projectOutput);
     }
 
     public ResultOutput getProjectById(Integer id) {
