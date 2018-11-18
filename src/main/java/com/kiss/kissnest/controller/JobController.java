@@ -27,6 +27,7 @@ public class JobController {
 
     @Autowired
     private JenkinsUtil jenkinsUtil;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
 
@@ -59,7 +60,7 @@ public class JobController {
         return buildService.getBuildLogsByTeamId(buildLogsInput);
     }
 
-    @GetMapping("/job/build/recentLog")
+    @GetMapping("/job/build/result")
     public ResultOutput getBuildRecentLog(@RequestParam("teamId") Integer teamId,@RequestParam("projectId") Integer projectId,@RequestParam("queueId") Long queueId) {
 
         return buildService.getBuildRecentLog(teamId,projectId,queueId);
