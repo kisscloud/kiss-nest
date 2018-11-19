@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
@@ -121,8 +122,9 @@ public class BuildService {
 
         jobDao.createJob(job);
 
+        JobOutput jobOutput = BeanCopyUtil.copy(job,JobOutput.class);
 //        operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
-        return ResultOutputUtil.success();
+        return ResultOutputUtil.success(jobOutput);
     }
 
     public ResultOutput createDeployJob(CreateDeployInput createDeployInput) {
