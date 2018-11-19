@@ -451,9 +451,9 @@ public class BuildService {
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            buildLog.setStatus(0);
-        } else {
             buildLog.setStatus(1);
+        } else {
+            buildLog.setStatus(0);
         }
 
         buildLogDao.createBuildLog(buildLog);
