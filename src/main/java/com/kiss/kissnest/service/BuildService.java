@@ -126,6 +126,7 @@ public class BuildService {
 
         JobOutput jobOutput = BeanCopyUtil.copy(job,JobOutput.class);
         operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
+        operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__CREATE_JOB,job);
         return ResultOutputUtil.success(jobOutput);
     }
 
@@ -205,6 +206,7 @@ public class BuildService {
         Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
+        operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
         Map<String, Object> result = new HashMap<>();
         result.put("id",buildLog.getId());
         result.put("projectName", project.getName());

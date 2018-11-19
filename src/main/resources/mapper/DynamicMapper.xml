@@ -11,7 +11,7 @@
         (#{teamId},#{groupId},#{projectId},#{targetType},#{log},#{operatorId},#{operatorName})
     </insert>
 
-    <select id="getDynamics" parameterType="com.kiss.kissnest.entity.Dynamic">
+    <select id="getDynamics" parameterType="com.kiss.kissnest.entity.Dynamic" resultType="com.kiss.kissnest.entity.Dynamic">
         select * from dynamics
         where 1=1
         <if test="id != null">

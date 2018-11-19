@@ -98,6 +98,7 @@ public class ProjectRepositoryService {
         projectRepositoryDao.createProjectRepository(projectRepository);
 
         operationLogService.saveOperationLog(projectRepository.getTeamId(),ThreadLocalUtil.getGuest(),null,projectRepository,"id",OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),projectRepository.getTeamId(),null,projectRepository.getProjectId(),OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY,projectRepository);
         return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository,ProjectRepositoryOutput.class));
     }
 
