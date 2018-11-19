@@ -69,6 +69,7 @@ public class ServerService {
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
         operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
@@ -117,6 +118,7 @@ public class ServerService {
         environmentDao.addEnvironmentServerCount(createServerInput.getEnvId());
         ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
         operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
+        operationLogService.saveDynamic(guest,server.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_SERVER,server);
         return ResultOutputUtil.success(serverOutput);
     }
 
@@ -135,7 +137,7 @@ public class ServerService {
 
         ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
         operationLogService.saveOperationLog(updateServerInput.getTeamId(),guest,oldValue,server,"id",OperationTargetType.TYPE__UPDATE_SERVER);
-
+        operationLogService.saveDynamic(guest,server.getTeamId(),null,null,OperationTargetType.TYPE__UPDATE_SERVER,server);
         return ResultOutputUtil.success(serverOutput);
     }
 

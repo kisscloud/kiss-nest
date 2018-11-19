@@ -129,7 +129,7 @@ public class ProjectService {
         }
 
         operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);
-
+        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_DELETE_PROJECT,project);
         return ResultOutputUtil.success();
     }
 
@@ -147,6 +147,7 @@ public class ProjectService {
         }
 
         operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
+        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_UPDATE_PROJECT,project);
 
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));

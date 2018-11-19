@@ -25,7 +25,7 @@ public class LinkService {
 
         linkDao.createLink(link);
         operationLogService.saveOperationLog(link.getTeamId(),ThreadLocalUtil.getGuest(),null,link,"id",OperationTargetType.TYPE__CREATE_LINK);
-
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),link.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_LINK,link);
         return ResultOutputUtil.success(link);
     }
 
@@ -34,7 +34,7 @@ public class LinkService {
         Link old = linkDao.getLinkById(link.getId());
         linkDao.updateLink(link);
         operationLogService.saveOperationLog(link.getTeamId(),ThreadLocalUtil.getGuest(),old,link,"id",OperationTargetType.TYPE__UPDATE_LINK);
-
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),old.getTeamId(),null,null,OperationTargetType.TYPE__DELETE_LINK,old);
         return ResultOutputUtil.success(link);
     }
 
@@ -48,7 +48,7 @@ public class LinkService {
         Link old = linkDao.getLinkById(linkId);
         linkDao.deleteLink(linkId);
         operationLogService.saveOperationLog(old.getTeamId(),ThreadLocalUtil.getGuest(),old,null,"id",OperationTargetType.TYPE__DELETE_LINK);
-
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),old.getTeamId(),null,null,OperationTargetType.TYPE__DELETE_LINK,old);
         return ResultOutputUtil.success();
     }
 }

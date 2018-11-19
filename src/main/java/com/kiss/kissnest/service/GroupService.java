@@ -141,6 +141,7 @@ public class GroupService {
         }
 
         operationLogService.saveOperationLog(group.getTeamId(),guest,oldValue,group,"id",OperationTargetType.TYPE_UPDATE_GROUP);
+        operationLogService.saveDynamic(guest,group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_UPDATE_GROUP,group);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(group, GroupOutput.class));
     }

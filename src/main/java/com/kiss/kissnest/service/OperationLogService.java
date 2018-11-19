@@ -5,11 +5,13 @@ import com.google.gson.JsonObject;
 import com.kiss.kissnest.dao.DynamicDao;
 import com.kiss.kissnest.dao.OperationLogDao;
 import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.output.DynamicOutput;
 import com.kiss.kissnest.output.OperationLogOutput;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.stereotype.Component;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
@@ -91,10 +93,58 @@ public class OperationLogService {
             Group group = (Group) object;
             logMap.put("name", group.getName());
             logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE_UPDATE_GROUP) {
+            Group group = (Group) object;
+            logMap.put("name", group.getName());
+            logMap.put("createdAt", new Date().getTime());
         } else if (targetType == 6) {
             Project project = (Project) object;
             logMap.put("name", project.getName());
-            logMap.put("createdAt", project.getCreatedAt());
+            logMap.put("createdAt", project.getCreatedAt().getTime());
+        } else if (targetType == OperationTargetType.TYPE_DELETE_PROJECT) {
+            Project project = (Project) object;
+            logMap.put("name", project.getName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE_UPDATE_PROJECT) {
+            Project project = (Project) object;
+            logMap.put("name", project.getName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_JOB) {
+            Job job = (Job) object;
+            logMap.put("name", job.getJobName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__BUILD_JOB) {
+            Job job = (Job) object;
+            logMap.put("name", job.getJobName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_ENVIRONMENT) {
+            Environment environment = (Environment) object;
+            logMap.put("name", environment.getName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_SERVER) {
+            Server server = (Server) object;
+            logMap.put("name", server.getName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__UPDATE_SERVER) {
+            Server server = (Server) object;
+            logMap.put("name", server.getName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_LINK) {
+            Link link = (Link) object;
+            logMap.put("name", link.getTitle());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__UPDATE_LINK) {
+            Link link = (Link) object;
+            logMap.put("name", link.getTitle());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__DELETE_LINK) {
+            Link link = (Link) object;
+            logMap.put("name", link.getTitle());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY) {
+            ProjectRepository projectRepository = (ProjectRepository) object;
+            logMap.put("name", projectRepository.getProjectName());
+            logMap.put("createdAt", new Date().getTime());
         } else if (targetType == 18) {
             Track track = new Track();
             logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
@@ -108,7 +158,6 @@ public class OperationLogService {
         }
 
         dynamic.setLog(JSON.toJSONString(logMap));
-//        dynamic.setLog(log);
         dynamic.setOperatorId(guest.getId());
         dynamic.setOperatorName(guest.getName());
         dynamicDao.createDynamic(dynamic);
@@ -121,5 +170,17 @@ public class OperationLogService {
         operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(codeUtil.getEnumsMessage("operation.log", String.valueOf(operationLogOutput.getTargetType()))));
 
         return ResultOutputUtil.success(operationLogOutputs);
+    }
+
+    public ResultOutput getDynamics(Integer teamId,Integer groupId,Integer projectId) {
+
+        Dynamic dynamic = new Dynamic();
+        dynamic.setTeamId(teamId);
+        dynamic.setGroupId(groupId);
+        dynamic.setProjectId(projectId);
+        List<Dynamic> dynamics = dynamicDao.getDynamics(dynamic);
+        List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics,DynamicOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(dynamicOutputs);
     }
 }
