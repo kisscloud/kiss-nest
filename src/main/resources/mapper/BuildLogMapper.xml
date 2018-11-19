@@ -87,9 +87,11 @@
     </select>
 
     <select id="getBuildRecentLog" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
-        select bu.*,pr.pathWithNamespace as commitPath from buildlogs bu
+        select bu.*,pr.pathWithNamespace as commitPath,po.name as projectName from buildlogs bu
         left join projectrepository pr
         on bu.projectId = pr.projectId and bu.teamId = pr.teamId
+        left join projects po
+        on bu.projectId = po.id and bu.teamId = po.teamId
         where bu.id = #{id};
     </select>
 

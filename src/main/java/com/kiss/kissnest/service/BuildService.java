@@ -281,7 +281,7 @@ public class BuildService {
 
         BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(id);
 
-        if (buildLogOutput == null) {
+        if (buildLogOutput == null || buildLogOutput.getStatus() == null) {
             buildLogOutput = new BuildLogOutput();
             buildLogOutput.setId(id);
             buildLogOutput.setStatus(2);
