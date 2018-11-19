@@ -37,6 +37,9 @@ public class PageController {
     @Autowired
     private ServerService serverService;
 
+    @Autowired
+    private MemberService memberService;
+
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
@@ -134,6 +137,18 @@ public class PageController {
         Map<String, Object> result = new HashMap<>();
         result.put("envs", envs.getData());
         result.put("servers", servers.getData());
+
+        return ResultOutputUtil.success(result);
+    }
+
+    @ApiOperation(value = "获取成员页面参数")
+    @GetMapping("/members")
+    public ResultOutput GetPageMembersParams(@RequestParam("teamId") Integer teamId) {
+
+        ResultOutput roles = memberService.getMemberRoles();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("roles", roles.getData());
 
         return ResultOutputUtil.success(result);
     }
