@@ -137,6 +137,18 @@ public class GitlabApiUtil {
         }
     }
 
+    public List<GitlabTag> getTags (Integer projectId,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            List<GitlabTag> gitlabTags = gitlabAPI.getTags(projectId);
+
+            return gitlabTags;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public String getBranchVersion(Integer projectId,String branch,String accessToken) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);

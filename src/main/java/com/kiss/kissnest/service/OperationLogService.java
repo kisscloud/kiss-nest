@@ -68,29 +68,43 @@ public class OperationLogService {
         operationLogDao.createOperationLog(operationLog);
     }
 
-    public void saveDynamic(Guest guest,Integer teamId,Integer groupId,Integer projectId,Integer targetType,Object object) {
+    public void saveDynamic(Guest guest, Integer teamId, Integer groupId, Integer projectId, Integer targetType, Object object) {
 
         Dynamic dynamic = new Dynamic();
         dynamic.setTeamId(teamId);
         dynamic.setGroupId(groupId);
         dynamic.setProjectId(projectId);
         dynamic.setTargetType(targetType);
-        Map<String,Object> logMap = new HashMap<>();
-        logMap.put("operatorId",guest.getId());
-        logMap.put("operatorName",guest.getName());
-        logMap.put("targetType",targetType);
+        Map<String, Object> logMap = new HashMap<>();
+        logMap.put("operatorId", guest.getId());
+        logMap.put("operatorName", guest.getName());
+        logMap.put("targetType", targetType);
         if (targetType == 1) {
             Team team = (Team) object;
-            logMap.put("name",team.getName());
-            logMap.put("createdAt",team.getCreatedAt());
+            logMap.put("name", team.getName());
+            logMap.put("createdAt", team.getCreatedAt().getTime());
         } else if (targetType == 3) {
             Group group = (Group) object;
-            logMap.put("name",group.getName());
-            logMap.put("createdAt",group.getCreatedAt());
+            logMap.put("name", group.getName());
+            logMap.put("createdAt", group.getCreatedAt().getTime());
+        } else if (targetType == OperationTargetType.TYPE_DELETE_GROUP) {
+            Group group = (Group) object;
+            logMap.put("name", group.getName());
+            logMap.put("createdAt", new Date().getTime());
         } else if (targetType == 6) {
             Project project = (Project) object;
-            logMap.put("name",project.getName());
-            logMap.put("createdAt",project.getCreatedAt());
+            logMap.put("name", project.getName());
+            logMap.put("createdAt", project.getCreatedAt());
+        } else if (targetType == 18) {
+            Track track = new Track();
+            logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
+            logMap.put("name",track.getProjectName());
+            logMap.put("version",track.getHash());
+        } else if (targetType == OperationTargetType.TYPE__MERGE_REQUEST) {
+            Track track = new Track();
+            logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
+            logMap.put("name",track.getProjectName());
+            logMap.put("version",track.getHash());
         }
 
         dynamic.setLog(JSON.toJSONString(logMap));
@@ -103,8 +117,8 @@ public class OperationLogService {
     public ResultOutput getOperationLogsByTeamId(Integer teamId) {
 
         List<OperationLog> operationLogs = operationLogDao.getOperationLogsByTeamId(teamId);
-        List<OperationLogOutput> operationLogOutputs = BeanCopyUtil.copyList(operationLogs,OperationLogOutput.class,BeanCopyUtil.defaultFieldNames);
-        operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(codeUtil.getEnumsMessage("operation.log",String.valueOf(operationLogOutput.getTargetType()))));
+        List<OperationLogOutput> operationLogOutputs = BeanCopyUtil.copyList(operationLogs, OperationLogOutput.class, BeanCopyUtil.defaultFieldNames);
+        operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(codeUtil.getEnumsMessage("operation.log", String.valueOf(operationLogOutput.getTargetType()))));
 
         return ResultOutputUtil.success(operationLogOutputs);
     }

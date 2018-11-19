@@ -5,18 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.dao.TrackDao;
+import com.kiss.kissnest.entity.OperationTargetType;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Track;
 import com.kiss.kissnest.output.TrackOutput;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import entity.Guest;
 import org.apache.commons.lang3.StringUtils;
 import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
+import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,8 @@ public class TrackService {
     @Autowired
     private ProjectRepositoryDao projectRepositoryDao;
 
+    @Autowired
+    private OperationLogService operationLogService;
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
@@ -70,6 +75,7 @@ public class TrackService {
 
         updateBranch(project.getTeamId(),project.getId());
         trackDao.createTrack(track);
+        operationLogService.saveDynamic(new Guest(),track.getTeamId(),null,null,OperationTargetType.TYPE__PUSH_CODES,track);
     }
 
     public void push(JSONObject hookJson, Track track) {

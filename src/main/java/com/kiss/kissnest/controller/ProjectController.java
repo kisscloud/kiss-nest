@@ -83,6 +83,12 @@ public class ProjectController {
         return projectService.getProjectBranches(projectId);
     }
 
+    @GetMapping("/project/tags")
+    public ResultOutput getProjectTags(@RequestParam("projectId") Integer projectId) {
+
+        return projectService.getProjectTags(projectId);
+    }
+
     @GetMapping("/project/repository/validate")
     public ResultOutput validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
 

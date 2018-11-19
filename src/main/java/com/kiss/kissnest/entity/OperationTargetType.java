@@ -19,6 +19,7 @@ public class OperationTargetType {
     public static final Integer TYPE__UPDATE_LINK = 15;
     public static final Integer TYPE__DELETE_LINK = 16;
     public static final Integer TYPE__CREATE_PROJECT_REPOSITORY = 17;
-
+    public static final Integer TYPE__PUSH_CODES = 18;
+    public static final Integer TYPE__MERGE_REQUEST = 19;
 
 }

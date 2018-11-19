@@ -95,12 +95,6 @@ public class GroupService {
     @Transactional
     public ResultOutput deleteGroup(Integer id) {
 
-//        List<GroupProject> groupProjects = groupProjectDao.getGroupProjectsByGroupId(id);
-
-//        if (groupProjects != null && groupProjects.size() != 0) {
-//            return ResultOutputUtil.error(NestStatusCode.GROUP_PROJECT_EXIST);
-//        }
-
         List<Project> projects = projectDao.getProjectsByGroupId(id);
 
         if (projects != null && projects.size() != 0) {
@@ -125,7 +119,10 @@ public class GroupService {
         if (!flag) {
             throw new TransactionalException(NestStatusCode.DELETE_GROUP_REPOSITORY_FAILED);
         }
+
         operationLogService.saveOperationLog(group.getTeamId(),ThreadLocalUtil.getGuest(),group,null,"id",OperationTargetType.TYPE_DELETE_GROUP);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_DELETE_GROUP,group);
+
         return ResultOutputUtil.success();
     }
 

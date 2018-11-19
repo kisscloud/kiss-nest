@@ -14,6 +14,7 @@ import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -188,6 +189,31 @@ public class ProjectService {
 
                 if (!StringUtils.isEmpty(gitlabBranch.getName())) {
                     branches.add(gitlabBranch.getName());
+                }
+            }
+        }
+
+        return ResultOutputUtil.success(branches);
+    }
+
+    public ResultOutput getProjectTags(Integer projectId) {
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+
+        if (projectRepository == null || projectRepository.getRepositoryId() == null) {
+            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+        }
+
+        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        List<GitlabTag> gitlabTags = gitlabApiUtil.getTags(projectRepository.getRepositoryId(), accessToken);
+        List<String> branches = new ArrayList<>();
+
+        if (gitlabTags != null) {
+
+            for (GitlabTag gitlabTag : gitlabTags) {
+
+                if (!StringUtils.isEmpty(gitlabTag.getName())) {
+                    branches.add(gitlabTag.getName());
                 }
             }
         }
