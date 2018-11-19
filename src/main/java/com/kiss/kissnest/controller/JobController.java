@@ -61,9 +61,9 @@ public class JobController {
     }
 
     @GetMapping("/job/build/result")
-    public ResultOutput getBuildRecentLog(@RequestParam("teamId") Integer teamId,@RequestParam("projectId") Integer projectId,@RequestParam("queueId") Long queueId) {
+    public ResultOutput getBuildRecentLog(@RequestParam("id") Integer id) {
 
-        return buildService.getBuildRecentLog(teamId,projectId,queueId);
+        return buildService.getBuildRecentLog(id);
     }
 
     @PostMapping("/job/deploy")

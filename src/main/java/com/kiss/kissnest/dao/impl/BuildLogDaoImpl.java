@@ -69,14 +69,9 @@ public class BuildLogDaoImpl implements BuildLogDao {
     }
 
     @Override
-    public BuildLogOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId) {
+    public BuildLogOutput getBuildRecentLog(Integer id) {
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("teamId", teamId);
-        params.put("projectId", projectId);
-        params.put("queueId", queueId);
-
-        return buildLogMapper.getBuildRecentLog(params);
+        return buildLogMapper.getBuildRecentLog(id);
     }
 
     @Override

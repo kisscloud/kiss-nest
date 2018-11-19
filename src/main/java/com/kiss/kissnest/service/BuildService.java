@@ -277,15 +277,13 @@ public class BuildService {
         return ResultOutputUtil.success(buildLogOutputs);
     }
 
-    public ResultOutput getBuildRecentLog(Integer teamId, Integer projectId, Long queueId) {
+    public ResultOutput getBuildRecentLog(Integer id) {
 
-        BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(teamId, projectId, queueId);
+        BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(id);
 
         if (buildLogOutput == null) {
             buildLogOutput = new BuildLogOutput();
-            buildLogOutput.setTeamId(teamId);
-            buildLogOutput.setProjectId(projectId);
-            buildLogOutput.setQueueId(queueId);
+            buildLogOutput.setId(id);
             buildLogOutput.setStatus(2);
             buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
             return ResultOutputUtil.success(buildLogOutput);

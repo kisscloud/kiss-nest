@@ -86,11 +86,11 @@
         </if>
     </select>
 
-    <select id="getBuildRecentLog" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.BuildLogOutput">
+    <select id="getBuildRecentLog" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.*,pr.pathWithNamespace as commitPath from buildlogs bu
         left join projectrepository pr
         on bu.projectId = pr.projectId and bu.teamId = pr.teamId
-        where bu.teamId = #{teamId} and bu.projectId = #{projectId} and bu.queueId = #{queueId};
+        where bu.id = #{id};
     </select>
 
     <delete id="deleteBuildLogsByProjectId" parameterType="java.lang.Integer">

@@ -24,7 +24,7 @@ public interface BuildLogMapper {
 
     List<BuildLogOutput> getBuildLogsByTeamId(Map params);
 
-    BuildLogOutput getBuildRecentLog(Map params);
+    BuildLogOutput getBuildRecentLog(Integer id);
 
     Integer deleteBuildLogsByProjectId(Integer projectId);
 
