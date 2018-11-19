@@ -5,7 +5,7 @@
 <!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
-    <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog">
+    <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog" useGeneratedKeys="true" keyProperty="id">
         insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt)
         value
         (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt})
@@ -22,6 +22,12 @@
         <if test="branch != null">
             ,branch = #{branch}
         </if>
+        <if test="number != null">
+            ,number = #{number}
+        </if>
+        <if test="queueId != null">
+            ,queueId = #{queueId}
+        </if>
         <if test="version != null">
             ,version = #{version}
         </if>
@@ -37,11 +43,20 @@
         <if test="output != null">
             ,output = #{output}
         </if>
-        <if test="operationId != null">
-            ,operationId = #{operationId}
+        <if test="duration != null">
+            ,duration = #{duration}
+        </if>
+        <if test="jarName != null">
+            ,jarName = #{jarName}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
         </if>
         <if test="operatorName != null">
             ,operatorName = #{operatorName}
+        </if>
+        <if test="buildAt != null">
+            ,buildAt = #{buildAt}
         </if>
         where id = #{id}
     </update>

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
@@ -175,6 +176,7 @@ public class BuildService {
         return ResultOutputUtil.success();
     }
 
+    @Transactional
     public ResultOutput buildJob(BuildJobInput buildJobInput) {
 
         Job job = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
@@ -184,22 +186,28 @@ public class BuildService {
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
+        BuildLog buildLog = saveBuildLog(job.getTeamId(),jobName,buildJobInput.getBranch(),buildJobInput.getProjectId(),guest);
+
+        if (buildLog == null) {
+            return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
+        }
+
         String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
 
         if (location == null) {
-            return ResultOutputUtil.error(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
+            throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
         }
 
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
-
-        Thread thread = new Thread(new BuildLogRunnable(jobName, job.getTeamId(), buildJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), 1, location));
-        thread.start();
         buildRemarks.put(location, buildJobInput.getRemark());
-//        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         String[] urlStr = location.split("/");
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location));
+        thread.start();
+//        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         Map<String, Object> result = new HashMap<>();
-        result.put("queueId", Long.valueOf(urlStr[urlStr.length - 1]));
+        result.put("id",buildLog.getId());
         result.put("projectName", project.getName());
+        result.put("projectId",buildJobInput.getProjectId());
         result.put("branch", buildJobInput.getBranch());
         result.put("remark", buildJobInput.getRemark());
         result.put("status",2);
@@ -328,31 +336,25 @@ public class BuildService {
 
     class BuildLogRunnable implements Runnable {
 
-        private String jobName;
-
-        private Integer teamId;
-
-        private Integer projectId;
+        private Integer id;
 
         private String account;
 
         private String passwordOrToken;
 
-        private Integer operatorId;
-
         private Integer type;
 
         private String location;
 
-        public BuildLogRunnable(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer type, String location) {
-            this.jobName = jobName;
-            this.projectId = projectId;
+        private String jobName;
+
+        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location) {
             this.account = account;
             this.passwordOrToken = passwordOrToken;
-            this.operatorId = operatorId;
             this.type = type;
-            this.teamId = teamId;
             this.location = location;
+            this.jobName = jobName;
+            this.id = buildLogId;
         }
 
         @Override
@@ -381,7 +383,7 @@ public class BuildService {
                     return;
                 }
 
-                saveBuildLog(build, teamId, jobName, operatorId, account, projectId, location);
+                updateBuildLog(build,id, jobName, account, location);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -390,19 +392,37 @@ public class BuildService {
                     jenkinsUtil.close(jenkinsServer);
                 }
 
-                if (newNumber != -1) {
-                    Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
-
-                    if (count == 0) {
-                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, newNumber);
-                    }
-                }
+//                if (newNumber != -1) {
+//                    Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
+//
+//                    if (count == 0) {
+//                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, newNumber);
+//                    }
+//                }
             }
 
         }
     }
 
-    public void saveBuildLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, String location) throws InterruptedException {
+    public BuildLog saveBuildLog(Integer teamId,String jobName,String branch,Integer projectId,Guest guest) {
+
+        BuildLog buildLog = new BuildLog();
+        buildLog.setTeamId(teamId);
+        buildLog.setJobName(jobName);
+        buildLog.setBranch(branch);
+        buildLog.setProjectId(projectId);
+        buildLog.setOperatorId(guest.getId());
+        buildLog.setOperatorName(guest.getName());
+        Integer count = buildLogDao.createBuildLog(buildLog);
+
+        if (count == 0) {
+            return null;
+        }
+
+        return buildLog;
+    }
+
+    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
@@ -425,14 +445,11 @@ public class BuildService {
         Map<String, String> params = buildWithDetails.getParameters();
         String branch = params.get("branch");
         BuildLog buildLog = new BuildLog();
-        buildLog.setTeamId(teamId);
+        buildLog.setId(id);
         buildLog.setBranch(branch);
-        buildLog.setJobName(jobName);
         buildLog.setNumber(build.getNumber());
-        buildLog.setOperatorId(operatorId);
         buildLog.setOperatorName(account);
         buildLog.setOutput(output);
-        buildLog.setProjectId(projectId);
         buildLog.setBuildAt(buildWithDetails.getTimestamp());
         buildLog.setRemark(buildRemarks.get(location));
         buildRemarks.remove(location);
@@ -456,7 +473,7 @@ public class BuildService {
             buildLog.setStatus(0);
         }
 
-        buildLogDao.createBuildLog(buildLog);
+        buildLogDao.updateBuildLog(buildLog);
     }
 
     class DeployLogRunner implements Runnable {

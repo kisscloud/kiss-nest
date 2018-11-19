@@ -70,7 +70,7 @@ public class MemberController {
         return memberService.getMemberTeamsByAccountId(accountId);
     }
 
-    @PostMapping("/member/client")
+    @PostMapping("/member/search")
     public ResultOutput getMembersByClientId(@RequestBody MemberClientInput memberClientInput) {
 
         return memberService.getMembersByClientId(memberClientInput);
