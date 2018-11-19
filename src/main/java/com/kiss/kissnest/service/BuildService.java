@@ -28,6 +28,7 @@ import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +125,7 @@ public class BuildService {
         jobDao.createJob(job);
 
         JobOutput jobOutput = BeanCopyUtil.copy(job,JobOutput.class);
-//        operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
+        operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
         return ResultOutputUtil.success(jobOutput);
     }
 
@@ -203,7 +204,7 @@ public class BuildService {
         String[] urlStr = location.split("/");
         Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location));
         thread.start();
-//        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
+        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         Map<String, Object> result = new HashMap<>();
         result.put("id",buildLog.getId());
         result.put("projectName", project.getName());
@@ -212,6 +213,7 @@ public class BuildService {
         result.put("remark", buildJobInput.getRemark());
         result.put("status",2);
         result.put("statusText",codeUtil.getEnumsMessage("build.status",String.valueOf(result.get("status"))));
+        result.put("createdAt",buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         return ResultOutputUtil.success(result);
     }
 
@@ -416,6 +418,9 @@ public class BuildService {
         if (count == 0) {
             return null;
         }
+
+        Integer id = buildLog.getId();
+        buildLog = buildLogDao.getBuildLogById(id);
 
         return buildLog;
     }

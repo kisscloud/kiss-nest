@@ -6,12 +6,12 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.OperationLogMapper">
     <insert id="createOperationLog" parameterType="com.kiss.kissnest.entity.OperationLog">
-        insert into operateLog (type,targetId,oldValue,newValue,operatorId,operatorName)
+        insert into operationlogs (teamId,type,targetId,targetType,beforeValue,afterValue,operatorId,operatorName)
         value
-        (#{type},#{targetId},#{oldValue},#{newValue},#{operatorId},#{operatorName})
+        (#{teamId},#{type},#{targetId},#{targetType},#{beforeValue},#{afterValue},#{operatorId},#{operatorName})
     </insert>
     
-    <select id="getOperationLogsByTeamId" parameterType="java.lang.Integer">
-        select * from operateLogs where teamId = #{teamId};
+    <select id="getOperationLogsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.OperationLog">
+        select * from operationlogs where teamId = #{teamId};
     </select>
 </mapper>

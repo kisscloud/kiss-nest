@@ -13,4 +13,6 @@ public interface LinkDao {
     List<Link> getLinks(Integer teamId);
 
     Integer deleteLink(Integer linkId);
+
+    Link getLinkById(Integer id);
 }

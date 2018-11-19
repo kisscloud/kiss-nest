@@ -6,6 +6,7 @@ import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Environment;
 import com.kiss.kissnest.entity.Job;
+import com.kiss.kissnest.entity.OperationTargetType;
 import com.kiss.kissnest.entity.Server;
 import com.kiss.kissnest.input.CreateEnvironmentInput;
 import com.kiss.kissnest.input.CreateServerInput;
@@ -67,7 +68,7 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
-//        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
@@ -115,7 +116,7 @@ public class ServerService {
 
         environmentDao.addEnvironmentServerCount(createServerInput.getEnvId());
         ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
-//        operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
+        operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
         return ResultOutputUtil.success(serverOutput);
     }
 
@@ -133,7 +134,7 @@ public class ServerService {
         }
 
         ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
-//        operationLogService.saveOperationLog(updateServerInput.getTeamId(),guest,oldValue,server,"id",OperationTargetType.TYPE__UPDATE_SERVER);
+        operationLogService.saveOperationLog(updateServerInput.getTeamId(),guest,oldValue,server,"id",OperationTargetType.TYPE__UPDATE_SERVER);
 
         return ResultOutputUtil.success(serverOutput);
     }

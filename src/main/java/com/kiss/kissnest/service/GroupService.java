@@ -83,7 +83,10 @@ public class GroupService {
 
         group.setRepositoryId(gitlabGroup.getId());
         groupDao.addRepositoryIdById(group);
-//        operationLogService.saveOperationLog(group.getTeamId(),guest,null,group,"id",OperationTargetType.TYPE_CREATE_GROUP);
+        Integer id = group.getId();
+        group = groupDao.getGroupById(id);
+        operationLogService.saveOperationLog(group.getTeamId(),guest,null,group,"id",OperationTargetType.TYPE_CREATE_GROUP);
+        operationLogService.saveDynamic(guest,group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_CREATE_GROUP,group);
         GroupOutput groupOutput = BeanCopyUtil.copy(group, GroupOutput.class);
         groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus())));
 
@@ -123,7 +126,7 @@ public class GroupService {
         if (!flag) {
             throw new TransactionalException(NestStatusCode.DELETE_GROUP_REPOSITORY_FAILED);
         }
-//        operationLogService.saveOperationLog(group.getTeamId(),ThreadLocalUtil.getGuest(),group,null,"id",OperationTargetType.TYPE_DELETE_GROUP);
+        operationLogService.saveOperationLog(group.getTeamId(),ThreadLocalUtil.getGuest(),group,null,"id",OperationTargetType.TYPE_DELETE_GROUP);
         return ResultOutputUtil.success();
     }
 
@@ -141,7 +144,7 @@ public class GroupService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_GROUP_FAILED);
         }
 
-//        operationLogService.saveOperationLog(group.getTeamId(),guest,oldValue,group,"id",OperationTargetType.TYPE_UPDATE_GROUP);
+        operationLogService.saveOperationLog(group.getTeamId(),guest,oldValue,group,"id",OperationTargetType.TYPE_UPDATE_GROUP);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(group, GroupOutput.class));
     }

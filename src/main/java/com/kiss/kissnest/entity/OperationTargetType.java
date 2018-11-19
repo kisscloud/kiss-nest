@@ -15,5 +15,10 @@ public class OperationTargetType {
     public static final Integer TYPE__CREATE_ENVIRONMENT = 11;
     public static final Integer TYPE__CREATE_SERVER = 12;
     public static final Integer TYPE__UPDATE_SERVER = 13;
+    public static final Integer TYPE__CREATE_LINK = 14;
+    public static final Integer TYPE__UPDATE_LINK = 15;
+    public static final Integer TYPE__DELETE_LINK = 16;
+    public static final Integer TYPE__CREATE_PROJECT_REPOSITORY = 17;
+
 
 }

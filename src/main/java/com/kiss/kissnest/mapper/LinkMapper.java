@@ -16,4 +16,5 @@ public interface LinkMapper {
 
     Integer deleteLink(Integer linkId);
 
+    Link getLinkById(Integer id);
 }

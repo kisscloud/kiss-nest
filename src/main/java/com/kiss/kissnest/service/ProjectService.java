@@ -1,10 +1,7 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.*;
-import com.kiss.kissnest.entity.Job;
-import com.kiss.kissnest.entity.Member;
-import com.kiss.kissnest.entity.Project;
-import com.kiss.kissnest.entity.ProjectRepository;
+import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
@@ -81,7 +78,10 @@ public class ProjectService {
         groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
-//        operationLogService.saveOperationLog(project.getTeamId(),guest,null,project,"id",OperationTargetType.TYPE_CREATE_PROJECT);
+        Integer id = project.getId();
+        project = projectDao.getProjectById(id);
+        operationLogService.saveOperationLog(project.getTeamId(),guest,null,project,"id",OperationTargetType.TYPE_CREATE_PROJECT);
+        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_CREATE_PROJECT,project);
         return ResultOutputUtil.success(projectOutput);
     }
 
@@ -125,7 +125,7 @@ public class ProjectService {
             gitlabApiUtil.deleteProject(projectRepository.getRepositoryId(),member.getAccessToken());
         }
 
-//        operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);
+        operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);
 
         return ResultOutputUtil.success();
     }
@@ -143,7 +143,7 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_PROJECT_FAILED);
         }
 
-//        operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
+        operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
 
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));

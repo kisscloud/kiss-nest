@@ -139,9 +139,6 @@
             <artifactId>saltstack-netapi-client</artifactId>
             <version>0.6.0</version>
         </dependency>
-
-
-
     </dependencies>
 
     <dependencyManagement>

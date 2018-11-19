@@ -38,4 +38,8 @@
     <select id="getLinks" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Link">
         select * from links where teamId = #{teamId};
     </select>
+    
+    <select id="getLinkById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Link">
+        select * from links where id = #{id};
+    </select>
 </mapper>

@@ -80,7 +80,10 @@ public class TeamService {
 
         team.setRepositoryId(gitlabGroup.getId());
         teamDao.addRepositoryIdById(team);
-//        operationLogService.saveOperationLog(team.getId(),guest,null,team,"id",OperationTargetType.TYPE_CREATE_TEAM);
+        Integer id = team.getId();
+        team = teamDao.getTeamById(id);
+        operationLogService.saveOperationLog(team.getId(),guest,null,team,"id",OperationTargetType.TYPE_CREATE_TEAM);
+        operationLogService.saveDynamic(guest,team.getId(),null,null,OperationTargetType.TYPE_CREATE_TEAM,team);
         TeamOutput teamOutput = BeanCopyUtil.copy(team,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(teamOutput);
@@ -155,7 +158,7 @@ public class TeamService {
             //更新
             member.setTeamId(teamId);
             Integer count = memberDao.updateMember(member);
-//            operationLogService.saveOperationLog(teamId,guest,before,member,"id",OperationTargetType.TYPE_CHANGE_TEAM);
+            operationLogService.saveOperationLog(teamId,guest,before,member,"id",OperationTargetType.TYPE_CHANGE_TEAM);
             return count;
         }
 

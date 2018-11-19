@@ -35,4 +35,10 @@ public class LinkDaoImpl implements LinkDao {
 
         return linkMapper.deleteLink(linkId);
     }
+
+    @Override
+    public Link getLinkById(Integer id) {
+
+        return linkMapper.getLinkById(id);
+    }
 }

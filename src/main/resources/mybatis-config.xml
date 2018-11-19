@@ -47,5 +47,7 @@
         <mapper resource="mapper/MemberGroupMapper.xml"/>
         <mapper resource="mapper/MemberProjectMapper.xml"/>
         <mapper resource="mapper/LinkMapper.xml"/>
+        <mapper resource="mapper/OperationLogMapper.xml"/>
+        <mapper resource="mapper/DynamicMapper.xml"/>
     </mappers>
 </configuration>

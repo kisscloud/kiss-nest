@@ -5,6 +5,7 @@ import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.entity.Group;
+import com.kiss.kissnest.entity.OperationTargetType;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.input.CreateProjectRepositoryInput;
@@ -41,6 +42,9 @@ public class ProjectRepositoryService {
 
     @Autowired
     private GitlabApiUtil gitlabApiUtil;
+
+    @Autowired
+    private OperationLogService operationLogService;
 
     public ResultOutput createProjectRepository(CreateProjectRepositoryInput createProjectRepositoryInput) {
 
@@ -93,6 +97,7 @@ public class ProjectRepositoryService {
 
         projectRepositoryDao.createProjectRepository(projectRepository);
 
+        operationLogService.saveOperationLog(projectRepository.getTeamId(),ThreadLocalUtil.getGuest(),null,projectRepository,"id",OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY);
         return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository,ProjectRepositoryOutput.class));
     }
 
