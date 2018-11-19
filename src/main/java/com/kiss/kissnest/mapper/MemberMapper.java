@@ -20,7 +20,7 @@ public interface MemberMapper {
 
     Member getMemberById(Integer id);
 
-    List<Member> getMembers();
+    List<Member> getMembers(Map params);
 
     Member getMemberByAccountId(Integer accountId);
 

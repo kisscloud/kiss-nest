@@ -76,6 +76,8 @@ public class ProjectService {
         }
 
         groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
+        Member member = memberDao.getMemberByAccountId(ThreadLocalUtil.getGuest().getId());
+        memberDao.addCount(member.getId(),1,"projects");
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
         Integer id = project.getId();

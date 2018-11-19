@@ -10,13 +10,16 @@ import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.MemberOutput;
+import com.kiss.kissnest.output.MemberRoleOutput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
+import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -52,6 +55,12 @@ public class MemberService {
 
     @Autowired
     private ClientServiceFeign clientServiceFeign;
+
+    @Autowired
+    private CodeUtil codeUtil;
+
+    @Value("${member.roles}")
+    private String memberRoles;
 
     public ResultOutput createMember(Member member) {
 
@@ -335,6 +344,9 @@ public class MemberService {
             if (count != memberGroups.size()) {
                 throw new TransactionalException(NestStatusCode.CREATE_MEMBER_GROUP_FAILED);
             }
+
+            memberGroups.forEach(memberGroup -> memberDao.addCount(memberGroup.getMemberId(),1,"groups"));
+
         } else {
             return ResultOutputUtil.error(NestStatusCode.GROUP_MEMBER_IS_EXIST);
         }
@@ -371,10 +383,35 @@ public class MemberService {
             if (count != memberProjects.size()) {
                 throw new TransactionalException(NestStatusCode.CREATE_MEMBER_PROJECT_FAILED);
             }
+
+            memberProjects.forEach(memberProject -> memberDao.addCount(memberProject.getMemberId(),1,"projects"));
         } else {
             return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
         }
 
         return ResultOutputUtil.success();
     }
+
+    public ResultOutput getMemberRoles() {
+        String[] roles = memberRoles.split(",");
+        List<MemberRoleOutput> memberRoleOutputs = new ArrayList<>();
+
+        for (String role : roles) {
+            MemberRoleOutput memberRoleOutput = new MemberRoleOutput();
+            memberRoleOutput.setRoleId(Integer.parseInt(role));
+            memberRoleOutput.setRoleName(codeUtil.getEnumsMessage("member.role",role));
+            memberRoleOutputs.add(memberRoleOutput);
+        }
+
+        return ResultOutputUtil.success(memberRoleOutputs);
+    }
+
+    public ResultOutput getMembers(Integer teamId,Integer groupId,Integer projectId) {
+
+        List<Member> members = memberDao.getMembers(teamId,groupId,projectId);
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(memberOutputs);
+    }
+
 }

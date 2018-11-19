@@ -1,10 +1,7 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.*;
-import com.kiss.kissnest.entity.Group;
-import com.kiss.kissnest.entity.GroupProject;
-import com.kiss.kissnest.entity.OperationTargetType;
-import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
@@ -67,8 +64,10 @@ public class GroupService {
         }
 
         teamDao.addGroupsCount(group.getTeamId());
+        Member member = memberDao.getMemberByAccountId(ThreadLocalUtil.getGuest().getId());
+        memberDao.addCount(member.getId(),1,"groups");
 
-        String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
+        String accessToken = member.getAccessToken();
         Integer parentId = teamDao.getRepositoryIdByTeamId(group.getTeamId());
 
         if (parentId == null) {

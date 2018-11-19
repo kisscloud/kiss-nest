@@ -6,6 +6,7 @@ import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.mapper.MemberMapper;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.ResultOutputUtil;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,12 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Integer addCount(Map map) {
+    public Integer addCount(Integer id,Integer increment,String type) {
+
+        Map<String,Object> map = new HashMap();
+        map.put("id",id);
+        map.put("increment",increment);
+        map.put("type",type);
 
         return memberMapper.addCount(map);
     }
@@ -50,9 +56,14 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> getMembers() {
+    public List<Member> getMembers(Integer teamId,Integer groupId,Integer projectId) {
 
-        return memberMapper.getMembers();
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("groupId",groupId);
+        params.put("projectId",projectId);
+
+        return memberMapper.getMembers(params);
     }
 
     @Override

@@ -93,4 +93,16 @@ public class MemberController {
 
         return memberService.createMemberProject(bindMemberProjectInput);
     }
+
+    @GetMapping("/member/roles")
+    public ResultOutput getMemberRoles() {
+
+        return memberService.getMemberRoles();
+    }
+
+    @GetMapping("/members")
+    public ResultOutput getMembers(@RequestParam("teamId") Integer teamId,Integer groupId,Integer projectId) {
+
+        return memberService.getMembers(teamId,groupId,projectId);
+    }
 }

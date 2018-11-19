@@ -14,11 +14,11 @@ public interface MemberDao {
 
     Integer updateMember(Member member);
 
-    Integer addCount(Map map);
+    Integer addCount(Integer id,Integer increment,String type);
 
     Member getMemberById(Integer id);
 
-    List<Member> getMembers();
+    List<Member> getMembers(Integer teamId,Integer groupId,Integer projectId);
 
     Member getMemberByAccountId(Integer accountId);
 

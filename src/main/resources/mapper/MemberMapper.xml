@@ -39,26 +39,22 @@
         update members
         set
         <if test="type == 'groups'">
-            groupsCount = groupsCount + 1
+            groupsCount = groupsCount + #{increment}
         </if>
-        <if test="test == 'projects'">
-            projectsCount = projectsCount + 1
+        <if test="type == 'projects'">
+            projectsCount = projectsCount + #{increment}
         </if>
-        <if test="test == 'needs'">
-            needsCount = needsCount + 1
+        <if test="type == 'needs'">
+            needsCount = needsCount + #{increment}
         </if>
-        <if test="test == 'issues'">
-            issuesCount = issuesCount + 1
+        <if test="type == 'issues'">
+            issuesCount = issuesCount + #{increment}
         </if>
         where id = #{id}
     </update>
 
     <select id="getMemberById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
         select * from members where id = #{id};
-    </select>
-    
-    <select id="getMembers" resultType="com.kiss.kissnest.entity.Member">
-        select * from members;
     </select>
     
     <select id="getMemberByAccountId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
@@ -94,4 +90,20 @@
             (#{m.accountId},#{m.teamId},#{m.accessToken},#{m.operatorId},#{m.operatorName})
         </foreach>
     </insert>
+
+    <select id="getMembers" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Member">
+        select me.* from members me
+        left join membergroups gr
+        on me.id = gr.memberId
+        left join memberprojects pr
+        on me.id = pr.memberId
+        where me.teamId = #{teamId}
+        <if test="groupId != null">
+            and gr.groupId = #{groupId}
+        </if>
+        <if test="projectId != null">
+            and pr.projectId = #{projectId}
+        </if>
+        group by me.id
+    </select>
 </mapper>
