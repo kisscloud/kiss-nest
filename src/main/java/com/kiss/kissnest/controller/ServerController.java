@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
 @RestController
-@Api(tags = "server", description = "服务器相关接口")
+@Api(tags = "Server", description = "服务器相关接口")
 public class ServerController {
 
     @Autowired
