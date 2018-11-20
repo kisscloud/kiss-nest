@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
     <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job">
-        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,status,number)
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,conf,status,number)
         value
-        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{status},#{number})
+        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{conf},#{status},#{number})
     </insert>
 
     <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">

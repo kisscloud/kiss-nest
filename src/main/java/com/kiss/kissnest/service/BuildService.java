@@ -1,5 +1,6 @@
 package com.kiss.kissnest.service;
 
+import com.alibaba.fastjson.JSON;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
@@ -28,6 +29,7 @@ import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,17 +156,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        String serverIds = "";
         List<Integer> serverIdList = createDeployInput.getServerIds();
-
-        for (Integer id : serverIdList) {
-            serverIds = serverIds + id + ",";
-        }
-
-        if (!serverIds.equals("")) {
-            serverIds = serverIds.substring(0,serverIds.length() - 1);
-        }
-
         Job job = new Job();
         job.setTeamId(project.getTeamId());
         job.setJobName(project.getSlug());
@@ -172,7 +164,8 @@ public class BuildService {
         job.setConf(createDeployInput.getConf());
         job.setType(createDeployInput.getType());
         job.setEnvId(createDeployInput.getEnvId());
-        job.setServerIds(serverIds);
+        job.setServerIds(serverIdList == null ? null : JSON.toJSONString(serverIdList));
+        job.setType(2);
 
         jobDao.createJob(job);
 
