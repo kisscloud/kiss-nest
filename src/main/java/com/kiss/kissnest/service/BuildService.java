@@ -370,7 +370,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String conf = String.format(stringBuilder.toString(),path,path,path,path,path);
+        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,path,path);
         conf = StringEscapeUtils.unescapeXml(conf);
         Map<String,Object> result = new HashMap<>();
         result.put("conf",conf);
