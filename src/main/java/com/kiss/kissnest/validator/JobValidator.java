@@ -2,18 +2,19 @@ package com.kiss.kissnest.validator;
 
 import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.dao.ServerDao;
 import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.entity.Project;
-import com.kiss.kissnest.input.BuildJobInput;
-import com.kiss.kissnest.input.CreateJobInput;
-import com.kiss.kissnest.input.BuildLogsInput;
-import com.kiss.kissnest.input.UpdateJobInput;
+import com.kiss.kissnest.entity.Server;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.util.List;
 
 
 @Component
@@ -23,7 +24,13 @@ public class JobValidator implements Validator {
     private ProjectDao projectDao;
 
     @Autowired
+    private ServerDao serverDao;
+
+    @Autowired
     private TeamValidaor teamValidaor;
+
+    @Autowired
+    private ServerValidator serverValidator;
 
     @Autowired
     private JobDao jobDao;
@@ -34,7 +41,9 @@ public class JobValidator implements Validator {
         return clazz.equals(CreateJobInput.class) ||
                 clazz.equals(BuildJobInput.class) ||
                 clazz.equals(BuildLogsInput.class) ||
-                clazz.equals(UpdateJobInput.class);
+                clazz.equals(CreateDeployInput.class) ||
+                clazz.equals(UpdateJobInput.class) ||
+                clazz.equals(UpdateDeployInput.class);
     }
 
     @Override
@@ -49,11 +58,11 @@ public class JobValidator implements Validator {
             BuildJobInput buildJobInput = (BuildJobInput) target;
             validateProjectId(buildJobInput.getProjectId(),errors);
             validateBranch(buildJobInput.getBranch(),errors);
+            validateExecType(buildJobInput.getType(),errors);
         } else if (BuildLogsInput.class.isInstance(target)) {
             BuildLogsInput buildLogsInput = (BuildLogsInput) target;
             teamValidaor.validateId(buildLogsInput.getTeamId(),"teamId",errors);
             validatePage(buildLogsInput.getPage(),errors);
-
         } else if (UpdateJobInput.class.isInstance(target)) {
             UpdateJobInput updateJobInput = (UpdateJobInput) target;
             validateJobId(updateJobInput.getId(),errors);
@@ -61,6 +70,30 @@ public class JobValidator implements Validator {
             validateProjectId(updateJobInput.getProjectId(),errors);
             validateType(updateJobInput.getType(),errors);
             validateScript(updateJobInput.getScript(),errors);
+        } else if (CreateDeployInput.class.isInstance(target)) {
+            CreateDeployInput createDeployInput = (CreateDeployInput) target;
+            teamValidaor.validateId(createDeployInput.getTeamId(),"teamId",errors);
+            validateProjectId(createDeployInput.getProjectId(),errors);
+            boolean envIdVal = serverValidator.validateEnvId(createDeployInput.getEnvId(),errors);
+
+            if (envIdVal) {
+                validateServerIds(createDeployInput.getServerIds(),createDeployInput.getEnvId(),errors);
+            }
+
+            validateConf(createDeployInput.getConf(),errors);
+            validateType(createDeployInput.getType(),errors);
+        }
+        else if (UpdateDeployInput.class.isInstance(target)) {
+            UpdateDeployInput updateDeployInput = (UpdateDeployInput) target;
+            validateJobId(updateDeployInput.getId(),errors);
+            boolean envIdVal = serverValidator.validateEnvId(updateDeployInput.getEnvId(),errors);
+
+            if (envIdVal) {
+                validateServerIds(updateDeployInput.getServerIds(),updateDeployInput.getEnvId(),errors);
+            }
+
+            validateConf(updateDeployInput.getConf(),errors);
+            validateType(updateDeployInput.getType(),errors);
         }
     }
 
@@ -132,6 +165,48 @@ public class JobValidator implements Validator {
 
         if (job == null) {
             errors.rejectValue("id",String.valueOf(NestStatusCode.JOB_NOT_EXIST),"任务不存在");
+        }
+    }
+
+    public void validateExecType(Integer type,Errors errors) {
+
+        if (type == null) {
+            errors.rejectValue("type",String.valueOf(NestStatusCode.EXECJOB_TYPE_IS_EMPTY),"版本类型为空");
+            return;
+        }
+
+        if (type != 0 && type != 1) {
+            errors.rejectValue("type",String.valueOf(NestStatusCode.EXECJOB_TYPE_ERROR),"版本类型错误");
+        }
+
+    }
+
+    public void validateServerIds(List<Integer> serverIds,Integer envId, Errors errors) {
+
+        if (serverIds == null || serverIds.size() == 0) {
+            errors.rejectValue("serverIds",String.valueOf(NestStatusCode.SERVERS_IS_EMPTY),"服务器列表为空");
+            return;
+        }
+
+        serverIds.forEach(id -> {
+            Server server = serverDao.getServerById(id);
+
+            if (server == null) {
+                errors.rejectValue("serverIds",String.valueOf(NestStatusCode.SERVER_NOT_EXIST),"服务器不存在");
+                return;
+            }
+
+            if (envId != server.getEnvId()) {
+                errors.rejectValue("serverIds",String.valueOf(NestStatusCode.SERVERS_ENVID_NOT_MATCH),"服务器与环境不匹配");
+                return;
+            }
+        });
+    }
+
+    public void validateConf(String conf,Errors errors) {
+
+        if (StringUtils.isEmpty(conf)) {
+            errors.rejectValue("conf",String.valueOf(NestStatusCode.DEPLOY_JOB_CONF_IS_EMPTY),"部署任务的配置为空");
         }
     }
 }

@@ -30,6 +30,8 @@ public interface ProjectDao {
 
     List<Project> getProjectsWithoutBuildJob(Integer teamId);
 
+    List<Project> getProjectsWithoutDeployJob(Integer teamId);
+
     List<Project> getProjectsWithBuildJob(Integer teamId);
 
     String getProjectOperatorAccessToken(Integer projectId);

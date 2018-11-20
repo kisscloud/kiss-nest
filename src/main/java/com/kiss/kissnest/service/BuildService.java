@@ -17,10 +17,9 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Update;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,7 +27,7 @@ import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
-import java.util.Date;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,16 @@ public class BuildService {
     private ProjectRepositoryDao projectRepositoryDao;
 
     @Autowired
+    private TeamDao teamDao;
+
+    @Autowired
+    private GroupDao groupDao;
+
+    @Autowired
     private OperationLogService operationLogService;
+
+    @Autowired
+    private PackageRepositoryService jobRepositoryService;
 
     public static Map<String, String> buildRemarks = new HashMap<>();
 
@@ -146,32 +154,25 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        String serverIds = String.join(",", createDeployInput.getServerIds());
-        List<String> serverIps = serverDao.getServerInnerIpsByIds(serverIds);
+        String serverIds = "";
+        List<Integer> serverIdList = createDeployInput.getServerIds();
 
-        String script = createDeployInput.getScript();
-
-        for (String serverIp : serverIps) {
-            String ansibleScript = "\n./ansible " + codeIps + " -u root -m shell -a \"rsync -v /opt/app/" + project.getSlug() + "$name.tar.gz root@" + serverIp + ":/root/\"\n";
-            script = script + ansibleScript;
+        for (Integer id : serverIdList) {
+            serverIds = serverIds + id + ",";
         }
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), null, guest.getName(), member.getApiToken());
-
-        if (!success) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
+        if (!serverIds.equals("")) {
+            serverIds = serverIds.substring(0,serverIds.length() - 1);
         }
 
         Job job = new Job();
         job.setTeamId(project.getTeamId());
         job.setJobName(project.getSlug());
         job.setProjectId(projectId);
-        job.setScript(createDeployInput.getScript());
+        job.setConf(createDeployInput.getConf());
         job.setType(createDeployInput.getType());
         job.setEnvId(createDeployInput.getEnvId());
         job.setServerIds(serverIds);
-        job.setStatus(0);
-        job.setNumber(0);
 
         jobDao.createJob(job);
 
@@ -203,7 +204,7 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
@@ -308,10 +309,10 @@ public class BuildService {
         return ResultOutputUtil.success(jobOutputs);
     }
 
-    public ResultOutput updateJob(UpdateJobInput updateJobInput) {
+    public ResultOutput updateBuildJob(UpdateJobInput updateJobInput) {
 
         Job job = BeanCopyUtil.copy(updateJobInput,Job.class);
-        Integer count = jobDao.updateJob(job);
+        Integer count = jobDao.updateBuildJob(job);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_JOB_FAILED);
@@ -336,6 +337,47 @@ public class BuildService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
     }
 
+    public ResultOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
+
+        Job job = BeanCopyUtil.copy(updateDeployInput,Job.class);
+        Integer count = jobDao.updateDeployJob(job);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.UPDATE_DEPLOY_JOB_FAILED);
+        }
+
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
+    }
+
+    public ResultOutput getProjectDeployConf(Integer projectId) {
+
+        Project project = projectDao.getProjectById(projectId);
+        Team team = teamDao.getTeamById(project.getTeamId());
+        Group group = groupDao.getGroupById(project.getGroupId());
+        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+
+        if (project == null) {
+            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+        }
+
+        StringBuilder stringBuilder = null;
+
+        try {
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/supervisor.conf");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
+        }
+
+        String conf = String.format(stringBuilder.toString(),path,path,path,path,path);
+        conf = StringEscapeUtils.unescapeXml(conf);
+        Map<String,Object> result = new HashMap<>();
+        result.put("conf",conf);
+
+        return ResultOutputUtil.success(result);
+    }
+
     class BuildLogRunnable implements Runnable {
 
         private Integer id;
@@ -350,13 +392,19 @@ public class BuildService {
 
         private String jobName;
 
-        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location) {
+        private Integer versionType;
+
+        private Integer projectId;
+
+        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location,Integer versionType,Integer projectId) {
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.type = type;
             this.location = location;
             this.jobName = jobName;
             this.id = buildLogId;
+            this.versionType = versionType;
+            this.projectId = projectId;
         }
 
         @Override
@@ -385,7 +433,7 @@ public class BuildService {
                     return;
                 }
 
-                updateBuildLog(build,id, jobName, account, location);
+                updateBuildLog(build,id, jobName, account, location,versionType,projectId);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -427,7 +475,7 @@ public class BuildService {
         return buildLog;
     }
 
-    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location) throws InterruptedException {
+    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location,Integer versionType,Integer projectId) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
@@ -452,6 +500,7 @@ public class BuildService {
         BuildLog buildLog = new BuildLog();
         buildLog.setId(id);
         buildLog.setBranch(branch);
+        buildLog.setType(versionType);
         buildLog.setNumber(build.getNumber());
         buildLog.setOperatorName(account);
         buildLog.setOutput(output);
@@ -479,6 +528,8 @@ public class BuildService {
         }
 
         buildLogDao.updateBuildLog(buildLog);
+        buildLog.setProjectId(projectId);
+        jobRepositoryService.createPackageRepository(buildLog);
     }
 
     class DeployLogRunner implements Runnable {

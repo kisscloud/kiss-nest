@@ -230,6 +230,14 @@ public class ProjectService {
         return ResultOutputUtil.success(projectOutputs);
     }
 
+    public ResultOutput getProjectsWithoutDeployJob(Integer teamId) {
+
+        List<Project> projects = projectDao.getProjectsWithoutDeployJob(teamId);
+        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
+
+        return ResultOutputUtil.success(projectOutputs);
+    }
+
     public ResultOutput getBuildProjects(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithBuildJob(teamId);

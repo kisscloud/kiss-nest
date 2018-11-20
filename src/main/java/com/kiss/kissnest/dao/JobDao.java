@@ -18,11 +18,13 @@ public interface JobDao {
 
     List<Job> getJobsByTeamId(Integer teamId,Integer type);
 
-    Integer updateJob(Job job);
+    Integer updateBuildJob(Job job);
 
     Job getJobById(Integer id);
 
     Integer deleteJobById(Integer id);
 
     List<Job> getJobsByServerIds(Integer serverId);
+
+    Integer updateDeployJob(Job job);
 }

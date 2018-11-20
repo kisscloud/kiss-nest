@@ -95,7 +95,7 @@ public class JenkinsUtil {
 
         try {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
-            StringBuilder builder = readFileFromClassPath();
+            StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
             String script = String.format(builder.toString(), sshUrl, jobName, jenkinBinIp, formatShell);
 
@@ -121,7 +121,7 @@ public class JenkinsUtil {
 
         try {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
-            StringBuilder builder = readFileFromClassPath();
+            StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
             String script = String.format(builder.toString(), sshUrl, jobName, jenkinBinIp, formatShell);
 
@@ -359,9 +359,9 @@ public class JenkinsUtil {
         }
     }
 
-    public StringBuilder readFileFromClassPath() throws IOException {
+    public StringBuilder readFileFromClassPath(String name) throws IOException {
 
-        InputStream in = JenkinsUtil.class.getResourceAsStream("/config.xml");
+        InputStream in = JenkinsUtil.class.getResourceAsStream(name);
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(in);
         BufferedReader bufferedReader = new BufferedReader(reader);

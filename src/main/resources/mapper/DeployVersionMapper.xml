@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.DeployVersionMapper">
+    <insert id="createDeployVersion" parameterType="com.kiss.kissnest.entity.DeployVersion">
+        insert into deployversion (projectId,serverId,branch,tag,type,version,operatorId,operatorName)
+        value
+        (#{projectId},#{serverId},#{branch},#{tag},#{type},#{version},#{operatorId},#{operatorName})
+    </insert>
+
+    <update id="updateDeployVersion" parameterType="com.kiss.kissnest.entity.DeployVersion">
+        update deployversion
+        set
+        version = #{version}
+        <if test="branch != null">
+            branch = #{branch}
+        </if>
+        <if test="tag != null">
+            tag = #{tag}
+        </if>
+        <if test="type != null">
+            type = #{type}
+        </if>
+        <if test="operatorId != null">
+            operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getDeployVersions" parameterType="com.kiss.kissnest.entity.DeployVersion" resultType="com.kiss.kissnest.entity.DeployVersion">
+        select * from deployversion where 1=1
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="projectId != null">
+            and projectId = #{projectId}
+        </if>
+        <if test="serverId != null">
+            and serverId = #{serverId}
+        </if>
+        <if test="branch != null">
+            and branch = #{branch}
+        </if>
+        <if test="tag != null">
+            and tag = #{tag}
+        </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        <if test="version != null">
+            and version = #{version}
+        </if>
+    </select>
+</mapper>

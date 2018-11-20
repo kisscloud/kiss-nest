@@ -2,8 +2,8 @@ package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.service.BuildService;
+import com.kiss.kissnest.service.PackageRepositoryService;
 import com.kiss.kissnest.util.JenkinsUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,8 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
-
-import java.io.IOException;
 
 @RestController
 @Api(tags = "Job", description = "构建部署任务相关接口")
@@ -27,6 +25,9 @@ public class JobController {
 
     @Autowired
     private JenkinsUtil jenkinsUtil;
+
+    @Autowired
+    private PackageRepositoryService packageRepositoryService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -72,6 +73,12 @@ public class JobController {
         return buildService.createDeployJob(createDeployInput);
     }
 
+    @PutMapping("/job/deploy")
+    public ResultOutput updateDeployJob(@RequestBody UpdateDeployInput updateDeployInput) {
+
+        return buildService.updateDeployJob(updateDeployInput);
+    }
+
     @PostMapping("/job/deploy/exec")
     public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) {
 
@@ -84,9 +91,27 @@ public class JobController {
         return buildService.getJobsByTeamId(teamId,type);
     }
 
-    @PutMapping("/job")
-    public ResultOutput updateJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
+    @PutMapping("/job/build")
+    public ResultOutput updateBuildJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
 
-        return buildService.updateJob(updateJobInput);
+        return buildService.updateBuildJob(updateJobInput);
+    }
+
+    @GetMapping("/job/package/repository/branches")
+    public ResultOutput getPackageRepositoryBranches(@RequestParam("projectId") Integer projectId) {
+
+        return packageRepositoryService.getPackageRepositoryBranches(projectId);
+    }
+
+    @GetMapping("/job/package/repository/tags")
+    public ResultOutput getPackageRepositoryTags(@RequestParam("projectId") Integer projectId) {
+
+        return packageRepositoryService.getPackageRepositoryTags(projectId);
+    }
+
+    @GetMapping("/job/deploy/conf")
+    public ResultOutput getProjectDeployConf(@RequestParam("projectId") Integer projectId) {
+
+        return buildService.getProjectDeployConf(projectId);
     }
 }

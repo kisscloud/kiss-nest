@@ -39,6 +39,8 @@ public class BuildLog {
 
     private Long buildAt;
 
+    private Integer type;
+
     private Date createdAt;
 
     private Date updatedAt;

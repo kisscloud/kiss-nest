@@ -95,9 +95,9 @@ public class MemberController {
     }
 
     @GetMapping("/member/roles")
-    public ResultOutput getMemberRoles() {
+    public ResultOutput getMemberRoles(@RequestParam("type") Integer type) {
 
-        return memberService.getMemberRoles();
+        return memberService.getMemberRoles(type);
     }
 
     @GetMapping("/members")

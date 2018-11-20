@@ -97,6 +97,12 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
+    public List<Project> getProjectsWithoutDeployJob(Integer teamId) {
+
+        return projectMapper.getProjectsWithoutDeployJob(teamId);
+    }
+
+    @Override
     public List<Project> getProjectsWithBuildJob(Integer teamId) {
 
         return projectMapper.getProjectsWithBuildJob(teamId);
