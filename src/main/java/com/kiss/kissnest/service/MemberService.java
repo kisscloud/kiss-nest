@@ -157,7 +157,7 @@ public class MemberService {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String accessToken = gitlabApiUtil.getAccessToken(guest.getName(), createMemberAccessInput.getPassword());
+            String accessToken = gitlabApiUtil.getAccessToken(guest.getUsername(), createMemberAccessInput.getPassword());
 
             if (StringUtils.isEmpty(accessToken)) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
@@ -176,7 +176,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getName());
+                member.setOperatorName(guest.getUsername());
                 member.setAccessToken(accessToken);
                 Integer count = memberDao.createMember(member);
 
@@ -196,7 +196,7 @@ public class MemberService {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String apiToken = jenkinsUtil.generateApiToken(guest.getName(), createMemberAccessInput.getPassword());
+            String apiToken = jenkinsUtil.generateApiToken(guest.getUsername(), createMemberAccessInput.getPassword());
 
             if (apiToken == null) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_APITOKEN_FAILED);
@@ -215,7 +215,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getName());
+                member.setOperatorName(guest.getUsername());
                 member.setApiToken(apiToken);
                 Integer count = memberDao.createMember(member);
 
@@ -274,7 +274,7 @@ public class MemberService {
                 member.setAccountId(memberInput.getId());
                 member.setTeamId(createMemberTeamInput.getTeamId());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getName());
+                member.setOperatorName(guest.getUsername());
                 members.add(member);
             } else {
                 memberAccount.put(member.getAccountId(), member.getId());
@@ -303,7 +303,7 @@ public class MemberService {
                 memberTeam.setTeamId(createMemberTeamInput.getTeamId());
                 memberTeam.setRole(memberInput.getRole());
                 memberTeam.setOperatorId(guest.getId());
-                memberTeam.setOperatorName(guest.getName());
+                memberTeam.setOperatorName(guest.getUsername());
                 memberTeams.add(memberTeam);
             }
         }
@@ -337,7 +337,7 @@ public class MemberService {
                 memberGroup.setTeamId(bindMemberGroupInput.getTeamId());
                 memberGroup.setRole(memberGroupInput.getRole());
                 memberGroup.setOperatorId(guest.getId());
-                memberGroup.setOperatorName(guest.getName());
+                memberGroup.setOperatorName(guest.getUsername());
                 memberGroup.setGroupId(bindMemberGroupInput.getGroupId());
                 memberGroups.add(memberGroup);
             }
@@ -376,7 +376,7 @@ public class MemberService {
                 memberProject.setTeamId(bindMemberProjectInput.getTeamId());
                 memberProject.setRole(memberProjectInput.getRole());
                 memberProject.setOperatorId(guest.getId());
-                memberProject.setOperatorName(guest.getName());
+                memberProject.setOperatorName(guest.getUsername());
                 memberProject.setProjectId(bindMemberProjectInput.getProjectId());
                 memberProjects.add(memberProject);
             }

@@ -56,7 +56,7 @@ public class GroupService {
         group.setStatus(1);
         group.setMembersCount(1);
         group.setOperatorId(guest.getId());
-        group.setOperatorName(guest.getName());
+        group.setOperatorName(guest.getUsername());
         Integer count = groupDao.createGroup(group);
 
         if (count == 0) {
@@ -131,7 +131,7 @@ public class GroupService {
         Group group = BeanCopyUtil.copy(updateGroupInput, Group.class);
         Guest guest = ThreadLocalUtil.getGuest();
         group.setOperatorId(guest.getId());
-        group.setOperatorName(guest.getName());
+        group.setOperatorName(guest.getUsername());
         group.setStatus(1);
         Group oldValue = groupDao.getGroupById(group.getId());
         Integer count = groupDao.updateGroupById(group);

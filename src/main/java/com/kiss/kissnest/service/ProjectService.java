@@ -69,7 +69,7 @@ public class ProjectService {
         Guest guest = ThreadLocalUtil.getGuest();
         project.setMembersCount(1);
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getName());
+        project.setOperatorName(guest.getUsername());
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
@@ -117,7 +117,7 @@ public class ProjectService {
                     throw new TransactionalException(NestStatusCode.DELETE_JOB_FAILED);
                 }
 
-                jenkinsUtil.deleteJob(job.getJobName(),guest.getName(),member.getApiToken());
+                jenkinsUtil.deleteJob(job.getJobName(),guest.getUsername(),member.getApiToken());
             });
         }
 
@@ -139,7 +139,7 @@ public class ProjectService {
         Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getName());
+        project.setOperatorName(guest.getUsername());
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {

@@ -29,7 +29,6 @@ import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +119,7 @@ public class BuildService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -194,7 +193,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
-        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
@@ -203,7 +202,7 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getUsername(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
@@ -227,7 +226,7 @@ public class BuildService {
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         String branch = deployJobInput.getBranch() == null ? deployJobInput.getTag() : deployJobInput.getBranch();
-        String location = jenkinsUtil.buildJob(jobName, branch, guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, branch, guest.getUsername(), member.getApiToken());
 
         if (location == null) {
             return ResultOutputUtil.error(NestStatusCode.DEPLOY_JENKINS_JOB_ERROR);
@@ -237,7 +236,7 @@ public class BuildService {
 
         if (count == 1) {
             Integer number = job.getNumber() + 1;
-            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getName(), member.getApiToken(), number, 2, job.getServerIds()));
+            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getUsername(), member.getApiToken(), number, 2, job.getServerIds()));
             thread.start();
             deployRemarks.put(deployJobInput.getProjectId() + "" + number, deployJobInput.getRemark());
         }
@@ -326,7 +325,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(),updateJobInput.getScript(),projectRepository.getSshUrl(),guest.getName(),member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(),updateJobInput.getScript(),projectRepository.getSshUrl(),guest.getUsername(),member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
@@ -462,7 +461,7 @@ public class BuildService {
         buildLog.setBranch(branch);
         buildLog.setProjectId(projectId);
         buildLog.setOperatorId(guest.getId());
-        buildLog.setOperatorName(guest.getName());
+        buildLog.setOperatorName(guest.getUsername());
         Integer count = buildLogDao.createBuildLog(buildLog);
 
         if (count == 0) {
