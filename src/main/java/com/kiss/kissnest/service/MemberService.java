@@ -62,11 +62,17 @@ public class MemberService {
     @Value("${member.roles}")
     private String memberRoles;
 
+    @Value("${group.roles}")
+    private String groupRoles;
+
+    @Value("${project.roles}")
+    private String projectRoles;
+
     public ResultOutput createMember(Member member) {
 
         Member exist = memberDao.getMemberByAccountId(member.getAccountId());
 
-        if (exist != null ) {
+        if (exist != null) {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_NAME_EXIST);
         }
 
@@ -76,7 +82,7 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(member, MemberOutput.class));
     }
 
     public ResultOutput deleteMember(Integer id) {
@@ -110,14 +116,14 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_MEMBER_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(member, MemberOutput.class));
     }
 
     public ResultOutput getMemberById(Integer id) {
 
         Member member = memberDao.getMemberById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(member, MemberOutput.class));
     }
 
     public ResultOutput getMember() {
@@ -126,7 +132,7 @@ public class MemberService {
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         if (member != null) {
-            return ResultOutputUtil.success(BeanCopyUtil.copy(member,MemberOutput.class));
+            return ResultOutputUtil.success(BeanCopyUtil.copy(member, MemberOutput.class));
         } else {
             return ResultOutputUtil.success();
         }
@@ -136,22 +142,22 @@ public class MemberService {
 
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
 
         if (member == null || StringUtils.isEmpty(member.getApiToken()) || StringUtils.isEmpty(member.getAccessToken())) {
-            result.put("validate",false);
+            result.put("validate", false);
         } else {
-            result.put("validate",true);
+            result.put("validate", true);
         }
 
         return ResultOutputUtil.success(result);
     }
 
-    public ResultOutput getMemberAccess (CreateMemberAccessInput createMemberAccessInput) {
+    public ResultOutput getMemberAccess(CreateMemberAccessInput createMemberAccessInput) {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String accessToken = gitlabApiUtil.getAccessToken(guest.getName(),createMemberAccessInput.getPassword());
+            String accessToken = gitlabApiUtil.getAccessToken(guest.getName(), createMemberAccessInput.getPassword());
 
             if (StringUtils.isEmpty(accessToken)) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
@@ -160,7 +166,7 @@ public class MemberService {
             Member member = memberDao.getMemberByAccountId(guest.getId());
 
             if (member != null) {
-                Integer count = memberDao.updateAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId(),accessToken);
+                Integer count = memberDao.updateAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId(), accessToken);
 
                 if (count == 0) {
                     return ResultOutputUtil.error(NestStatusCode.UPDATE_MEMBER_ACCESS_FAILED);
@@ -186,11 +192,11 @@ public class MemberService {
         }
     }
 
-    public ResultOutput getMemberApiToken (CreateMemberAccessInput createMemberAccessInput) {
+    public ResultOutput getMemberApiToken(CreateMemberAccessInput createMemberAccessInput) {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String apiToken = jenkinsUtil.generateApiToken(guest.getName(),createMemberAccessInput.getPassword());
+            String apiToken = jenkinsUtil.generateApiToken(guest.getName(), createMemberAccessInput.getPassword());
 
             if (apiToken == null) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_APITOKEN_FAILED);
@@ -199,7 +205,7 @@ public class MemberService {
             Member member = memberDao.getMemberByAccountId(guest.getId());
 
             if (member != null) {
-                Integer count = memberDao.updateApiTokenByAccountId(ThreadLocalUtil.getGuest().getId(),apiToken);
+                Integer count = memberDao.updateApiTokenByAccountId(ThreadLocalUtil.getGuest().getId(), apiToken);
 
                 if (count == 0) {
                     return ResultOutputUtil.error(NestStatusCode.UPDATE_MEMBER_APITOKEN_FAILED);
@@ -229,23 +235,23 @@ public class MemberService {
     public ResultOutput getMemberDefaultTeamId(Integer accountId) {
 
         Team team = memberDao.getMemberDefaultTeamId(accountId);
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",team.getId());
-        params.put("teamName",team.getName());
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", team.getId());
+        params.put("teamName", team.getName());
         return ResultOutputUtil.success(params);
     }
 
     public ResultOutput getMemberTeamsByAccountId(Integer accountId) {
 
         List<Team> memberTeams = memberTeamDao.getMemberTeams(accountId);
-        List<TeamOutput> memberTeamOutputs = BeanCopyUtil.copyList(memberTeams,TeamOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<TeamOutput> memberTeamOutputs = BeanCopyUtil.copyList(memberTeams, TeamOutput.class, BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(memberTeamOutputs);
     }
 
     public ResultOutput getMembersByClientId(MemberClientInput memberClientInput) {
 
-        ClientAccountInput clientAccountInput = BeanCopyUtil.copy(memberClientInput,ClientAccountInput.class);
+        ClientAccountInput clientAccountInput = BeanCopyUtil.copy(memberClientInput, ClientAccountInput.class);
 
         return clientServiceFeign.getClientAccounts(clientAccountInput);
     }
@@ -257,7 +263,7 @@ public class MemberService {
         List<Member> members = new ArrayList<>();
         List<MemberTeam> memberTeams = new ArrayList<>();
         List<MemberInput> memberInputs = createMemberTeamInput.getMemberInputs();
-        Map<Integer,Integer> memberAccount = new HashMap<>();
+        Map<Integer, Integer> memberAccount = new HashMap<>();
 
         for (MemberInput memberInput : memberInputs) {
 
@@ -271,7 +277,7 @@ public class MemberService {
                 member.setOperatorName(guest.getName());
                 members.add(member);
             } else {
-                memberAccount.put(member.getAccountId(),member.getId());
+                memberAccount.put(member.getAccountId(), member.getId());
             }
         }
 
@@ -283,13 +289,13 @@ public class MemberService {
             }
 
             for (Member member : members) {
-                memberAccount.put(member.getAccountId(),member.getId());
+                memberAccount.put(member.getAccountId(), member.getId());
             }
         }
 
         for (MemberInput memberInput : memberInputs) {
             Integer memberId = memberAccount.get(memberInput.getId());
-            MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(),memberId);
+            MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(), memberId);
 
             if (memberTeam == null) {
                 memberTeam = new MemberTeam();
@@ -323,7 +329,7 @@ public class MemberService {
         List<MemberGroupInput> memberGroupInputs = bindMemberGroupInput.getMemberGroupInputs();
 
         for (MemberGroupInput memberGroupInput : memberGroupInputs) {
-            MemberGroup memberGroup = memberGroupDao.getMemberGroup(bindMemberGroupInput.getTeamId(),bindMemberGroupInput.getGroupId(),memberGroupInput.getMemberId());
+            MemberGroup memberGroup = memberGroupDao.getMemberGroup(bindMemberGroupInput.getTeamId(), bindMemberGroupInput.getGroupId(), memberGroupInput.getMemberId());
 
             if (memberGroup == null) {
                 memberGroup = new MemberGroup();
@@ -345,7 +351,7 @@ public class MemberService {
                 throw new TransactionalException(NestStatusCode.CREATE_MEMBER_GROUP_FAILED);
             }
 
-            memberGroups.forEach(memberGroup -> memberDao.addCount(memberGroup.getMemberId(),1,"groups"));
+            memberGroups.forEach(memberGroup -> memberDao.addCount(memberGroup.getMemberId(), 1, "groups"));
 
         } else {
             return ResultOutputUtil.error(NestStatusCode.GROUP_MEMBER_IS_EXIST);
@@ -362,7 +368,7 @@ public class MemberService {
         List<MemberProjectInput> memberProjectInputs = bindMemberProjectInput.getMemberProjectInputs();
 
         for (MemberProjectInput memberProjectInput : memberProjectInputs) {
-            MemberProject memberProject = memberProjectDao.getMemberProject(bindMemberProjectInput.getTeamId(),bindMemberProjectInput.getProjectId(),memberProjectInput.getMemberId());
+            MemberProject memberProject = memberProjectDao.getMemberProject(bindMemberProjectInput.getTeamId(), bindMemberProjectInput.getProjectId(), memberProjectInput.getMemberId());
 
             if (memberProject == null) {
                 memberProject = new MemberProject();
@@ -384,7 +390,7 @@ public class MemberService {
                 throw new TransactionalException(NestStatusCode.CREATE_MEMBER_PROJECT_FAILED);
             }
 
-            memberProjects.forEach(memberProject -> memberDao.addCount(memberProject.getMemberId(),1,"projects"));
+            memberProjects.forEach(memberProject -> memberDao.addCount(memberProject.getMemberId(), 1, "projects"));
         } else {
             return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
         }
@@ -392,24 +398,43 @@ public class MemberService {
         return ResultOutputUtil.success();
     }
 
-    public ResultOutput getMemberRoles() {
-        String[] roles = memberRoles.split(",");
+    public ResultOutput getMemberRoles(Integer type) {
+
+        String[] roles = null;
+        String key = null;
+
+        switch (type) {
+            case 1:
+                roles = memberRoles.split(",");
+                key = "member.role";
+                break;
+            case 2:
+                roles = groupRoles.split(",");
+                key = "group.role";
+                break;
+            case 3:
+                roles = projectRoles.split(",");
+                key = "project.role";
+        }
+
         List<MemberRoleOutput> memberRoleOutputs = new ArrayList<>();
 
-        for (String role : roles) {
-            MemberRoleOutput memberRoleOutput = new MemberRoleOutput();
-            memberRoleOutput.setRoleId(Integer.parseInt(role));
-            memberRoleOutput.setRoleName(codeUtil.getEnumsMessage("member.role",role));
-            memberRoleOutputs.add(memberRoleOutput);
+        if (roles != null) {
+            for (String role : roles) {
+                MemberRoleOutput memberRoleOutput = new MemberRoleOutput();
+                memberRoleOutput.setRoleId(Integer.parseInt(role));
+                memberRoleOutput.setRoleName(codeUtil.getEnumsMessage(key, role));
+                memberRoleOutputs.add(memberRoleOutput);
+            }
         }
 
         return ResultOutputUtil.success(memberRoleOutputs);
     }
 
-    public ResultOutput getMembers(Integer teamId,Integer groupId,Integer projectId) {
+    public ResultOutput getMembers(Integer teamId, Integer groupId, Integer projectId) {
 
-        List<Member> members = memberDao.getMembers(teamId,groupId,projectId);
-        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<Member> members = memberDao.getMembers(teamId, groupId, projectId);
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class, BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(memberOutputs);
     }

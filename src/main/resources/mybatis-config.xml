@@ -49,5 +49,7 @@
         <mapper resource="mapper/LinkMapper.xml"/>
         <mapper resource="mapper/OperationLogMapper.xml"/>
         <mapper resource="mapper/DynamicMapper.xml"/>
+        <mapper resource="mapper/PackageRepositoryMapper.xml"/>
+        <mapper resource="mapper/DeployVersionMapper.xml"/>
     </mappers>
 </configuration>

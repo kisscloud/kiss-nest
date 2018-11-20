@@ -49,6 +49,7 @@ public class JobValidator implements Validator {
             BuildJobInput buildJobInput = (BuildJobInput) target;
             validateProjectId(buildJobInput.getProjectId(),errors);
             validateBranch(buildJobInput.getBranch(),errors);
+            validateExecType(buildJobInput.getType(),errors);
         } else if (BuildLogsInput.class.isInstance(target)) {
             BuildLogsInput buildLogsInput = (BuildLogsInput) target;
             teamValidaor.validateId(buildLogsInput.getTeamId(),"teamId",errors);
@@ -133,5 +134,18 @@ public class JobValidator implements Validator {
         if (job == null) {
             errors.rejectValue("id",String.valueOf(NestStatusCode.JOB_NOT_EXIST),"任务不存在");
         }
+    }
+
+    public void validateExecType(Integer type,Errors errors) {
+
+        if (type == null) {
+            errors.rejectValue("type",String.valueOf(NestStatusCode.EXECJOB_TYPE_IS_EMPTY),"版本类型为空");
+            return;
+        }
+
+        if (type != 0 && type != 1) {
+            errors.rejectValue("type",String.valueOf(NestStatusCode.EXECJOB_TYPE_ERROR),"版本类型错误");
+        }
+
     }
 }

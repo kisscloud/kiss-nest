@@ -95,6 +95,9 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer JOB_NOT_EXIST = 10010;
     public static final Integer DELETE_JOB_FAILED = 10011;
     public static final Integer CREATE_BUILD_LOG_FAILED = 10012;
+    public static final Integer EXECJOB_TYPE_IS_EMPTY = 10013;
+    public static final Integer EXECJOB_TYPE_ERROR = 10014;
+
 
 
 

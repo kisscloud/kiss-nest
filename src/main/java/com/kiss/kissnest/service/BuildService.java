@@ -17,10 +17,8 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,7 +26,6 @@ import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +81,9 @@ public class BuildService {
 
     @Autowired
     private OperationLogService operationLogService;
+
+    @Autowired
+    private PackageRepositoryService jobRepositoryService;
 
     public static Map<String, String> buildRemarks = new HashMap<>();
 
@@ -148,19 +148,19 @@ public class BuildService {
 
         String serverIds = String.join(",", createDeployInput.getServerIds());
         List<String> serverIps = serverDao.getServerInnerIpsByIds(serverIds);
+//
+//        String script = createDeployInput.getScript();
+//
+//        for (String serverIp : serverIps) {
+//            String ansibleScript = "\n./ansible " + codeIps + " -u root -m shell -a \"rsync -v /opt/app/" + project.getSlug() + "$name.tar.gz root@" + serverIp + ":/root/\"\n";
+//            script = script + ansibleScript;
+//        }
 
-        String script = createDeployInput.getScript();
-
-        for (String serverIp : serverIps) {
-            String ansibleScript = "\n./ansible " + codeIps + " -u root -m shell -a \"rsync -v /opt/app/" + project.getSlug() + "$name.tar.gz root@" + serverIp + ":/root/\"\n";
-            script = script + ansibleScript;
-        }
-
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), null, guest.getName(), member.getApiToken());
-
-        if (!success) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
-        }
+//        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), null, guest.getName(), member.getApiToken());
+//
+//        if (!success) {
+//            return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
+//        }
 
         Job job = new Job();
         job.setTeamId(project.getTeamId());
@@ -203,7 +203,7 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getName(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
@@ -350,13 +350,19 @@ public class BuildService {
 
         private String jobName;
 
-        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location) {
+        private Integer versionType;
+
+        private Integer projectId;
+
+        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location,Integer versionType,Integer projectId) {
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.type = type;
             this.location = location;
             this.jobName = jobName;
             this.id = buildLogId;
+            this.versionType = versionType;
+            this.projectId = projectId;
         }
 
         @Override
@@ -385,7 +391,7 @@ public class BuildService {
                     return;
                 }
 
-                updateBuildLog(build,id, jobName, account, location);
+                updateBuildLog(build,id, jobName, account, location,versionType,projectId);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -427,7 +433,7 @@ public class BuildService {
         return buildLog;
     }
 
-    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location) throws InterruptedException {
+    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location,Integer versionType,Integer projectId) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
@@ -452,6 +458,7 @@ public class BuildService {
         BuildLog buildLog = new BuildLog();
         buildLog.setId(id);
         buildLog.setBranch(branch);
+        buildLog.setType(versionType);
         buildLog.setNumber(build.getNumber());
         buildLog.setOperatorName(account);
         buildLog.setOutput(output);
@@ -479,6 +486,8 @@ public class BuildService {
         }
 
         buildLogDao.updateBuildLog(buildLog);
+        buildLog.setProjectId(projectId);
+        jobRepositoryService.createPackageRepository(buildLog);
     }
 
     class DeployLogRunner implements Runnable {

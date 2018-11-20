@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
     <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog" useGeneratedKeys="true" keyProperty="id">
-        insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt)
+        insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt,type)
         value
-        (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt})
+        (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt},#{type})
     </insert>
 
     <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
@@ -57,6 +57,9 @@
         </if>
         <if test="buildAt != null">
             ,buildAt = #{buildAt}
+        </if>
+        <if test="type != null">
+            ,type = #{type}
         </if>
         where id = #{id}
     </update>

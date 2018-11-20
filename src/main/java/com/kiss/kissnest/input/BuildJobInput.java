@@ -9,5 +9,7 @@ public class BuildJobInput {
 
     private String branch;
 
+    private Integer type;
+
     private String remark;
 }
