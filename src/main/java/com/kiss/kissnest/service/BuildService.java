@@ -84,6 +84,9 @@ public class BuildService {
     private ProjectRepositoryDao projectRepositoryDao;
 
     @Autowired
+    private EnvironmentDao environmentDao;
+
+    @Autowired
     private TeamDao teamDao;
 
     @Autowired
@@ -342,12 +345,14 @@ public class BuildService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
     }
 
-    public ResultOutput getProjectDeployConf(Integer projectId) {
+    public ResultOutput getProjectDeployConf(Integer projectId,Integer envId) {
 
         Project project = projectDao.getProjectById(projectId);
         Team team = teamDao.getTeamById(project.getTeamId());
         Group group = groupDao.getGroupById(project.getGroupId());
         String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+        Environment environment = environmentDao.getEnvironmentById(envId);
+        String type = codeUtil.getEnumsMessage("environment.type.conf",String.valueOf(environment.getType()));
 
         if (project == null) {
             return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
@@ -363,7 +368,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,path,path);
+        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,type,type,type,type,path,path);
         conf = StringEscapeUtils.unescapeXml(conf);
         Map<String,Object> result = new HashMap<>();
         result.put("conf",conf);

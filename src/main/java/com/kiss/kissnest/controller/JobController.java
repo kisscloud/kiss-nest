@@ -110,8 +110,8 @@ public class JobController {
     }
 
     @GetMapping("/job/deploy/conf")
-    public ResultOutput getProjectDeployConf(@RequestParam("projectId") Integer projectId) {
+    public ResultOutput getProjectDeployConf(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
 
-        return buildService.getProjectDeployConf(projectId);
+        return buildService.getProjectDeployConf(projectId,envId);
     }
 }
