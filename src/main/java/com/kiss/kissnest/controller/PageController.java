@@ -76,7 +76,7 @@ public class PageController {
     public ResultOutput GetPageBuildLogsParams(Integer teamId) {
 
         ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
-        ResultOutput buildProjects = projectService.getBuildProjects(teamId);
+        ResultOutput buildProjects = projectService.getProjectsWithBuildJob(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects.getData());
