@@ -11,6 +11,8 @@ public class JobOutput {
 
     private Integer projectId;
 
+    private String projectName;
+
     private String jobName;
 
     private String script;
@@ -18,6 +20,8 @@ public class JobOutput {
     private Integer type;
 
     private Integer envId;
+
+    private String envName;
 
     private String serverIds;
 

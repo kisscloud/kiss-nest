@@ -3,6 +3,7 @@ package com.kiss.kissnest.dao.impl;
 import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.mapper.JobMapper;
+import com.kiss.kissnest.output.JobOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -103,5 +104,15 @@ public class JobDaoImpl implements JobDao {
     public Integer updateDeployJob(Job job) {
 
         return jobMapper.updateDeployJob(job);
+    }
+
+    @Override
+    public List<JobOutput> getJobOutputsByTeamId(Integer teamId, Integer type) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("teamId",teamId);
+        params.put("type",type);
+
+        return jobMapper.getJobOutputsByTeamId(params);
     }
 }

@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.Job;
+import com.kiss.kissnest.output.JobOutput;
 
 import java.util.List;
 
@@ -27,4 +28,6 @@ public interface JobDao {
     List<Job> getJobsByServerIds(Integer serverId);
 
     Integer updateDeployJob(Job job);
+
+    List<JobOutput> getJobOutputsByTeamId(Integer teamId,Integer type);
 }

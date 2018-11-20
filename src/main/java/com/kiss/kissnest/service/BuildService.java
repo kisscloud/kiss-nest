@@ -302,8 +302,7 @@ public class BuildService {
 
     public ResultOutput getJobsByTeamId(Integer teamId, Integer type) {
 
-        List<Job> jobs = jobDao.getJobsByTeamId(teamId, type);
-        List<JobOutput> jobOutputs = BeanCopyUtil.copyList(jobs, JobOutput.class, BeanCopyUtil.defaultFieldNames);
+        List<JobOutput> jobOutputs = jobDao.getJobOutputsByTeamId(teamId, type);
 
         return ResultOutputUtil.success(jobOutputs);
     }
