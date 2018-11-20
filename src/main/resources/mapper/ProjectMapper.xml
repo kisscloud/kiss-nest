@@ -98,6 +98,13 @@
         and teamId = #{teamId}
     </select>
 
+    <select id="getProjectsWithoutDeployJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects
+        where id not in
+        (select projectId from jobs where teamId = #{teamId} and type =2)
+        and teamId = #{teamId}
+    </select>
+
     <select id="getProjectsWithBuildJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
         select * from projects
         where id in
