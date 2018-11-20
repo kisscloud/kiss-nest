@@ -5,11 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CreateDeployInput {
+public class UpdateDeployInput {
 
-    private Integer teamId;
-
-    private Integer projectId;
+    private Integer id;
 
     private Integer envId;
 

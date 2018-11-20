@@ -17,6 +17,7 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import output.ResultOutput;
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +80,12 @@ public class BuildService {
 
     @Autowired
     private ProjectRepositoryDao projectRepositoryDao;
+
+    @Autowired
+    private TeamDao teamDao;
+
+    @Autowired
+    private GroupDao groupDao;
 
     @Autowired
     private OperationLogService operationLogService;
@@ -146,32 +154,25 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        String serverIds = String.join(",", createDeployInput.getServerIds());
-        List<String> serverIps = serverDao.getServerInnerIpsByIds(serverIds);
-//
-//        String script = createDeployInput.getScript();
-//
-//        for (String serverIp : serverIps) {
-//            String ansibleScript = "\n./ansible " + codeIps + " -u root -m shell -a \"rsync -v /opt/app/" + project.getSlug() + "$name.tar.gz root@" + serverIp + ":/root/\"\n";
-//            script = script + ansibleScript;
-//        }
+        String serverIds = "";
+        List<Integer> serverIdList = createDeployInput.getServerIds();
 
-//        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createDeployInput.getScript(), null, guest.getName(), member.getApiToken());
-//
-//        if (!success) {
-//            return ResultOutputUtil.error(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
-//        }
+        for (Integer id : serverIdList) {
+            serverIds = serverIds + id + ",";
+        }
+
+        if (!serverIds.equals("")) {
+            serverIds = serverIds.substring(0,serverIds.length() - 1);
+        }
 
         Job job = new Job();
         job.setTeamId(project.getTeamId());
         job.setJobName(project.getSlug());
         job.setProjectId(projectId);
-        job.setScript(createDeployInput.getScript());
+        job.setConf(createDeployInput.getConf());
         job.setType(createDeployInput.getType());
         job.setEnvId(createDeployInput.getEnvId());
         job.setServerIds(serverIds);
-        job.setStatus(0);
-        job.setNumber(0);
 
         jobDao.createJob(job);
 
@@ -308,10 +309,10 @@ public class BuildService {
         return ResultOutputUtil.success(jobOutputs);
     }
 
-    public ResultOutput updateJob(UpdateJobInput updateJobInput) {
+    public ResultOutput updateBuildJob(UpdateJobInput updateJobInput) {
 
         Job job = BeanCopyUtil.copy(updateJobInput,Job.class);
-        Integer count = jobDao.updateJob(job);
+        Integer count = jobDao.updateBuildJob(job);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_JOB_FAILED);
@@ -334,6 +335,47 @@ public class BuildService {
         }
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
+    }
+
+    public ResultOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
+
+        Job job = BeanCopyUtil.copy(updateDeployInput,Job.class);
+        Integer count = jobDao.updateDeployJob(job);
+
+        if (count == 0) {
+            return ResultOutputUtil.error(NestStatusCode.UPDATE_DEPLOY_JOB_FAILED);
+        }
+
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
+    }
+
+    public ResultOutput getProjectDeployConf(Integer projectId) {
+
+        Project project = projectDao.getProjectById(projectId);
+        Team team = teamDao.getTeamById(project.getTeamId());
+        Group group = groupDao.getGroupById(project.getGroupId());
+        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+
+        if (project == null) {
+            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+        }
+
+        StringBuilder stringBuilder = null;
+
+        try {
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/supervisor.conf");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
+        }
+
+        String conf = String.format(stringBuilder.toString(),path,path,path,path,path);
+        conf = StringEscapeUtils.unescapeXml(conf);
+        Map<String,Object> result = new HashMap<>();
+        result.put("conf",conf);
+
+        return ResultOutputUtil.success(result);
     }
 
     class BuildLogRunnable implements Runnable {

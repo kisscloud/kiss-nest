@@ -23,6 +23,8 @@ public class Job {
 
     private String serverIds;
 
+    private String conf;
+
     private Integer status;
 
     private Integer number;

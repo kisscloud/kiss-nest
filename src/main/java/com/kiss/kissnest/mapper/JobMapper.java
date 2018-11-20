@@ -21,11 +21,13 @@ public interface JobMapper {
 
     List<Job> getJobsByTeamId(Map params);
 
-    Integer updateJob(Job job);
+    Integer updateBuildJob(Job job);
 
     Job getJobById(Integer id);
 
     Integer deleteJobById(Integer id);
 
     List<Job> getJobsByServerIds(String serverId);
+
+    Integer updateDeployJob(Job job);
 }

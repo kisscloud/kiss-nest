@@ -39,7 +39,7 @@
         select * from jobs where teamId = #{teamId} and type = #{type};
     </select>
 
-    <update id="updateJob" parameterType="com.kiss.kissnest.entity.Job">
+    <update id="updateBuildJob" parameterType="com.kiss.kissnest.entity.Job">
         update jobs set
         teamId = #{teamId},
         projectId = #{projectId},
@@ -59,4 +59,12 @@
     <select id="getJobsByServerIds" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where serverIds like #{serverId};
     </select>
+
+    <update id="updateDeployJob" parameterType="com.kiss.kissnest.entity.Job">
+        update jobs set
+        conf = #{conf},
+        type = #{type},
+        envId = #{envId},
+        where id = #{id}
+    </update>
 </mapper>

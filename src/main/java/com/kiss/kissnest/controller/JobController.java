@@ -73,6 +73,12 @@ public class JobController {
         return buildService.createDeployJob(createDeployInput);
     }
 
+    @PutMapping("/job/deploy")
+    public ResultOutput updateDeployJob(@RequestBody UpdateDeployInput updateDeployInput) {
+
+        return buildService.updateDeployJob(updateDeployInput);
+    }
+
     @PostMapping("/job/deploy/exec")
     public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) {
 
@@ -85,10 +91,10 @@ public class JobController {
         return buildService.getJobsByTeamId(teamId,type);
     }
 
-    @PutMapping("/job")
-    public ResultOutput updateJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
+    @PutMapping("/job/build")
+    public ResultOutput updateBuildJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
 
-        return buildService.updateJob(updateJobInput);
+        return buildService.updateBuildJob(updateJobInput);
     }
 
     @GetMapping("/job/package/repository/branches")
@@ -101,5 +107,11 @@ public class JobController {
     public ResultOutput getPackageRepositoryTags(@RequestParam("projectId") Integer projectId) {
 
         return packageRepositoryService.getPackageRepositoryTags(projectId);
+    }
+
+    @GetMapping("/job/deploy/conf")
+    public ResultOutput getProjectDeployConf(@RequestParam("projectId") Integer projectId) {
+
+        return buildService.getProjectDeployConf(projectId);
     }
 }

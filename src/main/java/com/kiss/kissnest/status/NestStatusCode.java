@@ -97,6 +97,9 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer CREATE_BUILD_LOG_FAILED = 10012;
     public static final Integer EXECJOB_TYPE_IS_EMPTY = 10013;
     public static final Integer EXECJOB_TYPE_ERROR = 10014;
+    public static final Integer DEPLOY_JOB_CONF_IS_EMPTY = 10015;
+    public static final Integer UPDATE_DEPLOY_JOB_FAILED = 10016;
+    public static final Integer GET_DEPLOY_CONF_FAILED = 10017;
 
 
 
@@ -127,6 +130,8 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer SERVER_UPDATE_FAILED = 13006;
     public static final Integer SERVER_HAS_JOB = 13007;
     public static final Integer DELETE_SERVER_FAILED = 13008;
+    public static final Integer SERVERS_IS_EMPTY = 13009;
+    public static final Integer SERVERS_ENVID_NOT_MATCH = 13010;
 
 
 

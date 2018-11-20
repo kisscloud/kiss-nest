@@ -74,9 +74,9 @@ public class JobDaoImpl implements JobDao {
     }
 
     @Override
-    public Integer updateJob(Job job) {
+    public Integer updateBuildJob(Job job) {
 
-        return jobMapper.updateJob(job);
+        return jobMapper.updateBuildJob(job);
     }
 
     @Override
@@ -97,5 +97,11 @@ public class JobDaoImpl implements JobDao {
         String idStr = "%" + serverId + "%";
 
         return jobMapper.getJobsByServerIds(idStr);
+    }
+
+    @Override
+    public Integer updateDeployJob(Job job) {
+
+        return jobMapper.updateDeployJob(job);
     }
 }
