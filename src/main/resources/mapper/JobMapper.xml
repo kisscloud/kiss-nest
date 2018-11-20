@@ -6,7 +6,7 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
-    <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job">
+    <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job" keyProperty="id" useGeneratedKeys="true">
         insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,conf,status,number)
         value
         (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{conf},#{status},#{number})

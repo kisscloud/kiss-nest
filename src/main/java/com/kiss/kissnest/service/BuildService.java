@@ -172,7 +172,10 @@ public class BuildService {
 
         jobDao.createJob(job);
 
-        return ResultOutputUtil.success();
+        Integer id = job.getId();
+        job = jobDao.getJobById(id);
+
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class,BeanCopyUtil.defaultFieldNames));
     }
 
     @Transactional

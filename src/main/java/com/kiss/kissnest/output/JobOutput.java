@@ -21,6 +21,8 @@ public class JobOutput {
 
     private String serverIds;
 
+    private String conf;
+
     private Long createdAt;
 
     private Long updatedAt;
