@@ -3,9 +3,11 @@ package com.kiss.kissnest.input;
 import lombok.Data;
 
 @Data
-public class  MemberInput {
+public class MemberTeamInput {
 
     private Integer id;
+
+    private String name;
 
     private Integer role;
 }

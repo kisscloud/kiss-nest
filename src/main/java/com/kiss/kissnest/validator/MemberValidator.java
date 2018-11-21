@@ -8,7 +8,6 @@ import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.feign.AccountServiceFeign;
-import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import entity.Guest;
@@ -62,16 +61,16 @@ public class MemberValidator implements Validator {
         } else if (CreateMemberTeamInput.class.isInstance(target)) {
             CreateMemberTeamInput createMemberTeamInput = (CreateMemberTeamInput) target;
             teamValidaor.validateId(createMemberTeamInput.getTeamId(), "teamId", errors);
-            validateMemberInputList(createMemberTeamInput.getMemberInputs(), errors);
+            validateMemberTeamInputList(createMemberTeamInput.getMemberTeamInputs(), errors);
         } else if (BindMemberGroupInput.class.isInstance(target)) {
             BindMemberGroupInput bindMemberGroupInput = (BindMemberGroupInput) target;
             teamValidaor.validateId(bindMemberGroupInput.getTeamId(), "teamId", errors);
-            validateMemberGroupList(bindMemberGroupInput.getMemberGroupInputs(), errors);
+            validateMemberGroupInputList(bindMemberGroupInput.getMemberGroupInputs(), errors);
             validateGroupId(bindMemberGroupInput.getGroupId(),errors);
         } else if (BindMemberProjectInput.class.isInstance(target)) {
             BindMemberProjectInput bindMemberProjectInput = (BindMemberProjectInput) target;
             teamValidaor.validateId(bindMemberProjectInput.getTeamId(), "teamId", errors);
-            validateMemberProjectList(bindMemberProjectInput.getMemberProjectInputs(),errors);
+            validateMemberProjectInputList(bindMemberProjectInput.getMemberProjectInputs(),errors);
             validateProjectId(bindMemberProjectInput.getProjectId(),errors);
         } else {
             errors.rejectValue("password", "", "数据绑定错误");
@@ -104,14 +103,29 @@ public class MemberValidator implements Validator {
         }
     }
 
-    public void validateMemberInputList(List list, Errors errors) {
+    public void validateMemberTeamInputList(List<MemberTeamInput> list, Errors errors) {
 
         if (list == null || list.size() == 0) {
-            errors.rejectValue("memberInputs", String.valueOf(NestStatusCode.MEMBER_LIST_IS_EMPTY), "添加成员数为空");
+            errors.rejectValue("memberTeamInputs", String.valueOf(NestStatusCode.MEMBER_LIST_IS_EMPTY), "添加成员数为空");
         }
+
+        list.forEach(memberTeamInput -> {
+
+            if (memberTeamInput.getId() == null) {
+                errors.rejectValue("memberTeamInputs",String.valueOf(NestStatusCode.MEMBER_ACCOUNT_ID_IS_EMPTY),"添加成员的id为空");
+            }
+
+            if (memberTeamInput.getRole() == null) {
+                errors.rejectValue("memberTeamInputs",String.valueOf(NestStatusCode.MEMBER_ACCOUNT_ROLE_IS_EMPTY),"添加成员的角色为空");
+            }
+
+            if (StringUtils.isEmpty(memberTeamInput.getName())) {
+                errors.rejectValue("memberTeamInputs",String.valueOf(NestStatusCode.MEMBER_ACCOUNT_NAME_IS_EMPTY),"添加成员的名字为空");
+            }
+        });
     }
 
-    public void validateMemberGroupList(List<MemberGroupInput> list, Errors errors) {
+    public void validateMemberGroupInputList(List<MemberGroupInput> list, Errors errors) {
 
         if (list == null || list.size() == 0) {
             errors.rejectValue("memberGroupInputs", String.valueOf(NestStatusCode.MEMBER_LIST_IS_EMPTY), "添加成员数为空");
@@ -127,7 +141,7 @@ public class MemberValidator implements Validator {
         });
     }
 
-    public void validateMemberProjectList(List<MemberProjectInput> list, Errors errors) {
+    public void validateMemberProjectInputList(List<MemberProjectInput> list, Errors errors) {
 
         if (list == null || list.size() == 0) {
             errors.rejectValue("memberProjectInputs", String.valueOf(NestStatusCode.MEMBER_LIST_IS_EMPTY), "添加成员数为空");

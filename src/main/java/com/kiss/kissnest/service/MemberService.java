@@ -175,8 +175,9 @@ public class MemberService {
             } else {
                 member = new Member();
                 member.setAccountId(guest.getId());
+                member.setName(guest.getName());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getUsername());
+                member.setOperatorName(guest.getName());
                 member.setAccessToken(accessToken);
                 Integer count = memberDao.createMember(member);
 
@@ -214,8 +215,9 @@ public class MemberService {
             } else {
                 member = new Member();
                 member.setAccountId(guest.getId());
+                member.setName(guest.getName());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getUsername());
+                member.setOperatorName(guest.getName());
                 member.setApiToken(apiToken);
                 Integer count = memberDao.createMember(member);
 
@@ -262,19 +264,20 @@ public class MemberService {
         Guest guest = ThreadLocalUtil.getGuest();
         List<Member> members = new ArrayList<>();
         List<MemberTeam> memberTeams = new ArrayList<>();
-        List<MemberInput> memberInputs = createMemberTeamInput.getMemberInputs();
+        List<MemberTeamInput> memberInputs = createMemberTeamInput.getMemberTeamInputs();
         Map<Integer, Integer> memberAccount = new HashMap<>();
 
-        for (MemberInput memberInput : memberInputs) {
+        for (MemberTeamInput memberInput : memberInputs) {
 
             Member member = memberDao.getMemberByAccountId(memberInput.getId());
 
             if (member == null) {
                 member = new Member();
                 member.setAccountId(memberInput.getId());
+                member.setName(memberInput.getName());
                 member.setTeamId(createMemberTeamInput.getTeamId());
                 member.setOperatorId(guest.getId());
-                member.setOperatorName(guest.getUsername());
+                member.setOperatorName(guest.getName());
                 members.add(member);
             } else {
                 memberAccount.put(member.getAccountId(), member.getId());
@@ -293,7 +296,7 @@ public class MemberService {
             }
         }
 
-        for (MemberInput memberInput : memberInputs) {
+        for (MemberTeamInput memberInput : memberInputs) {
             Integer memberId = memberAccount.get(memberInput.getId());
             MemberTeam memberTeam = memberTeamDao.getMemberTeam(createMemberTeamInput.getTeamId(), memberId);
 
@@ -303,7 +306,7 @@ public class MemberService {
                 memberTeam.setTeamId(createMemberTeamInput.getTeamId());
                 memberTeam.setRole(memberInput.getRole());
                 memberTeam.setOperatorId(guest.getId());
-                memberTeam.setOperatorName(guest.getUsername());
+                memberTeam.setOperatorName(guest.getName());
                 memberTeams.add(memberTeam);
             }
         }
@@ -337,7 +340,7 @@ public class MemberService {
                 memberGroup.setTeamId(bindMemberGroupInput.getTeamId());
                 memberGroup.setRole(memberGroupInput.getRole());
                 memberGroup.setOperatorId(guest.getId());
-                memberGroup.setOperatorName(guest.getUsername());
+                memberGroup.setOperatorName(guest.getName());
                 memberGroup.setGroupId(bindMemberGroupInput.getGroupId());
                 memberGroups.add(memberGroup);
             }
@@ -376,7 +379,7 @@ public class MemberService {
                 memberProject.setTeamId(bindMemberProjectInput.getTeamId());
                 memberProject.setRole(memberProjectInput.getRole());
                 memberProject.setOperatorId(guest.getId());
-                memberProject.setOperatorName(guest.getUsername());
+                memberProject.setOperatorName(guest.getName());
                 memberProject.setProjectId(bindMemberProjectInput.getProjectId());
                 memberProjects.add(memberProject);
             }

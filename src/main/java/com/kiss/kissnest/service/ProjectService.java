@@ -69,7 +69,7 @@ public class ProjectService {
         Guest guest = ThreadLocalUtil.getGuest();
         project.setMembersCount(1);
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getUsername());
+        project.setOperatorName(guest.getName());
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
@@ -139,7 +139,7 @@ public class ProjectService {
         Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getUsername());
+        project.setOperatorName(guest.getName());
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {

@@ -10,5 +10,5 @@ public class CreateMemberTeamInput {
 
     private Integer teamId;
 
-    private List<MemberInput> memberInputs;
+    private List<MemberTeamInput> memberTeamInputs;
 }

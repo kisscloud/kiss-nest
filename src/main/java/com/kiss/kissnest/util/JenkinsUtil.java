@@ -9,6 +9,7 @@ import com.offbytwo.jenkins.model.*;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -192,10 +193,9 @@ public class JenkinsUtil {
         String url = String.format(generateTokenUrl, account);
 
         try {
-            HttpResponse result = authorizationExecute(null, url, account, password);
-
-//            return JSONObject.parseObject(result).getJSONObject("data").getString("tokenValue");
-            return null;
+            authorizationExecute(null, url, account, password);
+            String result = ThreadLocalUtil.getString("entity");
+            return JSONObject.parseObject(result).getJSONObject("data").getString("tokenValue");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
@@ -408,7 +408,8 @@ public class JenkinsUtil {
             Integer code = response.getStatusLine().getStatusCode();
 
             if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
-//                return EntityUtils.toString(response.getEntity(), "utf-8");
+                String result = EntityUtils.toString(response.getEntity(), "utf-8");
+                ThreadLocalUtil.setString("entity",result);
                 return response;
             }
 
@@ -555,83 +556,83 @@ public class JenkinsUtil {
 //            }
 //        }
 
-//        try {
-//            Map<String, String> params = new HashMap<>();
+        try {
+            Map<String, String> params = new HashMap<>();
 //            String url = String.format("http://build.kisscloud.io/job/%s/buildWithParameters", "kiss-eureka-server");
-//
-//            URI uri = URI.create(url);
-//            HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-//            CredentialsProvider credsProvider = new BasicCredentialsProvider();
-//            credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials("xiaohu", "12345678"));
-//            AuthCache authCache = new BasicAuthCache();
-//            BasicScheme basicAuth = new BasicScheme();
-//            authCache.put(host, basicAuth);
-//            CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-//            HttpPost httpPost = new HttpPost(uri);
-//
-//            if (null != params && !params.isEmpty()) {
-//                List<BasicNameValuePair> pairs = new ArrayList<>();
-//
-//                for (Map.Entry<String, String> entry : params.entrySet()) {
-//                    pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-//                }
-//
-//                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(pairs, "UTF-8");
-//                httpPost.setEntity(urlEncodedFormEntity);
-//            }
-//
-//            HttpClientContext localContext = HttpClientContext.create();
-//            localContext.setAuthCache(authCache);
-//            HttpResponse response = null;
-//
-//            JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"), "xiaohu", "12345678");
-//            String jsonResult = jenkinsHttpClient.get("/crumbIssuer/api/json");
-//            CrumbEntity crumbEntity = JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
-//            try {
-//                httpPost.addHeader(crumbEntity.getCrumbRequestField(), crumbEntity.getCrumb());
-//                response = httpClient.execute(host, httpPost, localContext);
-//
-////            log.info(EntityUtils.toString(response.getEntity()));
-//                Integer code = response.getStatusLine().getStatusCode();
-//
-//                if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
-//                    HttpEntity httpEntity = response.getEntity();
+            String url = "http://build.kisscloud.io/user/xiaoqian/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken";
+            URI uri = URI.create(url);
+            HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+            CredentialsProvider credsProvider = new BasicCredentialsProvider();
+            credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials("xiaoqian", "12345678"));
+            AuthCache authCache = new BasicAuthCache();
+            BasicScheme basicAuth = new BasicScheme();
+            authCache.put(host, basicAuth);
+            CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+            HttpPost httpPost = new HttpPost(uri);
+
+            if (null != params && !params.isEmpty()) {
+                List<BasicNameValuePair> pairs = new ArrayList<>();
+
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+                }
+
+                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(pairs, "UTF-8");
+                httpPost.setEntity(urlEncodedFormEntity);
+            }
+
+            HttpClientContext localContext = HttpClientContext.create();
+            localContext.setAuthCache(authCache);
+            HttpResponse response = null;
+
+            JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"), "xiaoqian", "12345678");
+            String jsonResult = jenkinsHttpClient.get("/crumbIssuer/api/json");
+            CrumbEntity crumbEntity = JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
+            try {
+                httpPost.addHeader(crumbEntity.getCrumbRequestField(), crumbEntity.getCrumb());
+                response = httpClient.execute(host, httpPost, localContext);
+
+//            log.info(EntityUtils.toString(response.getEntity()));
+                Integer code = response.getStatusLine().getStatusCode();
+
+                if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
+                    HttpEntity httpEntity = response.getEntity();
 //                    InputStream in = httpEntity.getContent();
-////                    Header[] heads = response.getAllHeaders();
 //                    Header[] heads = response.getHeaders("Location");
 //                    String value = heads[0].getValue();
-//                    System.out.println(EntityUtils.toString(response.getEntity(), "utf-8"));
-//                }
-//                System.out.println("aaa");
-//            } catch (Exception e) {
-//                httpPost.abort();
-//                e.printStackTrace();
-//            } finally {
-//
-//                if (response != null) {
-//                    ((CloseableHttpResponse) response).close();
-//                }
-//
-//                httpPost.releaseConnection();
-//                httpClient.close();
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        JenkinsServer server = null;
+                    System.out.println(EntityUtils.toString(response.getEntity(), "utf-8"));
+                    System.out.println(httpEntity);
+                }
+                System.out.println("aaa");
+            } catch (Exception e) {
+                httpPost.abort();
+                e.printStackTrace();
+            } finally {
 
-        try {
-            server = new JenkinsServer(new URI("http://build.kisscloud.io"), "xiaohu", "12345678");
-            QueueReference queueReference = new QueueReference("http://build.kisscloud.io/queue/item/57/api/json");
-            QueueItem queueItem = server.getQueueItem(queueReference);
+                if (response != null) {
+                    ((CloseableHttpResponse) response).close();
+                }
 
-            Build build = server.getBuild(queueItem);
-            System.out.println(build);
+                httpPost.releaseConnection();
+                httpClient.close();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
+//        JenkinsServer server = null;
+//
+//        try {
+//            server = new JenkinsServer(new URI("http://build.kisscloud.io"), "xiaohu", "12345678");
+//            QueueReference queueReference = new QueueReference("http://build.kisscloud.io/queue/item/57/api/json");
+//            QueueItem queueItem = server.getQueueItem(queueReference);
+//
+//            Build build = server.getBuild(queueItem);
+//            System.out.println(build);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//        }
 
 
     }

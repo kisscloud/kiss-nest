@@ -90,7 +90,7 @@ public class ProjectRepositoryService {
         projectRepository.setSshUrl(gitlabProject.getSshUrl());
         projectRepository.setTeamId(project.getTeamId());
         projectRepository.setOperatorId(ThreadLocalUtil.getGuest().getId());
-        projectRepository.setOperatorName(ThreadLocalUtil.getGuest().getUsername());
+        projectRepository.setOperatorName(ThreadLocalUtil.getGuest().getName());
         projectRepository.setBranchCount(1);
         projectRepository.setPathWithNamespace(gitlabProject.getPathWithNamespace());
         projectRepository.setProjectName(project.getName());

@@ -168,7 +168,7 @@ public class GitlabApiUtil {
 //        String resp = HttpUtil.doPost("http://192.168.99.100:32769/oauth/token",JSONObject.toJSONString(map));
 //        String token = JSONObject.parseObject(resp).getString("access_token");
 //        System.out.println(token);
-        GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io","909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612",TokenType.ACCESS_TOKEN);
+//        GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io","909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612",TokenType.ACCESS_TOKEN);
 //        GitlabGroup gitlabGroup = gitlabAPI.getGroup("gitApi");
 //        GitlabGroup gitlabGroup1 = gitlabAPI.createGroup("gitApi1","gitApi1",null,null,null,gitlabGroup.getId());
 //        System.out.println("hello");
@@ -188,8 +188,10 @@ public class GitlabApiUtil {
 //        GitlabBranchCommit gitlabBranchCommit = gitlabBranch.getCommit();
 
 //        GitlabProjectHook gitlabProjectHook = gitlabAPI.addProjectHook(2,"http://localhost:8920/kiss/nest/note",true,false,true,true,true);
-        GitlabProject gitlabProject = gitlabAPI.getProject(9);
-        System.out.println(gitlabProject.getPathWithNamespace());
+//        GitlabProject gitlabProject = gitlabAPI.getProject(9);
+//        System.out.println(gitlabProject.getPathWithNamespace());
+        GitlabSession gitlabSession = GitlabAPI.connect("http://git.kisscloud.io","xiaoqian","12345678");
+        String token = gitlabSession.getPrivateToken();
 //        gitlabProject.getId();
 //        gitlabProject.getCreatedAt();
 //        gitlabProject.getName();

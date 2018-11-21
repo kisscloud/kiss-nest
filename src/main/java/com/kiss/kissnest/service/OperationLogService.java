@@ -63,7 +63,7 @@ public class OperationLogService {
 
     private void saveLog(Guest guest, OperationLog operationLog) {
         operationLog.setOperatorId(guest.getId());
-        operationLog.setOperatorName(guest.getUsername());
+        operationLog.setOperatorName(guest.getName());
         operationLog.setCreatedAt(new Date());
         operationLog.setUpdatedAt(new Date());
         operationLog.setRecoveredAt(null);
@@ -79,7 +79,7 @@ public class OperationLogService {
         dynamic.setTargetType(targetType);
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("operatorId", guest.getId());
-        logMap.put("operatorName", guest.getUsername());
+        logMap.put("operatorName", guest.getName());
         logMap.put("targetType", targetType);
         if (targetType == 1) {
             Team team = (Team) object;
@@ -159,7 +159,7 @@ public class OperationLogService {
 
         dynamic.setLog(JSON.toJSONString(logMap));
         dynamic.setOperatorId(guest.getId());
-        dynamic.setOperatorName(guest.getUsername());
+        dynamic.setOperatorName(guest.getName());
         dynamicDao.createDynamic(dynamic);
     }
 

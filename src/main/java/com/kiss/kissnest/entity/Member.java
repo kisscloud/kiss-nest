@@ -11,6 +11,8 @@ public class Member {
 
     private Integer accountId;
 
+    private String name;
+
     private Integer teamId;
 
     private String accessToken;

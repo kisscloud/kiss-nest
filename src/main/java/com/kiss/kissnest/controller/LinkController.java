@@ -42,7 +42,7 @@ public class LinkController {
         link.setTitle(createLinkInput.getTitle());
         link.setUrl(createLinkInput.getUrl());
         link.setOperatorId(guest.getId());
-        link.setOperatorName(guest.getUsername());
+        link.setOperatorName(guest.getName());
 
         return linkService.createLink(link);
     }
@@ -58,7 +58,7 @@ public class LinkController {
         link.setTitle(updateLinkInput.getTitle());
         link.setUrl(updateLinkInput.getUrl());
         link.setOperatorId(guest.getId());
-        link.setOperatorName(guest.getUsername());
+        link.setOperatorName(guest.getName());
 
         return linkService.updateLink(link);
     }

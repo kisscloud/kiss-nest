@@ -50,7 +50,7 @@ public class TeamService {
         Team team = BeanCopyUtil.copy(teamInput,Team.class);
         Guest guest = ThreadLocalUtil.getGuest();
         team.setOperatorId(guest.getId());
-        team.setOperatorName(guest.getUsername());
+        team.setOperatorName(guest.getName());
         Integer count = teamDao.createTeam(team);
 
         if (count == 0) {
@@ -165,8 +165,9 @@ public class TeamService {
         member = new Member();
         member.setTeamId(teamId);
         member.setAccountId(accountId);
+        member.setName(guest.getName());
         member.setOperatorId(accountId);
-        member.setOperatorName(guest.getUsername());
+        member.setOperatorName(guest.getName());
         Integer count = memberDao.createMember(member);
 //        operationLogService.saveOperationLog(teamId,guest,null,member,"id",OperationTargetType.TYPE_CHANGE_TEAM);
         return count;
@@ -178,7 +179,7 @@ public class TeamService {
         memberTeam.setMemberId(memberId);
         memberTeam.setTeamId(teamId);
         memberTeam.setOperatorId(guest.getId());
-        memberTeam.setOperatorName(guest.getUsername());
+        memberTeam.setOperatorName(guest.getName());
 
         return memberTeam;
     }

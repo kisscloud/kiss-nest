@@ -202,7 +202,7 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getUsername(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getUsername(),guest.getName(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
@@ -225,21 +225,21 @@ public class BuildService {
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
-        String branch = deployJobInput.getBranch() == null ? deployJobInput.getTag() : deployJobInput.getBranch();
-        String location = jenkinsUtil.buildJob(jobName, branch, guest.getUsername(), member.getApiToken());
-
-        if (location == null) {
-            return ResultOutputUtil.error(NestStatusCode.DEPLOY_JENKINS_JOB_ERROR);
-        }
-
-        Integer count = jobDao.updateJobStatus(deployJobInput.getProjectId(), 2, 0, 1);
-
-        if (count == 1) {
-            Integer number = job.getNumber() + 1;
-            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getUsername(), member.getApiToken(), number, 2, job.getServerIds()));
-            thread.start();
-            deployRemarks.put(deployJobInput.getProjectId() + "" + number, deployJobInput.getRemark());
-        }
+//        String branch = deployJobInput.getBranch() == null ? deployJobInput.getTag() : deployJobInput.getBranch();
+//        String location = jenkinsUtil.buildJob(jobName, branch, guest.getUsername(), member.getApiToken());
+//
+//        if (location == null) {
+//            return ResultOutputUtil.error(NestStatusCode.DEPLOY_JENKINS_JOB_ERROR);
+//        }
+//
+//        Integer count = jobDao.updateJobStatus(deployJobInput.getProjectId(), 2, 0, 1);
+//
+//        if (count == 1) {
+//            Integer number = job.getNumber() + 1;
+//            Thread thread = new Thread(new DeployLogRunner(jobName, job.getTeamId(), deployJobInput.getProjectId(), guest.getId(), guest.getUsername(), member.getApiToken(), number, 2, job.getServerIds()));
+//            thread.start();
+//            deployRemarks.put(deployJobInput.getProjectId() + "" + number, deployJobInput.getRemark());
+//        }
 
         return ResultOutputUtil.success();
     }
@@ -395,7 +395,9 @@ public class BuildService {
 
         private Integer projectId;
 
-        public BuildLogRunnable(Integer buildLogId,String jobName, String account, String passwordOrToken, Integer type, String location,Integer versionType,Integer projectId) {
+        private String operatorName;
+
+        public BuildLogRunnable(Integer buildLogId,String jobName, String account,String operatorName, String passwordOrToken, Integer type, String location,Integer versionType,Integer projectId) {
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.type = type;
@@ -404,6 +406,7 @@ public class BuildService {
             this.id = buildLogId;
             this.versionType = versionType;
             this.projectId = projectId;
+            this.operatorName = operatorName;
         }
 
         @Override
@@ -432,7 +435,7 @@ public class BuildService {
                     return;
                 }
 
-                updateBuildLog(build,id, jobName, account, location,versionType,projectId);
+                updateBuildLog(build,id, jobName, operatorName, location,versionType,projectId);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -461,7 +464,7 @@ public class BuildService {
         buildLog.setBranch(branch);
         buildLog.setProjectId(projectId);
         buildLog.setOperatorId(guest.getId());
-        buildLog.setOperatorName(guest.getUsername());
+        buildLog.setOperatorName(guest.getName());
         Integer count = buildLogDao.createBuildLog(buildLog);
 
         if (count == 0) {
@@ -474,7 +477,7 @@ public class BuildService {
         return buildLog;
     }
 
-    public void updateBuildLog(Build build,Integer id,String jobName,String account, String location,Integer versionType,Integer projectId) throws InterruptedException {
+    public void updateBuildLog(Build build,Integer id,String jobName,String operatorName, String location,Integer versionType,Integer projectId) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
@@ -501,7 +504,7 @@ public class BuildService {
         buildLog.setBranch(branch);
         buildLog.setType(versionType);
         buildLog.setNumber(build.getNumber());
-        buildLog.setOperatorName(account);
+        buildLog.setOperatorName(operatorName);
         buildLog.setOutput(output);
         buildLog.setBuildAt(buildWithDetails.getTimestamp());
         buildLog.setRemark(buildRemarks.get(location));
