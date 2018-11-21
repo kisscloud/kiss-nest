@@ -82,6 +82,7 @@ public class JobValidator implements Validator {
 
             validateConf(createDeployInput.getConf(),errors);
             validateType(createDeployInput.getType(),errors);
+            validateScript(createDeployInput.getScript(),errors);
         }
         else if (UpdateDeployInput.class.isInstance(target)) {
             UpdateDeployInput updateDeployInput = (UpdateDeployInput) target;

@@ -17,5 +17,7 @@ public class CreateDeployInput {
 
     private String conf;
 
+    private String script;
+
     private Integer type;
 }

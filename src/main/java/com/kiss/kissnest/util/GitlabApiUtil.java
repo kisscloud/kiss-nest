@@ -30,22 +30,22 @@ public class GitlabApiUtil {
     @Value("${kiss.nest.webHook.url}")
     private String webHookUrl;
 
-    public String getAccessToken (String account,String password) throws Exception {
+    public String getAccessToken(String account, String password) throws Exception {
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("grant_type","password");
-        map.put("username",account);
-        map.put("password",password);
-        String accessTokenStr = HttpUtil.doPost(gitlabServerUrl + tokenPath,JSONObject.toJSONString(map));
+        Map<String, Object> map = new HashMap<>();
+        map.put("grant_type", "password");
+        map.put("username", account);
+        map.put("password", password);
+        String accessTokenStr = HttpUtil.doPost(gitlabServerUrl + tokenPath, JSONObject.toJSONString(map));
         String accessToken = JSONObject.parseObject(accessTokenStr).getString("access_token");
 
         return accessToken;
     }
 
-    public GitlabGroup createGroup (String groupName,String accessToken) {
+    public GitlabGroup createGroup(String groupName, String accessToken) {
 
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = gitlabAPI.createGroup(groupName);
             return gitlabGroup;
         } catch (Exception e) {
@@ -54,11 +54,11 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabGroup createSubGroup (String groupName,String accessToken,Integer parentId) {
+    public GitlabGroup createSubGroup(String groupName, String accessToken, Integer parentId) {
 
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
-            GitlabGroup gitlabGroup = gitlabAPI.createGroup(groupName,groupName,null,null,null,parentId);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
+            GitlabGroup gitlabGroup = gitlabAPI.createGroup(groupName, groupName, null, null, null, parentId);
             return gitlabGroup;
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,9 +66,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public boolean deleteGroup(Integer groupId,String accessToken) {
+    public boolean deleteGroup(Integer groupId, String accessToken) {
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             gitlabAPI.deleteGroup(groupId);
 
             return true;
@@ -78,10 +78,10 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabProject createProject (String projectName,String accessToken) {
+    public GitlabProject createProject(String projectName, String accessToken) {
 
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             GitlabProject gitlabProject = gitlabAPI.createProject(projectName);
             return gitlabProject;
         } catch (Exception e) {
@@ -90,10 +90,10 @@ public class GitlabApiUtil {
         }
     }
 
-    public GitlabProject createProjectForGroup (String projectName,Integer groupId,String accessToken) {
+    public GitlabProject createProjectForGroup(String projectName, Integer groupId, String accessToken) {
 
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             GitlabGroup gitlabGroup = null;
 
             try {
@@ -103,8 +103,8 @@ public class GitlabApiUtil {
                 throw new TransactionalException(NestStatusCode.GROUP_REPOSITORYID_NOT_EXIST);
             }
 
-            GitlabProject gitlabProject = gitlabAPI.createProjectForGroup(projectName,gitlabGroup);
-            gitlabAPI.addProjectHook(gitlabProject.getId(),webHookUrl,true,false,true,true,true);
+            GitlabProject gitlabProject = gitlabAPI.createProjectForGroup(projectName, gitlabGroup);
+            gitlabAPI.addProjectHook(gitlabProject.getId(), webHookUrl, true, false, true, true, true);
 
             return gitlabProject;
         } catch (Exception e) {
@@ -113,9 +113,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public boolean deleteProject(Integer projectId,String accessToken) {
+    public boolean deleteProject(Integer projectId, String accessToken) {
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             gitlabAPI.deleteProject(projectId);
 
             return true;
@@ -125,9 +125,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public List<GitlabBranch> getBranches (Integer projectId,String accessToken) {
+    public List<GitlabBranch> getBranches(Integer projectId, String accessToken) {
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             List<GitlabBranch> gitlabBranches = gitlabAPI.getBranches(projectId);
 
             return gitlabBranches;
@@ -137,9 +137,9 @@ public class GitlabApiUtil {
         }
     }
 
-    public List<GitlabTag> getTags (Integer projectId,String accessToken) {
+    public List<GitlabTag> getTags(Integer projectId, String accessToken) {
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             List<GitlabTag> gitlabTags = gitlabAPI.getTags(projectId);
 
             return gitlabTags;
@@ -149,10 +149,38 @@ public class GitlabApiUtil {
         }
     }
 
-    public String getBranchVersion(Integer projectId,String branch,String accessToken) {
+    public List<GitlabTag> addMember(Integer repositoryId, String inviterAccessToken, String inviteeAccessToken, Integer level,Integer type) {
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl,accessToken,TokenType.ACCESS_TOKEN);
-            GitlabBranch gitlabBranch = gitlabAPI.getBranch(projectId,branch);
+            GitlabAPI inviterAPI = GitlabAPI.connect(gitlabServerUrl, inviterAccessToken, TokenType.ACCESS_TOKEN);
+            GitlabAPI inviteeAPI = GitlabAPI.connect(gitlabServerUrl, inviterAccessToken, TokenType.ACCESS_TOKEN);
+            GitlabUser gitlabUser = inviteeAPI.getUser();
+            GitlabAccessLevel accessLevel = GitlabAccessLevel.Developer;
+
+            switch (level) {
+                case 0:
+                    accessLevel = GitlabAccessLevel.Master;
+                    break;
+                case 1:
+                    accessLevel = GitlabAccessLevel.Developer;
+                    break;
+                default:
+                    accessLevel = GitlabAccessLevel.Guest;
+            }
+
+            if (type == 0) {
+                inviterAPI.addGroupMember(repositoryId, gitlabUser.getId(), accessLevel);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getBranchVersion(Integer projectId, String branch, String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
+            GitlabBranch gitlabBranch = gitlabAPI.getBranch(projectId, branch);
 
             return gitlabBranch.getCommit().getId();
         } catch (Exception e) {
@@ -160,6 +188,7 @@ public class GitlabApiUtil {
             return null;
         }
     }
+
     public static void main(String[] args) throws Exception {
 //        Map<String,Object> map = new HashMap<>();
 //        map.put("grant_type","password");
@@ -190,8 +219,8 @@ public class GitlabApiUtil {
 //        GitlabProjectHook gitlabProjectHook = gitlabAPI.addProjectHook(2,"http://localhost:8920/kiss/nest/note",true,false,true,true,true);
 //        GitlabProject gitlabProject = gitlabAPI.getProject(9);
 //        System.out.println(gitlabProject.getPathWithNamespace());
-        GitlabSession gitlabSession = GitlabAPI.connect("http://git.kisscloud.io","xiaoqian","12345678");
-        String token = gitlabSession.getPrivateToken();
+//        GitlabSession gitlabSession = GitlabAPI.connect("http://git.kisscloud.io","xiaoqian","12345678");
+//        String token = gitlabSession.getPrivateToken();
 //        gitlabProject.getId();
 //        gitlabProject.getCreatedAt();
 //        gitlabProject.getName();
@@ -199,5 +228,15 @@ public class GitlabApiUtil {
 //        gitlabProject.getHttpUrl();
 
         System.out.println("");
+
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io", "909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612", TokenType.ACCESS_TOKEN);
+            GitlabAPI gitlabAPI1 = GitlabAPI.connect("http://git.kisscloud.io", "4c372b421f6bbeca7a723c0ac9e7a8c2c004e24dca06274f927c1c77af5fc0d1", TokenType.ACCESS_TOKEN);
+            GitlabUser gitlabUser = gitlabAPI1.getUser();
+            gitlabAPI.addGroupMember(35, gitlabUser.getId(), GitlabAccessLevel.Developer);
+            System.out.println("aaa");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

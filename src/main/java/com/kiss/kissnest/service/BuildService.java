@@ -166,6 +166,7 @@ public class BuildService {
         job.setConf(createDeployInput.getConf());
         job.setType(createDeployInput.getType());
         job.setEnvId(createDeployInput.getEnvId());
+        job.setScript(createDeployInput.getScript());
         job.setServerIds(serverIdList == null ? null : JSON.toJSONString(serverIdList));
         job.setType(2);
 
@@ -373,6 +374,38 @@ public class BuildService {
         conf = StringEscapeUtils.unescapeXml(conf);
         Map<String,Object> result = new HashMap<>();
         result.put("conf",conf);
+
+        return ResultOutputUtil.success(result);
+    }
+
+    public ResultOutput getProjectDeployScript(Integer projectId,Integer envId) {
+
+//        Project project = projectDao.getProjectById(projectId);
+//        Team team = teamDao.getTeamById(project.getTeamId());
+//        Group group = groupDao.getGroupById(project.getGroupId());
+//        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+//        Environment environment = environmentDao.getEnvironmentById(envId);
+//        String type = codeUtil.getEnumsMessage("environment.type.conf",String.valueOf(environment.getType()));
+//
+//        if (project == null) {
+//            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+//        }
+
+        StringBuilder stringBuilder = null;
+
+        try {
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/deploy.conf");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
+        }
+
+//        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,type,type,type,type,path,path);
+//        conf = StringEscapeUtils.unescapeXml(conf);
+        String script = stringBuilder.toString();
+        Map<String,Object> result = new HashMap<>();
+        result.put("script",script);
 
         return ResultOutputUtil.success(result);
     }

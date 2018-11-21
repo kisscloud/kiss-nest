@@ -114,4 +114,10 @@ public class JobController {
 
         return buildService.getProjectDeployConf(projectId,envId);
     }
+
+    @GetMapping("/job/deploy/script")
+    public ResultOutput getProjectDeployScript(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
+
+        return buildService.getProjectDeployScript(projectId,envId);
+    }
 }
