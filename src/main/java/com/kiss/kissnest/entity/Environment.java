@@ -17,6 +17,10 @@ public class Environment {
 
     private Integer serverCount;
 
+    private String saltHost;
+
+    private String saltToken;
+
     private Integer operatorId;
 
     private String operatorName;

@@ -10,4 +10,8 @@ public class UpdateEnvironmentInput {
     private Integer id;
 
     private String name;
+
+    private String saltHost;
+
+    private String saltToken;
 }

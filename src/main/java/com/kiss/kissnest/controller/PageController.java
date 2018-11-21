@@ -117,9 +117,11 @@ public class PageController {
     @GetMapping("/deploy/logs")
     public ResultOutput GetPageDeployLogsParams(Integer teamId) {
 
-        ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
+        ResultOutput projects = projectService.getProjects(teamId, null);
+        ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
 
         Map<String, Object> result = new HashMap<>();
+        result.put("envs", envs.getData());
         result.put("projects", projects.getData());
 
         return ResultOutputUtil.success(result);
@@ -131,7 +133,7 @@ public class PageController {
 
         ResultOutput jobs = buildService.getJobsByTeamId(teamId, 2);
         ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
-        ResultOutput projects = projectService.getProjects(teamId, null);
+        ResultOutput projects = projectService.getProjectsWithoutDeployJob(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("jobs", jobs.getData());
@@ -172,10 +174,17 @@ public class PageController {
     @GetMapping("/members")
     public ResultOutput GetPageMembersParams(@RequestParam("teamId") Integer teamId) {
 
-        ResultOutput roles = memberService.getMemberRoles(1);
+        ResultOutput teamRoles = memberService.getMemberRoles(1);
+        ResultOutput groupRoles = memberService.getMemberRoles(2);
+        ResultOutput projectRoles = memberService.getMemberRoles(3);
+        ResultOutput members = memberService.getMembers(teamId, null, null);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("roles", roles.getData());
+
+        result.put("members", members.getData());
+        result.put("teamRoles", teamRoles.getData());
+        result.put("groupRoles", groupRoles.getData());
+        result.put("projectRoles", projectRoles.getData());
 
         return ResultOutputUtil.success(result);
     }
