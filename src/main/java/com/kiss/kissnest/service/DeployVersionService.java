@@ -25,7 +25,7 @@ public class DeployVersionService {
         deployVersion.setTag(tag);
         deployVersion.setVersion(version);
         deployVersion.setOperatorId(guest.getId());
-        deployVersion.setOperatorName(guest.getName());
+        deployVersion.setOperatorName(guest.getUsername());
 
         return deployVersionDao.createDeployVersion(deployVersion);
     }
@@ -38,7 +38,7 @@ public class DeployVersionService {
         deployVersion.setTag(tag);
         deployVersion.setVersion(version);
         deployVersion.setOperatorId(guest.getId());
-        deployVersion.setOperatorName(guest.getName());
+        deployVersion.setOperatorName(guest.getUsername());
 
         return deployVersionDao.updateDeployVersion(deployVersion);
     }

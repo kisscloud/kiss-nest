@@ -109,6 +109,12 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
+    public List<Project> getProjectsWithDeployJob(Integer teamId) {
+
+        return projectMapper.getProjectsWithDeployJob(teamId);
+    }
+
+    @Override
     public String getProjectOperatorAccessToken(Integer projectId) {
 
         return projectMapper.getProjectOperatorAccessToken(projectId);

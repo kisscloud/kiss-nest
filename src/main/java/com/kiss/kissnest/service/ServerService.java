@@ -59,7 +59,7 @@ public class ServerService {
         Environment environment = BeanCopyUtil.copy(environmentInput, Environment.class);
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
-        environment.setOperatorName(guest.getName());
+        environment.setOperatorName(guest.getUsername());
         environment.setServerCount(0);
         Integer count = environmentDao.createEnvironment(environment);
 
@@ -81,7 +81,7 @@ public class ServerService {
         environment.setId(updateEnvironmentInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         environment.setOperatorId(guest.getId());
-        environment.setOperatorName(guest.getName());
+        environment.setOperatorName(guest.getUsername());
         Integer count = environmentDao.updateEnvironment(environment);
 
         if (count == 0) {
@@ -108,7 +108,7 @@ public class ServerService {
         Server server = BeanCopyUtil.copy(createServerInput, Server.class);
         Guest guest = ThreadLocalUtil.getGuest();
         server.setOperatorId(guest.getId());
-        server.setOperatorName(guest.getName());
+        server.setOperatorName(guest.getUsername());
         Integer count = serverDao.createServer(server);
 
         if (count == 0) {
@@ -127,7 +127,7 @@ public class ServerService {
         Server server = BeanCopyUtil.copy(updateServerInput, Server.class);
         Guest guest = ThreadLocalUtil.getGuest();
         server.setOperatorId(guest.getId());
-        server.setOperatorName(guest.getName());
+        server.setOperatorName(guest.getUsername());
         Server oldValue = serverDao.getServerById(updateServerInput.getId());
         Integer count = serverDao.updateServer(server);
 

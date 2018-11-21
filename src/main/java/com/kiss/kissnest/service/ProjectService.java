@@ -69,7 +69,7 @@ public class ProjectService {
         Guest guest = ThreadLocalUtil.getGuest();
         project.setMembersCount(1);
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getName());
+        project.setOperatorName(guest.getUsername());
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
@@ -117,7 +117,7 @@ public class ProjectService {
                     throw new TransactionalException(NestStatusCode.DELETE_JOB_FAILED);
                 }
 
-                jenkinsUtil.deleteJob(job.getJobName(),guest.getName(),member.getApiToken());
+                jenkinsUtil.deleteJob(job.getJobName(),guest.getUsername(),member.getApiToken());
             });
         }
 
@@ -139,7 +139,7 @@ public class ProjectService {
         Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         project.setOperatorId(guest.getId());
-        project.setOperatorName(guest.getName());
+        project.setOperatorName(guest.getUsername());
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {
@@ -238,37 +238,19 @@ public class ProjectService {
         return ResultOutputUtil.success(projectOutputs);
     }
 
-    public ResultOutput getBuildProjects(Integer teamId) {
+    public ResultOutput getProjectsWithBuildJob(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithBuildJob(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
+        return ResultOutputUtil.success(projectOutputs);
+    }
 
-//        if (projects != null && projects.size() != 0) {
-//            String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
-//
-//            if (!StringUtils.isEmpty(accessToken)) {
-//                List<String> branches = new ArrayList<>();
-//
-//                for (Project project : projects) {
-//                    Integer repositoryId = project.getRepositoryId();
-//
-//                    if (repositoryId != null) {
-//                        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(repositoryId, accessToken);
-//
-//                        for (GitlabBranch gitlabBranch : gitlabBranches) {
-//                            branches.add(gitlabBranch.getName());
-//                        }
-//                    }
-//
-//                    ProjectOutput projectOutput = new ProjectOutput();
-//                    projectOutput.setId(project.getId());
-//                    projectOutput.setBranches(branches);
-//                    projectOutput.setName(project.getName());
-//                    projectOutputs.add(projectOutput);
-//                }
-//            }
-//        }
+    public ResultOutput getProjectsWithDeployJob(Integer teamId) {
+
+        List<Project> projects = projectDao.getProjectsWithDeployJob(teamId);
+        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
+
         return ResultOutputUtil.success(projectOutputs);
     }
 
