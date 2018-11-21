@@ -9,5 +9,9 @@ public class CreateEnvironmentInput {
 
     private String name;
 
+    private String saltHost;
+
+    private String saltToken;
+
     private Integer type;
 }

@@ -11,6 +11,10 @@ public class MemberOutput {
 
     private Integer accountId;
 
+    private String name;
+
+    private Integer teamId;
+
     private Integer groupsCount;
 
     private Integer projectsCount;

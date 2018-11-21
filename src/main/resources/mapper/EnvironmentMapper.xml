@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.EnvironmentMapper">
     <insert id="createEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
-        insert into environments (teamId,name,type,operatorId,operatorName)
+        insert into environments (teamId,name,type,saltHost,saltToken,operatorId,operatorName)
         value
-        (#{teamId},#{name},#{type},#{operatorId},#{operatorName})
+        (#{teamId},#{name},#{type},#{saltHost},#{saltToken},#{operatorId},#{operatorName})
     </insert>
     
     <select id="getEnvironmentsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
@@ -25,7 +25,7 @@
     
     <update id="updateEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
         update environments
-        set name = #{name}
+        set name = #{name}, saltHost = #{saltHost}, saltToken = #{saltToken}
         where id = #{id} and teamId = #{teamId}
     </update>
     

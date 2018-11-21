@@ -50,7 +50,7 @@ public class OperationLogService {
                 field.setAccessible(true);
                 operationLog.setTargetId(Integer.parseInt(field.get(before).toString()));
                 operationLog.setBeforeValue(JSON.toJSONString(before));
-                operationLog.setAfterValue("");
+                operationLog.setAfterValue(after == null ? "" : JSON.toJSONString(after));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,13 +148,13 @@ public class OperationLogService {
         } else if (targetType == 18) {
             Track track = new Track();
             logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
-            logMap.put("name",track.getProjectName());
-            logMap.put("version",track.getHash());
+            logMap.put("name", track.getProjectName());
+            logMap.put("version", track.getHash());
         } else if (targetType == OperationTargetType.TYPE__MERGE_REQUEST) {
             Track track = new Track();
             logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
-            logMap.put("name",track.getProjectName());
-            logMap.put("version",track.getHash());
+            logMap.put("name", track.getProjectName());
+            logMap.put("version", track.getHash());
         }
 
         dynamic.setLog(JSON.toJSONString(logMap));
@@ -172,14 +172,14 @@ public class OperationLogService {
         return ResultOutputUtil.success(operationLogOutputs);
     }
 
-    public ResultOutput getDynamics(Integer teamId,Integer groupId,Integer projectId) {
+    public ResultOutput getDynamics(Integer teamId, Integer groupId, Integer projectId) {
 
         Dynamic dynamic = new Dynamic();
         dynamic.setTeamId(teamId);
         dynamic.setGroupId(groupId);
         dynamic.setProjectId(projectId);
         List<Dynamic> dynamics = dynamicDao.getDynamics(dynamic);
-        List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics,DynamicOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics, DynamicOutput.class, BeanCopyUtil.defaultFieldNames);
 
         return ResultOutputUtil.success(dynamicOutputs);
     }
