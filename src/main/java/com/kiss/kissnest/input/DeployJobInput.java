@@ -12,4 +12,6 @@ public class DeployJobInput {
     private String tag;
 
     private String remark;
+
+    private Integer type;
 }
