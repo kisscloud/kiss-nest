@@ -19,6 +19,8 @@ public class EnvironmentOutput {
 
     private String saltHost;
 
+    private String saltVersion;
+
     private Integer operatorId;
 
     private String operatorName;
