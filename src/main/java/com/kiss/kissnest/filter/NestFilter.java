@@ -35,10 +35,11 @@ public class NestFilter implements Filter {
 
         preFilterChain.doFilter(httpServletRequest, httpServletResponse, preFilterChain);
 
-//        Guest operator = new Guest();
-//        operator.setId(117);
-//        operator.setName("xiaohu");
-//        GuestUtil.setGuest(operator);
+        Guest operator = new Guest();
+        operator.setId(120);
+        operator.setName("小钱");
+        operator.setUsername("xiaoqian");
+        GuestUtil.setGuest(operator);
 
         chain.doFilter(httpServletRequest,httpServletResponse);
     }

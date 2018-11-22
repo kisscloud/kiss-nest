@@ -113,4 +113,24 @@ public class MemberDaoImpl implements MemberDao {
 
         return memberMapper.createMembers(members);
     }
+
+    @Override
+    public List<Member> getGroupValidMembers(Integer groupId, String name) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("groupId",groupId);
+        params.put("name", name + "%");
+
+        return memberMapper.getGroupValidMembers(params);
+    }
+
+    @Override
+    public List<Member> getProjectValidMembers(Integer projectId, String name) {
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("projectId",projectId);
+        params.put("name", name + "%");
+
+        return memberMapper.getProjectValidMembers(params);
+    }
 }

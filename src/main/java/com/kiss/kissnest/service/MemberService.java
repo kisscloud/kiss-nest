@@ -1,11 +1,9 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.account.input.ClientAccountInput;
-import com.kiss.kissnest.dao.MemberDao;
-import com.kiss.kissnest.dao.MemberGroupDao;
-import com.kiss.kissnest.dao.MemberProjectDao;
-import com.kiss.kissnest.dao.MemberTeamDao;
+import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.*;
@@ -55,6 +53,15 @@ public class MemberService {
 
     @Autowired
     private ClientServiceFeign clientServiceFeign;
+
+    @Autowired
+    private TeamDao teamDao;
+
+    @Autowired
+    private GroupDao groupDao;
+
+    @Autowired
+    private ProjectRepositoryDao projectRepositoryDao;
 
     @Autowired
     private CodeUtil codeUtil;
@@ -176,6 +183,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setName(guest.getName());
+                member.setUsername(guest.getUsername());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 member.setAccessToken(accessToken);
@@ -216,6 +224,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setName(guest.getName());
+                member.setUsername(guest.getUsername());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 member.setApiToken(apiToken);
@@ -266,6 +275,7 @@ public class MemberService {
         List<MemberTeam> memberTeams = new ArrayList<>();
         List<MemberTeamInput> memberInputs = createMemberTeamInput.getMemberTeamInputs();
         Map<Integer, Integer> memberAccount = new HashMap<>();
+        Map<String,Integer> gitlabMember = new HashMap<>();
 
         for (MemberTeamInput memberInput : memberInputs) {
 
@@ -275,6 +285,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(memberInput.getId());
                 member.setName(memberInput.getName());
+                member.setUsername(memberInput.getUsername());
                 member.setTeamId(createMemberTeamInput.getTeamId());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
@@ -308,6 +319,7 @@ public class MemberService {
                 memberTeam.setOperatorId(guest.getId());
                 memberTeam.setOperatorName(guest.getName());
                 memberTeams.add(memberTeam);
+                gitlabMember.put(memberInput.getUsername(),memberInput.getRole());
             }
         }
 
@@ -321,6 +333,13 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.TEAM_MEMBER_IS_EXIST);
         }
 
+        Team team = teamDao.getTeamById(createMemberTeamInput.getTeamId());
+        Member operator = memberDao.getMemberByAccountId(guest.getId());
+
+        for (Map.Entry<String,Integer> entry : gitlabMember.entrySet()) {
+            gitlabApiUtil.addMember(team.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Group);
+        }
+
         return ResultOutputUtil.success();
     }
 
@@ -330,6 +349,7 @@ public class MemberService {
         Guest guest = ThreadLocalUtil.getGuest();
         List<MemberGroup> memberGroups = new ArrayList<>();
         List<MemberGroupInput> memberGroupInputs = bindMemberGroupInput.getMemberGroupInputs();
+        Map<String,Integer> gitlabGroup = new HashMap<>();
 
         for (MemberGroupInput memberGroupInput : memberGroupInputs) {
             MemberGroup memberGroup = memberGroupDao.getMemberGroup(bindMemberGroupInput.getTeamId(), bindMemberGroupInput.getGroupId(), memberGroupInput.getMemberId());
@@ -343,6 +363,8 @@ public class MemberService {
                 memberGroup.setOperatorName(guest.getName());
                 memberGroup.setGroupId(bindMemberGroupInput.getGroupId());
                 memberGroups.add(memberGroup);
+                Member member = memberDao.getMemberById(memberGroupInput.getMemberId());
+                gitlabGroup.put(member.getUsername(),memberGroupInput.getRole());
             }
         }
 
@@ -360,6 +382,13 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.GROUP_MEMBER_IS_EXIST);
         }
 
+        Group group = groupDao.getGroupById(bindMemberGroupInput.getGroupId());
+        Member operator = memberDao.getMemberByAccountId(guest.getId());
+
+        for (Map.Entry<String,Integer> entry : gitlabGroup.entrySet()) {
+            gitlabApiUtil.addMember(group.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.SubGroup);
+        }
+
         return ResultOutputUtil.success();
     }
 
@@ -369,6 +398,7 @@ public class MemberService {
         Guest guest = ThreadLocalUtil.getGuest();
         List<MemberProject> memberProjects = new ArrayList<>();
         List<MemberProjectInput> memberProjectInputs = bindMemberProjectInput.getMemberProjectInputs();
+        Map<String,Integer> gitlabProject = new HashMap<>();
 
         for (MemberProjectInput memberProjectInput : memberProjectInputs) {
             MemberProject memberProject = memberProjectDao.getMemberProject(bindMemberProjectInput.getTeamId(), bindMemberProjectInput.getProjectId(), memberProjectInput.getMemberId());
@@ -382,6 +412,8 @@ public class MemberService {
                 memberProject.setOperatorName(guest.getName());
                 memberProject.setProjectId(bindMemberProjectInput.getProjectId());
                 memberProjects.add(memberProject);
+                Member member = memberDao.getMemberById(memberProjectInput.getMemberId());
+                gitlabProject.put(member.getUsername(),memberProjectInput.getRole());
             }
         }
 
@@ -396,6 +428,13 @@ public class MemberService {
             memberProjects.forEach(memberProject -> memberDao.addCount(memberProject.getMemberId(), 1, "projects"));
         } else {
             return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
+        }
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(bindMemberProjectInput.getProjectId());
+        Member operator = memberDao.getMemberByAccountId(guest.getId());
+
+        for (Map.Entry<String,Integer> entry : gitlabProject.entrySet()) {
+            gitlabApiUtil.addMember(projectRepository.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Project);
         }
 
         return ResultOutputUtil.success();
@@ -438,6 +477,22 @@ public class MemberService {
 
         List<Member> members = memberDao.getMembers(teamId, groupId, projectId);
         List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class, BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(memberOutputs);
+    }
+
+    public ResultOutput getGroupValidMembers(GroupMemberSearchInput groupMemberSearchInput) {
+
+        List<Member> members = memberDao.getGroupValidMembers(groupMemberSearchInput.getGroupId(),groupMemberSearchInput.getAccountName());
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class);
+
+        return ResultOutputUtil.success(memberOutputs);
+    }
+
+    public ResultOutput getProjectValidMembers(ProjectMemberSearchInput projectMemberSearchInput) {
+
+        List<Member> members = memberDao.getProjectValidMembers(projectMemberSearchInput.getProjectId(),projectMemberSearchInput.getAccountName());
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class);
 
         return ResultOutputUtil.success(memberOutputs);
     }

@@ -14,21 +14,25 @@ public interface MemberDao {
 
     Integer updateMember(Member member);
 
-    Integer addCount(Integer id,Integer increment,String type);
+    Integer addCount(Integer id, Integer increment, String type);
 
     Member getMemberById(Integer id);
 
-    List<Member> getMembers(Integer teamId,Integer groupId,Integer projectId);
+    List<Member> getMembers(Integer teamId, Integer groupId, Integer projectId);
 
     Member getMemberByAccountId(Integer accountId);
 
-    Integer updateAccessTokenByAccountId(Integer accountId,String accessToken);
+    Integer updateAccessTokenByAccountId(Integer accountId, String accessToken);
 
     String getAccessTokenByAccountId(Integer accountId);
 
-    Integer updateApiTokenByAccountId(Integer accountId,String apiToken);
+    Integer updateApiTokenByAccountId(Integer accountId, String apiToken);
 
     Team getMemberDefaultTeamId(Integer accountId);
 
     Integer createMembers(List<Member> members);
+
+    List<Member> getGroupValidMembers(Integer groupId, String name);
+
+    List<Member> getProjectValidMembers(Integer projectId, String name);
 }

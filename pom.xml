@@ -139,6 +139,12 @@
             <artifactId>saltstack-netapi-client</artifactId>
             <version>0.6.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.gitlab4j</groupId>
+            <artifactId>gitlab4j-api</artifactId>
+            <version>4.8.56</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

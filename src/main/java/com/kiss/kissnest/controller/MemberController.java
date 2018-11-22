@@ -70,10 +70,22 @@ public class MemberController {
         return memberService.getMemberTeamsByAccountId(accountId);
     }
 
-    @PostMapping("/member/search")
+    @PostMapping("/member/team/search")
     public ResultOutput getMembersByClientId(@RequestBody MemberClientInput memberClientInput) {
 
         return memberService.getMembersByClientId(memberClientInput);
+    }
+
+    @PostMapping("/member/group/search")
+    public ResultOutput getGroupMembers(@RequestBody GroupMemberSearchInput groupMemberSearchInput) {
+
+        return memberService.getGroupValidMembers(groupMemberSearchInput);
+    }
+
+    @PostMapping("/member/project/search")
+    public ResultOutput getMembersByClientId(@RequestBody ProjectMemberSearchInput projectMemberSearchInput) {
+
+        return memberService.getProjectValidMembers(projectMemberSearchInput);
     }
 
     @PostMapping("/member/team")

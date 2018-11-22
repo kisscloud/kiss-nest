@@ -166,6 +166,7 @@ public class TeamService {
         member.setTeamId(teamId);
         member.setAccountId(accountId);
         member.setName(guest.getName());
+        member.setUsername(guest.getUsername());
         member.setOperatorId(accountId);
         member.setOperatorName(guest.getName());
         Integer count = memberDao.createMember(member);

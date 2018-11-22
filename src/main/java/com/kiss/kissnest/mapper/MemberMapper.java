@@ -33,4 +33,8 @@ public interface MemberMapper {
     Team getMemberDefaultTeamId(Integer accountId);
 
     Integer createMembers(List<Member> members);
+
+    List<Member> getGroupValidMembers(Map params);
+
+    List<Member> getProjectValidMembers(Map params);
 }

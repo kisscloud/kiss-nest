@@ -13,6 +13,8 @@ public class Member {
 
     private String name;
 
+    private String username;
+
     private Integer teamId;
 
     private String accessToken;

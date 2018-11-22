@@ -106,4 +106,22 @@
         </if>
         group by me.id
     </select>
+    
+    <select id="getGroupValidMembers" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Member">
+        select me.id,me.name from memberteams mt
+        left join groups gr
+        on mt.teamId = gr.teamId
+        left join members me
+        on mt.memberId = me.id
+        where gr.id = #{groupId} and me.name like #{name}
+    </select>
+    
+    <select id="getProjectValidMembers" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Member">
+        select me.id,me.name from membergroups mg
+        left join projects pr
+        on mg.groupId = pr.groupId
+        left join members me
+        on mg.memberId = me.id
+        where pr.id = #{projectId} and me.name like #{name}
+    </select>
 </mapper>

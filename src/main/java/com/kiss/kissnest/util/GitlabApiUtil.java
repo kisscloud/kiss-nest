@@ -1,22 +1,63 @@
 package com.kiss.kissnest.util;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.offbytwo.jenkins.JenkinsServer;
+import com.suse.saltstack.netapi.AuthModule;
+import com.suse.saltstack.netapi.calls.LocalCall;
+import com.suse.saltstack.netapi.calls.WheelCall;
+import com.suse.saltstack.netapi.client.Connection;
+import com.suse.saltstack.netapi.client.ConnectionFactory;
+import com.suse.saltstack.netapi.client.SaltStackClient;
+import com.suse.saltstack.netapi.client.impl.HttpClientConnectionFactory;
+import com.suse.saltstack.netapi.config.ClientConfig;
+import com.suse.saltstack.netapi.datatypes.Token;
+import com.suse.saltstack.netapi.datatypes.target.Glob;
+import com.suse.saltstack.netapi.datatypes.target.Target;
+import com.suse.saltstack.netapi.parser.JsonParser;
+import com.suse.saltstack.netapi.results.Result;
 import entity.Guest;
+import okhttp3.*;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
 import org.gitlab.api.models.*;
+import org.gitlab4j.api.Constants;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GroupApi;
+import org.gitlab4j.api.models.Group;
+import org.gitlab4j.api.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import sun.security.krb5.Config;
 import utils.ThreadLocalUtil;
 
+import javax.security.auth.callback.Callback;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
 
 @Component
 public class GitlabApiUtil {
@@ -29,6 +70,9 @@ public class GitlabApiUtil {
 
     @Value("${kiss.nest.webHook.url}")
     private String webHookUrl;
+
+    @Value("${gitlab.server.user}")
+    private String gitlabServerUser;
 
     public String getAccessToken(String account, String password) throws Exception {
 
@@ -149,12 +193,25 @@ public class GitlabApiUtil {
         }
     }
 
-    public List<GitlabTag> addMember(Integer repositoryId, String inviterAccessToken, String inviteeAccessToken, Integer level,Integer type) {
+    public void addMember(Integer repositoryId, String accessToken,String username, Integer level,RepositoryType type) {
         try {
-            GitlabAPI inviterAPI = GitlabAPI.connect(gitlabServerUrl, inviterAccessToken, TokenType.ACCESS_TOKEN);
-            GitlabAPI inviteeAPI = GitlabAPI.connect(gitlabServerUrl, inviterAccessToken, TokenType.ACCESS_TOKEN);
-            GitlabUser gitlabUser = inviteeAPI.getUser();
-            GitlabAccessLevel accessLevel = GitlabAccessLevel.Developer;
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
+            String users = getUser(username,accessToken);
+
+            if (users == null) {
+                return;
+            }
+
+            JSONArray jsonArray = JSONObject.parseArray(users);
+
+            if (jsonArray.size() == 0) {
+                return;
+            }
+
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            Integer id = jsonObject.getInteger("id");
+
+            GitlabAccessLevel accessLevel;
 
             switch (level) {
                 case 0:
@@ -167,13 +224,19 @@ public class GitlabApiUtil {
                     accessLevel = GitlabAccessLevel.Guest;
             }
 
-            if (type == 0) {
-                inviterAPI.addGroupMember(repositoryId, gitlabUser.getId(), accessLevel);
+            switch (type) {
+                case Group:
+                    gitlabAPI.addGroupMember(repositoryId, id, accessLevel);
+                    break;
+                case SubGroup:
+                    gitlabAPI.addGroupMember(repositoryId, id, accessLevel);
+                    break;
+                case Project:
+                    gitlabAPI.addProjectMember(repositoryId, id, accessLevel);
+                    break;
             }
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
     }
 
@@ -186,6 +249,34 @@ public class GitlabApiUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public String getUser(String userName,String accessToken) {
+
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(String.format(gitlabServerUser,userName));
+        CloseableHttpResponse response = null;
+        try {
+            httpGet.setHeader("Authorization","Bearer " + accessToken);
+            response = httpclient.execute(httpGet);
+            String str = EntityUtils.toString(response.getEntity(),"utf-8");
+            return str;
+        } catch (Exception e) {
+            e.printStackTrace();
+            httpGet.abort();
+            return null;
+        } finally {
+            httpGet.abort();
+            if (response != null) {
+
+                try {
+                    response.close();
+                    httpclient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -230,11 +321,77 @@ public class GitlabApiUtil {
         System.out.println("");
 
         try {
-            GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io", "909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612", TokenType.ACCESS_TOKEN);
-            GitlabAPI gitlabAPI1 = GitlabAPI.connect("http://git.kisscloud.io", "4c372b421f6bbeca7a723c0ac9e7a8c2c004e24dca06274f927c1c77af5fc0d1", TokenType.ACCESS_TOKEN);
-            GitlabUser gitlabUser = gitlabAPI1.getUser();
-            gitlabAPI.addGroupMember(35, gitlabUser.getId(), GitlabAccessLevel.Developer);
-            System.out.println("aaa");
+//            GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io", "909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612", TokenType.ACCESS_TOKEN);
+//            GitlabAPI gitlabAPI1 = GitlabAPI.connect("http://git.kisscloud.io", "4c372b421f6bbeca7a723c0ac9e7a8c2c004e24dca06274f927c1c77af5fc0d1", TokenType.ACCESS_TOKEN);
+//            GitlabUser gitlabUser = gitlabAPI1.getUser();
+//            gitlabAPI.addGroupMember(35, gitlabUser.getId(), GitlabAccessLevel.Developer);
+//            System.out.println("aaa");
+//            GitLabApi gitLabApi = new GitLabApi("http://git.kisscloud.io",Constants.TokenType.ACCESS,"909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612");
+//            User user = gitLabApi.getUserApi().getUser("xiaoqian");
+//            CloseableHttpClient httpclient = HttpClients.createDefault();
+//            HttpGet httpGet = new HttpGet("http://git.kisscloud.io/api/v4/users?username=xiaoqian");
+//            httpGet.setHeader("Authorization","Bearer 909e8fec9700ef7978b8b301e32ba9ae6d7294536301d9aaa17e052a23484612");
+//            HttpResponse response = httpclient.execute(httpGet);
+//            String str = EntityUtils.toString(response.getEntity(),"utf-8");
+//            System.out.println(str);
+//            System.out.println(user);
+//            List<NameValuePair> params = new ArrayList<>();
+//            params.add(new BasicNameValuePair("username","salt-api"));
+//            params.add(new BasicNameValuePair("password","12345678"));
+//            params.add(new BasicNameValuePair("eauth","pam"));
+//            params.add(new BasicNameValuePair("client","local"));
+//            params.add(new BasicNameValuePair("tgt","*"));
+//            params.add(new BasicNameValuePair("fun","cmd.run"));
+//            params.add(new BasicNameValuePair("arg","cd /opt && touch test.txt"));
+
+//            Map<String,Object> params = new HashMap<>();
+//            params.put("username","salt-api");
+//            params.put("password","12345678");
+//            params.put("eauth","pam");
+//            params.put("client","local");
+//            params.put("tgt","*");
+//            params.put("fun","cmd.run");
+//            params.put("arg","cd /opt && touch test.txt");
+//            String str = HttpUtil.formDataPost("http://47.100.235.203:8000",params);
+
+//            CloseableHttpClient httpclient = HttpClients.createDefault();
+//            HttpPost httpPost = new HttpPost("http://47.100.235.203:8000");// 创建httpPost
+//            httpPost.setHeader("Content-Type", "application/json");
+//            httpPost.setHeader("Cache-Control", "no-cache");
+//            String charSet = "UTF-8";
+//            StringEntity entity = new StringEntity(JSONObject.toJSONString(params));
+//            httpPost.setEntity(entity);
+//            CloseableHttpResponse response = null;
+
+//            response = httpclient.execute(httpPost);
+//            System.out.println(str);
+
+            URL url = new URL("http://47.100.235.203:8000");
+            SaltStackClient saltStackClient = new SaltStackClient(URI.create("http://47.100.235.203:8000"));
+
+            Map<String, String> props = new LinkedHashMap();
+            props.put("username", "salt-api");
+            props.put("password", "12345678");
+            props.put("eauth", AuthModule.PAM.getValue());
+//            Gson gson = (new GsonBuilder()).create();
+//            String payload = gson.toJson(props);
+            String payload = JSONObject.toJSONString(props);
+            ConnectionFactory connectionFactory = new HttpClientConnectionFactory();
+            ClientConfig config = new ClientConfig();
+            config.put(ClientConfig.URL, new URI("http://47.100.235.203:8000"));
+            Connection connection = connectionFactory.create("/login", JsonParser.TOKEN, config);
+//            Object object = connection.getResult();
+            connection.getResult(payload);
+//            Object object = connectionFactory.create("/login", JsonParser.TOKEN, config).getResult(payload);
+
+
+            saltStackClient.login("salt-api","12345678",AuthModule.PAM);
+            List<String> list = new ArrayList<>();
+            list.add("cd /opt && touch test.txt");
+            Optional<List<String>> optional = Optional.of(list);
+
+            LocalCall localCall = new LocalCall("cmd.run",optional,null,TypeToken.get(Object.class));
+            saltStackClient.callSync(localCall,new Glob());
         } catch (Exception e) {
             e.printStackTrace();
         }

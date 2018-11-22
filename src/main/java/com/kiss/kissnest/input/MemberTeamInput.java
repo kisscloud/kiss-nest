@@ -9,5 +9,7 @@ public class MemberTeamInput {
 
     private String name;
 
+    private String username;
+
     private Integer role;
 }
