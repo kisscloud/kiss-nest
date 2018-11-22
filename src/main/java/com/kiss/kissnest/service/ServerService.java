@@ -68,8 +68,8 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
-        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
-        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
+//        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+//        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
