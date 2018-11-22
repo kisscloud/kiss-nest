@@ -19,6 +19,8 @@ public class Environment {
 
     private String saltHost;
 
+    private String saltVersion;
+
     private String saltUser;
 
     private String saltPassword;
