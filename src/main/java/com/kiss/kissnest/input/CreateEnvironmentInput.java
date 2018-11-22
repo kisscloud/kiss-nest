@@ -11,7 +11,9 @@ public class CreateEnvironmentInput {
 
     private String saltHost;
 
-    private String saltToken;
+    private String saltUser;
+
+    private String saltPassword;
 
     private Integer type;
 }
