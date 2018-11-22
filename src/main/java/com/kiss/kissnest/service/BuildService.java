@@ -18,6 +18,7 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 @Service
 @Slf4j
@@ -119,7 +121,7 @@ public class BuildService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -136,9 +138,9 @@ public class BuildService {
 
         jobDao.createJob(job);
 
-        JobOutput jobOutput = BeanCopyUtil.copy(job,JobOutput.class);
-        operationLogService.saveOperationLog(project.getTeamId(),guest,null,job,"id",OperationTargetType.TYPE__CREATE_JOB);
-        operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__CREATE_JOB,job);
+        JobOutput jobOutput = BeanCopyUtil.copy(job, JobOutput.class);
+        operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_JOB);
+        operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_JOB, job);
         return ResultOutputUtil.success(jobOutput);
     }
 
@@ -175,7 +177,7 @@ public class BuildService {
         Integer id = job.getId();
         job = jobDao.getJobById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class,BeanCopyUtil.defaultFieldNames));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames));
     }
 
     @Transactional
@@ -188,13 +190,13 @@ public class BuildService {
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
-        BuildLog buildLog = saveBuildLog(job.getTeamId(),jobName,buildJobInput.getBranch(),buildJobInput.getProjectId(),guest);
+        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest);
 
         if (buildLog == null) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
-        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
@@ -203,23 +205,23 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(),jobName, guest.getUsername(),guest.getName(), member.getApiToken(), 1, location,buildJobInput.getType(),project.getId()));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getName(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
         thread.start();
-        operationLogService.saveOperationLog(job.getTeamId(),guest,job,null,"id",OperationTargetType.TYPE__BUILD_JOB);
-        operationLogService.saveDynamic(guest,job.getTeamId(),null,job.getProjectId(),OperationTargetType.TYPE__BUILD_JOB,job);
+        operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
+        operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
         Map<String, Object> result = new HashMap<>();
-        result.put("id",buildLog.getId());
+        result.put("id", buildLog.getId());
         result.put("projectName", project.getName());
-        result.put("projectId",buildJobInput.getProjectId());
+        result.put("projectId", buildJobInput.getProjectId());
         result.put("branch", buildJobInput.getBranch());
         result.put("remark", buildJobInput.getRemark());
-        result.put("status",2);
-        result.put("statusText",codeUtil.getEnumsMessage("build.status",String.valueOf(result.get("status"))));
-        result.put("createdAt",buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
+        result.put("status", 2);
+        result.put("statusText", codeUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
+        result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         return ResultOutputUtil.success(result);
     }
 
-    public ResultOutput deployJob(DeployJobInput deployJobInput) {
+    public ResultOutput deployJob(DeployJobInput deployJobInput) throws IOException {
         Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(), 2);
         String jobName = job.getJobName();
 
@@ -242,8 +244,29 @@ public class BuildService {
 //            deployRemarks.put(deployJobInput.getProjectId() + "" + number, deployJobInput.getRemark());
 //        }
 
+
+        // 1. 获取TOKEN
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, "{\n    \"username\": \"salt-api\",\n    \"password\": \"12345678\",\n    \"eauth\": \"pam\"\n}");
+        Request request = new Request.Builder()
+                .url("http://47.100.235.203:8000/login")
+                .post(body)
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        Response response = client.newCall(request).execute();
+
+        String tokenResp = response.body().string();
+
+        // 创建文件
+
+
+
         return ResultOutputUtil.success();
     }
+
 
     public ResultOutput validateJobExist(Integer projectId, Integer type) {
 
@@ -289,13 +312,13 @@ public class BuildService {
             buildLogOutput = new BuildLogOutput();
             buildLogOutput.setId(id);
             buildLogOutput.setStatus(2);
-            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
+            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
             return ResultOutputUtil.success(buildLogOutput);
         }
 
         String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
         buildLogOutput.setCommitPath(commitPath);
-        buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status",String.valueOf(buildLogOutput.getStatus())));
+        buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
 
         return ResultOutputUtil.success(buildLogOutput);
     }
@@ -309,7 +332,7 @@ public class BuildService {
 
     public ResultOutput updateBuildJob(UpdateJobInput updateJobInput) {
 
-        Job job = BeanCopyUtil.copy(updateJobInput,Job.class);
+        Job job = BeanCopyUtil.copy(updateJobInput, Job.class);
         Integer count = jobDao.updateBuildJob(job);
 
         if (count == 0) {
@@ -326,35 +349,35 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(),updateJobInput.getScript(),projectRepository.getSshUrl(),guest.getUsername(),member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
     }
 
     public ResultOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
 
-        Job job = BeanCopyUtil.copy(updateDeployInput,Job.class);
+        Job job = BeanCopyUtil.copy(updateDeployInput, Job.class);
         Integer count = jobDao.updateDeployJob(job);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_DEPLOY_JOB_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job,JobOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
     }
 
-    public ResultOutput getProjectDeployConf(Integer projectId,Integer envId) {
+    public ResultOutput getProjectDeployConf(Integer projectId, Integer envId) {
 
         Project project = projectDao.getProjectById(projectId);
         Team team = teamDao.getTeamById(project.getTeamId());
         Group group = groupDao.getGroupById(project.getGroupId());
         String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
         Environment environment = environmentDao.getEnvironmentById(envId);
-        String type = codeUtil.getEnumsMessage("environment.type.conf",String.valueOf(environment.getType()));
+        String type = codeUtil.getEnumsMessage("environment.type.conf", String.valueOf(environment.getType()));
 
         if (project == null) {
             return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
@@ -370,15 +393,15 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,type,type,type,type,path,path);
+        String conf = String.format(stringBuilder.toString(), project.getName(), path, path, path, type, type, type, type, path, path);
         conf = StringEscapeUtils.unescapeXml(conf);
-        Map<String,Object> result = new HashMap<>();
-        result.put("conf",conf);
+        Map<String, Object> result = new HashMap<>();
+        result.put("conf", conf);
 
         return ResultOutputUtil.success(result);
     }
 
-    public ResultOutput getProjectDeployScript(Integer projectId,Integer envId) {
+    public ResultOutput getProjectDeployScript(Integer projectId, Integer envId) {
 
 //        Project project = projectDao.getProjectById(projectId);
 //        Team team = teamDao.getTeamById(project.getTeamId());
@@ -404,8 +427,8 @@ public class BuildService {
 //        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,type,type,type,type,path,path);
 //        conf = StringEscapeUtils.unescapeXml(conf);
         String script = stringBuilder.toString();
-        Map<String,Object> result = new HashMap<>();
-        result.put("script",script);
+        Map<String, Object> result = new HashMap<>();
+        result.put("script", script);
 
         return ResultOutputUtil.success(result);
     }
@@ -430,7 +453,7 @@ public class BuildService {
 
         private String operatorName;
 
-        public BuildLogRunnable(Integer buildLogId,String jobName, String account,String operatorName, String passwordOrToken, Integer type, String location,Integer versionType,Integer projectId) {
+        public BuildLogRunnable(Integer buildLogId, String jobName, String account, String operatorName, String passwordOrToken, Integer type, String location, Integer versionType, Integer projectId) {
             this.account = account;
             this.passwordOrToken = passwordOrToken;
             this.type = type;
@@ -468,7 +491,7 @@ public class BuildService {
                     return;
                 }
 
-                updateBuildLog(build,id, jobName, operatorName, location,versionType,projectId);
+                updateBuildLog(build, id, jobName, operatorName, location, versionType, projectId);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -489,7 +512,7 @@ public class BuildService {
         }
     }
 
-    public BuildLog saveBuildLog(Integer teamId,String jobName,String branch,Integer projectId,Guest guest) {
+    public BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest) {
 
         BuildLog buildLog = new BuildLog();
         buildLog.setTeamId(teamId);
@@ -510,7 +533,7 @@ public class BuildService {
         return buildLog;
     }
 
-    public void updateBuildLog(Build build,Integer id,String jobName,String operatorName, String location,Integer versionType,Integer projectId) throws InterruptedException {
+    public void updateBuildLog(Build build, Integer id, String jobName, String operatorName, String location, Integer versionType, Integer projectId) throws InterruptedException {
 
         JenkinsHttpConnection client = build.getClient();
         String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());

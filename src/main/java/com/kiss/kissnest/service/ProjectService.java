@@ -117,7 +117,7 @@ public class ProjectService {
                     throw new TransactionalException(NestStatusCode.DELETE_JOB_FAILED);
                 }
 
-                jenkinsUtil.deleteJob(job.getJobName(),guest.getUsername(),member.getApiToken());
+                jenkinsUtil.deleteJob(job.getJobName(),guest.getName(),member.getApiToken());
             });
         }
 
