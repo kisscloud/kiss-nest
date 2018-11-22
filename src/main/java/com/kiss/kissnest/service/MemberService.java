@@ -164,7 +164,7 @@ public class MemberService {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String accessToken = gitlabApiUtil.getAccessToken(guest.getUsername(), createMemberAccessInput.getPassword());
+            String accessToken = gitlabApiUtil.getAccessToken(guest.getName(), createMemberAccessInput.getPassword());
 
             if (StringUtils.isEmpty(accessToken)) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_ACCESS_FAILED);
@@ -205,7 +205,7 @@ public class MemberService {
 
         try {
             Guest guest = ThreadLocalUtil.getGuest();
-            String apiToken = jenkinsUtil.generateApiToken(guest.getUsername(), createMemberAccessInput.getPassword());
+            String apiToken = jenkinsUtil.generateApiToken(guest.getName(), createMemberAccessInput.getPassword());
 
             if (apiToken == null) {
                 return ResultOutputUtil.error(NestStatusCode.CREATE_MEMBER_APITOKEN_FAILED);

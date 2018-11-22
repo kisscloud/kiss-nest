@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.PackageRepositoryMapper">
     <insert id="createPackageRepository" parameterType="com.kiss.kissnest.entity.PackageRepository" useGeneratedKeys="true" keyProperty="id">
-        insert into packagerepository (projectId,buildLogId,jarName,version,branch,tag,type,buildAt)
+        insert into packagerepository (projectId,buildLogId,jarName,tarName,version,branch,tag,type,buildAt)
         value
-        (#{projectId},#{buildLogId},#{jarName},#{version},#{branch},#{tag},#{type},#{buildAt})
+        (#{projectId},#{buildLogId},#{jarName},#{tarName},#{version},#{branch},#{tag},#{type},#{buildAt})
     </insert>
 
     <update id="updatePackageRepository" parameterType="com.kiss.kissnest.entity.PackageRepository">
@@ -16,6 +16,7 @@
         set
         buildLogId = #{buildLogId},
         jarName = #{jarName},
+        tarName = #{tarName},
         version = #{version},
         buildAt = #{buildAt}
         where id = #{id}

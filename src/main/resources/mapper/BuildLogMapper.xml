@@ -49,6 +49,9 @@
         <if test="jarName != null">
             ,jarName = #{jarName}
         </if>
+        <if test="tarName != null">
+            ,tarName = #{tarName}
+        </if>
         <if test="operatorId != null">
             ,operatorId = #{operatorId}
         </if>

@@ -102,4 +102,12 @@
     <select id="getServersByEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Server">
         select * from servers where envId = #{envId};
     </select>
+    
+    <select id="getServerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">
+        select group_concat(se.innerIp) as innerIps from
+        (
+        select concat("node-",replace(innerIp,'.','-')) as innerIp,teamId from servers where id in (#{ids})
+        ) se
+        group by se.teamId
+    </select>
 </mapper>

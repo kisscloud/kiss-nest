@@ -29,4 +29,6 @@ public interface ServerDao {
     Integer getServerOutputCount(Integer teamId,Integer envId);
 
     List<Server> getServersByEnvId(Integer envId);
+
+    String getServerIpsByIds(String ids);
 }

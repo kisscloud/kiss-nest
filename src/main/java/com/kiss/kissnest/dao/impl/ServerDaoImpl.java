@@ -102,4 +102,10 @@ public class ServerDaoImpl implements ServerDao {
 
         return serverMapper.getServersByEnvId(envId);
     }
+
+    @Override
+    public String getServerIpsByIds(String ids) {
+
+        return serverMapper.getServerIpsByIds(ids);
+    }
 }

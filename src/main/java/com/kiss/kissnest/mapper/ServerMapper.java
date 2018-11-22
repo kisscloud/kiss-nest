@@ -31,4 +31,6 @@ public interface ServerMapper {
     Integer getServerOutputCount(Map params);
 
     List<Server> getServersByEnvId(Integer envId);
+
+    String getServerIpsByIds(String ids);
 }

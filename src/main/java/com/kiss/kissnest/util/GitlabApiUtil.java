@@ -344,14 +344,14 @@ public class GitlabApiUtil {
 //            params.add(new BasicNameValuePair("fun","cmd.run"));
 //            params.add(new BasicNameValuePair("arg","cd /opt && touch test.txt"));
 
-//            Map<String,Object> params = new HashMap<>();
+            Map<String,Object> params = new HashMap<>();
 //            params.put("username","salt-api");
 //            params.put("password","12345678");
 //            params.put("eauth","pam");
-//            params.put("client","local");
-//            params.put("tgt","*");
-//            params.put("fun","cmd.run");
-//            params.put("arg","cd /opt && touch test.txt");
+            params.put("client","local");
+            params.put("tgt","*");
+            params.put("fun","cmd.run");
+            params.put("arg","cd /opt && touch test.txt");
 //            String str = HttpUtil.formDataPost("http://47.100.235.203:8000",params);
 
 //            CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -366,32 +366,66 @@ public class GitlabApiUtil {
 //            response = httpclient.execute(httpPost);
 //            System.out.println(str);
 
-            URL url = new URL("http://47.100.235.203:8000");
-            SaltStackClient saltStackClient = new SaltStackClient(URI.create("http://47.100.235.203:8000"));
-
-            Map<String, String> props = new LinkedHashMap();
-            props.put("username", "salt-api");
-            props.put("password", "12345678");
-            props.put("eauth", AuthModule.PAM.getValue());
-//            Gson gson = (new GsonBuilder()).create();
-//            String payload = gson.toJson(props);
-            String payload = JSONObject.toJSONString(props);
-            ConnectionFactory connectionFactory = new HttpClientConnectionFactory();
-            ClientConfig config = new ClientConfig();
-            config.put(ClientConfig.URL, new URI("http://47.100.235.203:8000"));
-            Connection connection = connectionFactory.create("/login", JsonParser.TOKEN, config);
-//            Object object = connection.getResult();
-            connection.getResult(payload);
+//            URL url = new URL("http://47.100.235.203:8000");
+//            SaltStackClient saltStackClient = new SaltStackClient(URI.create("http://47.100.235.203:8000"));
+//
+//            Map<String, String> props = new LinkedHashMap();
+//            props.put("username", "salt-api");
+//            props.put("password", "12345678");
+//            props.put("eauth", AuthModule.PAM.getValue());
+////            Gson gson = (new GsonBuilder()).create();
+////            String payload = gson.toJson(props);
+//            String payload = JSONObject.toJSONString(props);
+//            ConnectionFactory connectionFactory = new HttpClientConnectionFactory();
+//            ClientConfig config = new ClientConfig();
+//            config.put(ClientConfig.URL, new URI("http://47.100.235.203:8000"));
+//            Connection connection = connectionFactory.create("/login", JsonParser.TOKEN, config);
+//            connection.getResult(payload);
 //            Object object = connectionFactory.create("/login", JsonParser.TOKEN, config).getResult(payload);
 
 
-            saltStackClient.login("salt-api","12345678",AuthModule.PAM);
-            List<String> list = new ArrayList<>();
-            list.add("cd /opt && touch test.txt");
-            Optional<List<String>> optional = Optional.of(list);
+//            saltStackClient.login("salt-api","12345678",AuthModule.PAM);
+//            List<String> list = new ArrayList<>();
+//            list.add("cd /opt && touch test.txt");
+//            Optional<List<String>> optional = Optional.of(list);
+//
+//            LocalCall localCall = new LocalCall("cmd.run",optional,null,TypeToken.get(Object.class));
+//            saltStackClient.callSync(localCall,new Glob());
+//            OkHttpClient client = new OkHttpClient();
+////
+//            MediaType mediaType = MediaType.parse("application/json");
+//            RequestBody body = RequestBody.create(mediaType, "{\n    \"username\": \"salt-api\",\n    \"password\": \"12345678\",\n    \"eauth\": \"pam\"\n}");
+//            Request request = new Request.Builder()
+//                    .url("http://47.100.235.203:8000/login")
+//                    .post(body)
+//                    .addHeader("Content-Type", "application/json")
+//                    .build();
+//
+//            Response response = client.newCall(request).execute();
+//
+//            String tokenResp = response.body().string();
+//            JSONObject jsonObject = JSONObject.parseObject(tokenResp);
+//            JSONArray jsonArray =  jsonObject.getJSONArray("return");
+////            JSONArray jsonArray = JSONObject.parseArray(jsonObject.getString("return"));
+//            JSONObject tokenJson = jsonArray.getJSONObject(0);
+//            System.out.println(tokenJson.getString("token"));
+            OkHttpClient client = new OkHttpClient();
+//
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, JSONObject.toJSONString(params));
+            Request request = new Request.Builder()
+                    .url("http://47.100.235.203:8000")
+                    .post(body)
+                    .addHeader("Accept", "application/json")
+                    .addHeader("X-Auth-Token","6c20c994d77ea25946e1a398a58a9df857bbfd8d")
+//                    .addHeader("Cache-Control", "no-cache")
+//                    .addHeader("Postman-Token", "8c1390fe-d567-49f6-aac8-c72eb60e9870")
+                    .build();
 
-            LocalCall localCall = new LocalCall("cmd.run",optional,null,TypeToken.get(Object.class));
-            saltStackClient.callSync(localCall,new Glob());
+            Response response = client.newCall(request).execute();
+            System.out.println(response.code());
+            System.out.println(response.body());
+            System.out.println(response.body().string());
         } catch (Exception e) {
             e.printStackTrace();
         }

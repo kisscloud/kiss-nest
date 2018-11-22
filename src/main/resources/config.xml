@@ -65,6 +65,7 @@ mv __PACKAGE__* $newName&#x000A;
 tar -zcvf $newName.tar.gz $newName*&#x000A;
 ansible $binIp -u root -m shell -a "if [ ! -d "/opt/apps/$slug" ];then mkdir -p /opt/apps/$slug;fi"&#x000A;
 rsync -v $newName.tar.gz root@$binIp:/opt/apps/$slug/&#x000A;
+echo "tarNameStart="$newName.tar.gz"=tarNameEnd"&#x000A;
             </command>
         </hudson.tasks.Shell>
     </builders>

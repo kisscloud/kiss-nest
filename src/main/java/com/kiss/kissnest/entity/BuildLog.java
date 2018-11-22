@@ -33,6 +33,8 @@ public class BuildLog {
 
     private String jarName;
 
+    private String tarName;
+
     private Integer operatorId;
 
     private String operatorName;

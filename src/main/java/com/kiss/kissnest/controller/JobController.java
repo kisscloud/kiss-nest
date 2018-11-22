@@ -13,6 +13,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import output.ResultOutput;
 
+import java.io.IOException;
+
 @RestController
 @Api(tags = "Job", description = "构建部署任务相关接口")
 public class JobController {
@@ -80,7 +82,7 @@ public class JobController {
     }
 
     @PostMapping("/job/deploy/exec")
-    public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) {
+    public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) throws IOException {
 
         return buildService.deployJob(deployJobInput);
     }

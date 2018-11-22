@@ -18,29 +18,30 @@ public class PackageRepositoryService {
 
     public Integer createPackageRepository(BuildLog buildLog) {
 
-        PackageRepository jobRepository = new PackageRepository();
-        jobRepository.setProjectId(buildLog.getProjectId());
-        jobRepository.setBuildLogId(buildLog.getId());
-        jobRepository.setJarName(buildLog.getJarName());
-        jobRepository.setVersion(buildLog.getVersion());
+        PackageRepository packageRepository = new PackageRepository();
+        packageRepository.setProjectId(buildLog.getProjectId());
+        packageRepository.setBuildLogId(buildLog.getId());
+        packageRepository.setJarName(buildLog.getJarName());
+        packageRepository.setVersion(buildLog.getVersion());
+        packageRepository.setTarName(buildLog.getTarName());
 
         switch (buildLog.getType()) {
             case 1:
-                jobRepository.setBranch(buildLog.getBranch());
+                packageRepository.setBranch(buildLog.getBranch());
                 break;
             case 2:
-                jobRepository.setTag(buildLog.getBranch());
+                packageRepository.setTag(buildLog.getBranch());
         }
 
-        jobRepository.setType(buildLog.getType());
-        jobRepository.setBuildAt(buildLog.getBuildAt());
-        PackageRepository exist = packageRepositoryDao.getPackageRepository(jobRepository);
+        packageRepository.setType(buildLog.getType());
+        packageRepository.setBuildAt(buildLog.getBuildAt());
+        PackageRepository exist = packageRepositoryDao.getPackageRepository(packageRepository);
 
         if (exist != null) {
-            return packageRepositoryDao.updatePackageRepository(jobRepository);
+            return packageRepositoryDao.updatePackageRepository(packageRepository);
         }
 
-        return packageRepositoryDao.createPackageRepository(jobRepository);
+        return packageRepositoryDao.createPackageRepository(packageRepository);
     }
 
     public ResultOutput getPackageRepositoryBranches(Integer projectId) {

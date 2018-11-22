@@ -13,5 +13,5 @@ public class DeployJobInput {
 
     private String remark;
 
-    private Integer type;
+    private Integer envId;
 }

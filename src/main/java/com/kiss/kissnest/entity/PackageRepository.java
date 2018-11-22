@@ -15,6 +15,8 @@ public class PackageRepository {
 
     private String jarName;
 
+    private String tarName;
+
     private String version;
 
     private String branch;
