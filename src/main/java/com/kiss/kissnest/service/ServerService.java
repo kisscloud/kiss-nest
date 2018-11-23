@@ -68,8 +68,8 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
-        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
-        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
+//        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+//        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
@@ -116,7 +116,9 @@ public class ServerService {
         }
 
         environmentDao.addEnvironmentServerCount(createServerInput.getEnvId());
+        Environment environment = environmentDao.getEnvironmentById(createServerInput.getEnvId());
         ServerOutput serverOutput = BeanCopyUtil.copy(server, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
+        serverOutput.setEnvName(environment.getName());
         operationLogService.saveOperationLog(createServerInput.getTeamId(),guest,null,server,"id",OperationTargetType.TYPE__CREATE_SERVER);
         operationLogService.saveDynamic(guest,server.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_SERVER,server);
         return ResultOutputUtil.success(serverOutput);

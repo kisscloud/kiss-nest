@@ -38,6 +38,7 @@ public class PackageRepositoryService {
         PackageRepository exist = packageRepositoryDao.getPackageRepository(packageRepository);
 
         if (exist != null) {
+            packageRepository.setId(exist.getId());
             return packageRepositoryDao.updatePackageRepository(packageRepository);
         }
 

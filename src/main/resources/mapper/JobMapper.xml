@@ -78,4 +78,15 @@
         on jo.envId = en.id
         where jo.teamId = #{teamId} and jo.type = #{type};
     </select>
+
+    <select id="getJobOutputsById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.JobOutput">
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.conf,jo.status,jo.number,
+        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
+        pr.name as projectName,en.name as envName from jobs jo
+        left join projects pr
+        on jo.projectId = pr.id
+        left join environments en
+        on jo.envId = en.id
+        where jo.id = #{id};
+    </select>
 </mapper>

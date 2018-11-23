@@ -91,14 +91,14 @@ public class JenkinsUtil {
         }
     }
 
-    public boolean createJobByShell(String jobName, String shell, String sshUrl, String account, String passwordOrToken) {
+    public boolean createJobByShell(String jobName, String path, String shell, String sshUrl, String account, String passwordOrToken) {
         JenkinsServer server = null;
 
         try {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
             StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(), sshUrl, jobName, jenkinBinIp, formatShell);
+            String script = String.format(builder.toString(), sshUrl, jobName, path, jenkinBinIp, formatShell);
 
             if (builder == null) {
                 return false;
@@ -301,7 +301,7 @@ public class JenkinsUtil {
         }
     }
 
-    public Build getBuild(JenkinsServer server,String location) {
+    public Build getBuild(JenkinsServer server, String location) {
 
         try {
             QueueReference queueReference = new QueueReference(location + jenkinsQueuePath);
@@ -319,6 +319,7 @@ public class JenkinsUtil {
             return null;
         }
     }
+
     public Build getLastBuild(String jobName, JenkinsServer server) {
 
         try {
@@ -409,7 +410,7 @@ public class JenkinsUtil {
 
             if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
                 String result = EntityUtils.toString(response.getEntity(), "utf-8");
-                ThreadLocalUtil.setString("entity",result);
+                ThreadLocalUtil.setString("entity", result);
                 return response;
             }
 

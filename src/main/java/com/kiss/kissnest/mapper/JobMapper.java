@@ -33,4 +33,6 @@ public interface JobMapper {
     Integer updateDeployJob(Job job);
 
     List<JobOutput> getJobOutputsByTeamId(Map params);
+
+    JobOutput getJobOutputsById(Integer id);
 }

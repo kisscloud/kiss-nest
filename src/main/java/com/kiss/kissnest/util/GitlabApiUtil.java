@@ -1,62 +1,23 @@
 package com.kiss.kissnest.util;
 
-
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.offbytwo.jenkins.JenkinsServer;
-import com.suse.saltstack.netapi.AuthModule;
-import com.suse.saltstack.netapi.calls.LocalCall;
-import com.suse.saltstack.netapi.calls.WheelCall;
-import com.suse.saltstack.netapi.client.Connection;
-import com.suse.saltstack.netapi.client.ConnectionFactory;
-import com.suse.saltstack.netapi.client.SaltStackClient;
-import com.suse.saltstack.netapi.client.impl.HttpClientConnectionFactory;
-import com.suse.saltstack.netapi.config.ClientConfig;
-import com.suse.saltstack.netapi.datatypes.Token;
-import com.suse.saltstack.netapi.datatypes.target.Glob;
-import com.suse.saltstack.netapi.datatypes.target.Target;
-import com.suse.saltstack.netapi.parser.JsonParser;
-import com.suse.saltstack.netapi.results.Result;
-import entity.Guest;
 import okhttp3.*;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.TokenType;
 import org.gitlab.api.models.*;
-import org.gitlab4j.api.Constants;
-import org.gitlab4j.api.GitLabApi;
-import org.gitlab4j.api.GroupApi;
-import org.gitlab4j.api.models.Group;
-import org.gitlab4j.api.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import sun.security.krb5.Config;
-import utils.ThreadLocalUtil;
-
-import javax.security.auth.callback.Callback;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
 @Component

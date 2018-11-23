@@ -46,7 +46,7 @@ public class SaltStackUtil {
         }
     }
 
-    public String callLocalSync (String url,String username,String password,String functionName,String nodes,String option) {
+    public String callLocalSync (String url,String username,String password,String version,String functionName,String nodes,String option) {
         OkHttpClient client = new OkHttpClient();
         Map<String,Object> params = new HashMap<>();
         params.put("client","local");

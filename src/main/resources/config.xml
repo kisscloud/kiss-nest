@@ -51,10 +51,10 @@ fi&#x000A;
 log=`git log|grep 'commit'|head -1`&#x000A;
 version=`echo ${log##*commit}`&#x000A;
 slug=%s&#x000A;
+path=%s&#x000A;
 binIp=%s&#x000A;
 name=$slug-${branch}-$version&#x000A;
 echo "versionStart="$version"=versionEnd"&#x000A;
-echo "jarNameStart="$name"=jarNameEnd"&#x000A;
 &#x000A;
 %s&#x000A;
 &#x000A;
@@ -63,8 +63,9 @@ ts=`date '+%%Y-%%m-%%d-%%H-%%M-%%S'`&#x000A;
 newName=$name-$ts`echo ${default##__PACKAGE__}`&#x000A;
 mv __PACKAGE__* $newName&#x000A;
 tar -zcvf $newName.tar.gz $newName*&#x000A;
-ansible $binIp -u root -m shell -a "if [ ! -d "/opt/apps/$slug" ];then mkdir -p /opt/apps/$slug;fi"&#x000A;
-rsync -v $newName.tar.gz root@$binIp:/opt/apps/$slug/&#x000A;
+ansible $binIp -u root -m shell -a "if [ ! -d "/opt/apps/$path" ];then mkdir -p /opt/apps/$path;fi"&#x000A;
+rsync -v $newName.tar.gz root@$binIp:/opt/apps/$path/&#x000A;
+echo "jarNameStart="$newName"=jarNameEnd"&#x000A;
 echo "tarNameStart="$newName.tar.gz"=tarNameEnd"&#x000A;
             </command>
         </hudson.tasks.Shell>

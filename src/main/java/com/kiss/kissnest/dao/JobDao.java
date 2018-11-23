@@ -30,4 +30,6 @@ public interface JobDao {
     Integer updateDeployJob(Job job);
 
     List<JobOutput> getJobOutputsByTeamId(Integer teamId,Integer type);
+
+    JobOutput getJobOutputsById(Integer id);
 }

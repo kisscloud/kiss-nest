@@ -19,7 +19,11 @@ public class Environment {
 
     private String saltHost;
 
-    private String saltToken;
+    private String saltVersion;
+
+    private String saltUser;
+
+    private String saltPassword;
 
     private Integer operatorId;
 

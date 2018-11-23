@@ -115,4 +115,10 @@ public class JobDaoImpl implements JobDao {
 
         return jobMapper.getJobOutputsByTeamId(params);
     }
+
+    @Override
+    public JobOutput getJobOutputsById(Integer id) {
+
+        return jobMapper.getJobOutputsById(id);
+    }
 }

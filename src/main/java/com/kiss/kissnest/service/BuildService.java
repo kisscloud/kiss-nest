@@ -17,7 +17,6 @@ import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
-import com.suse.saltstack.netapi.client.SaltStackClient;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -145,7 +144,7 @@ public class BuildService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -161,6 +160,7 @@ public class BuildService {
         job.setNumber(0);
 
         jobDao.createJob(job);
+        job = jobDao.getJobById(job.getId());
 
         JobOutput jobOutput = BeanCopyUtil.copy(job, JobOutput.class);
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_JOB);
@@ -195,13 +195,11 @@ public class BuildService {
         job.setScript(createDeployInput.getScript());
         job.setServerIds(serverIdList == null ? null : JSON.toJSONString(serverIdList));
         job.setType(2);
-
         jobDao.createJob(job);
-
         Integer id = job.getId();
-        job = jobDao.getJobById(id);
+        JobOutput jobOutput = jobDao.getJobOutputsById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames));
+        return ResultOutputUtil.success(jobOutput);
     }
 
     @Transactional
@@ -220,7 +218,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
-        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
@@ -229,7 +227,7 @@ public class BuildService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getName(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getUsername(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
@@ -250,38 +248,51 @@ public class BuildService {
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         Integer type = environment.getType();
         String tarName;
+        String jarName;
         if (type == 1) {
             //测试环境
             PackageRepository packageRepository = new PackageRepository();
             packageRepository.setProjectId(deployJobInput.getProjectId());
             packageRepository.setBranch(deployJobInput.getBranch());
-            packageRepository =  packageRepositoryDao.getPackageRepository(packageRepository);
+            packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
+            jarName = packageRepository.getJarName();
         } else {
             PackageRepository packageRepository = new PackageRepository();
             packageRepository.setProjectId(deployJobInput.getProjectId());
             packageRepository.setTag(deployJobInput.getTag());
-            packageRepository =  packageRepositoryDao.getPackageRepository(packageRepository);
+            packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
+            jarName = packageRepository.getJarName();
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(deployJobInput.getProjectId());
         String path = projectRepository.getPathWithNamespace();
+        Project project = projectDao.getProjectById(deployJobInput.getProjectId());
 
         String script = job.getScript();
-        String shell = String.format(script,path);
-        shell.replace("__TAR__PACKAGE__",packageUrl + tarName);
-        shell.replace("__CONFIG__",configUrl + ":" + path + ".git");
+//        String shell = String.format(script,path);
+        script = script.replace("__TAR__PACKAGE__", packageUrl + path + "/" + tarName);
+        String slug = path.replace("/", "-");
+        path = path.substring(0, path.lastIndexOf("/") + 1);
+        script = script.replace("__CONFIG__", configUrl + ":" + path + "config.git");
 
-        String option = "mkdir -p /opt/option/" + path + " && cd /opt/option/" + path + " && echo '" +shell+ "' > " + deployJobInput.getProjectId() + ".sh && chmod +r " + deployJobInput.getProjectId() + ".sh"
-                        + " && ./" + deployJobInput.getProjectId() + ".sh";
+        String option = "mkdir -p /opt/option/" + path + " && cd /opt/option/" + path + " && echo '" + script + "' > " + deployJobInput.getProjectId() + ".sh && chmod +x " + deployJobInput.getProjectId() + ".sh"
+                + " && ./" + deployJobInput.getProjectId() + ".sh";
+
+        String conf = job.getConf();
+        conf = conf.replace("__PACKAGE__", jarName);
+        conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
+        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update";
 
         String serverIds = job.getServerIds();
+        serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
         String targetIps = serverDao.getServerIpsByIds(serverIds);
 
-        log.info("操作{},目标{}",option,targetIps);
+        log.info("操作{},目标{},conf{}", option, targetIps, conf);
 
-        String str = saltStackUtil.callLocalSync(saltStackUrl,saltStatckUsername,saltStatckPassword,"cmd.run",targetIps,option);
+        String str = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
+        System.out.println(str);
         return ResultOutputUtil.success(str);
     }
 
@@ -391,9 +402,12 @@ public class BuildService {
     public ResultOutput getProjectDeployConf(Integer projectId, Integer envId) {
 
         Project project = projectDao.getProjectById(projectId);
-        Team team = teamDao.getTeamById(project.getTeamId());
-        Group group = groupDao.getGroupById(project.getGroupId());
-        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+        String slug = project.getSlug();
+//        Team team = teamDao.getTeamById(project.getTeamId());
+//        Group group = groupDao.getGroupById(project.getGroupId());
+//        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+        String path = projectRepository.getPathWithNamespace();
         Environment environment = environmentDao.getEnvironmentById(envId);
         String type = codeUtil.getEnumsMessage("environment.type.conf", String.valueOf(environment.getType()));
 
@@ -411,7 +425,7 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String conf = String.format(stringBuilder.toString(), project.getName(), path, path, path, type, type, type, type, path, path);
+        String conf = String.format(stringBuilder.toString(), slug, slug, path, type, type, type, type, path, slug);
         conf = StringEscapeUtils.unescapeXml(conf);
         Map<String, Object> result = new HashMap<>();
         result.put("conf", conf);
@@ -420,17 +434,6 @@ public class BuildService {
     }
 
     public ResultOutput getProjectDeployScript(Integer projectId, Integer envId) {
-
-//        Project project = projectDao.getProjectById(projectId);
-//        Team team = teamDao.getTeamById(project.getTeamId());
-//        Group group = groupDao.getGroupById(project.getGroupId());
-//        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
-//        Environment environment = environmentDao.getEnvironmentById(envId);
-//        String type = codeUtil.getEnumsMessage("environment.type.conf",String.valueOf(environment.getType()));
-//
-//        if (project == null) {
-//            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
-//        }
 
         StringBuilder stringBuilder = null;
 
@@ -442,10 +445,14 @@ public class BuildService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-//        String conf = String.format(stringBuilder.toString(),project.getName(),path,path,path,type,type,type,type,path,path);
-//        conf = StringEscapeUtils.unescapeXml(conf);
         String script = stringBuilder.toString();
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+        String path = projectRepository.getPathWithNamespace();
+        String prePath = path.substring(0,path.lastIndexOf("/"));
+        script = String.format(script, path,prePath);
+        script = StringEscapeUtils.unescapeXml(script);
         Map<String, Object> result = new HashMap<>();
+
         result.put("script", script);
 
         return ResultOutputUtil.success(result);
@@ -745,5 +752,12 @@ public class BuildService {
 
         deployLogDao.createDeployLog(deployLog);
         deployRemarks.remove(projectId + "" + number);
+    }
+
+    public static void main(String[] args) {
+        String str = "abc/a/c";
+
+        str = str.substring(0,str.lastIndexOf("/"));
+        System.out.println(str);
     }
 }
