@@ -287,14 +287,14 @@ public class JobService {
 
         String str = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
 
-        log.info("部署日志:{}",str);
+        log.info("部署日志:{}", str);
         String statusStr = str.substring(str.lastIndexOf("\\n") + 2, str.length() - 2);
         Integer status = 0;
 
         try {
             status = Integer.parseInt(statusStr);
         } catch (Exception e) {
-            log.info("部署状态转换失败:{}",statusStr);
+            log.info("部署状态转换失败:{}", statusStr);
         }
 
         DeployLog deployLog = new DeployLog();
@@ -306,7 +306,7 @@ public class JobService {
         deployLog.setVersion(version);
         deployLog.setProjectId(job.getProjectId());
         deployLog.setRemark(deployJobInput.getRemark());
-        deployLog.setStatus(status);
+        deployLog.setStatus(status == 0 ? 1 : 0);
         deployLog.setOutput(str);
         deployLog.setOperatorId(GuestUtil.getGuestId());
         deployLog.setOperatorName(GuestUtil.getName());
@@ -425,7 +425,7 @@ public class JobService {
         Integer size = deployLogInput.getSize();
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = deployLogInput.getPage() == 0 ? null : (deployLogInput.getPage() - 1) * pageSize;
-        List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(),start,size);
+        List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(), start, size);
 
         return ResultOutputUtil.success(deployLogOutputs);
     }
