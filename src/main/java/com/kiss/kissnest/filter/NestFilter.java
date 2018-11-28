@@ -38,10 +38,10 @@ public class NestFilter implements Filter {
         Guest operator = new Guest();
         operator.setId(120);
         operator.setName("小钱");
-        operator.setUsername("xiaoqian");
+        operator.setName("xiaoqian");
         GuestUtil.setGuest(operator);
 
-        chain.doFilter(httpServletRequest,httpServletResponse);
+        chain.doFilter(httpServletRequest, httpServletResponse);
     }
 
     @Override
