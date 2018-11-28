@@ -289,7 +289,7 @@ public class JobService {
 
         log.info("部署日志:{}", str);
         String statusStr = str.substring(str.lastIndexOf("\\n") + 2, str.length() - 2);
-        Integer status = 0;
+        Integer status = 1;
 
         try {
             status = Integer.parseInt(statusStr);
