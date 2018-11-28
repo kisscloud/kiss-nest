@@ -6,6 +6,7 @@ import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.BuildLogOutput;
+import com.kiss.kissnest.output.DeployLogOutput;
 import com.kiss.kissnest.output.GetBuildLogOutput;
 import com.kiss.kissnest.output.JobOutput;
 import com.kiss.kissnest.status.NestStatusCode;
@@ -19,7 +20,6 @@ import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,17 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
+import utils.GuestUtil;
 import utils.ThreadLocalUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
 
 @Service
 @Slf4j
-public class BuildService {
+public class JobService {
 
     @Autowired
     private ProjectDao projectDao;
@@ -104,12 +104,6 @@ public class BuildService {
     private EnvironmentDao environmentDao;
 
     @Autowired
-    private TeamDao teamDao;
-
-    @Autowired
-    private GroupDao groupDao;
-
-    @Autowired
     private OperationLogService operationLogService;
 
     @Autowired
@@ -123,8 +117,6 @@ public class BuildService {
 
 
     public static Map<String, String> buildRemarks = new HashMap<>();
-
-    public static Map<String, String> deployRemarks = new HashMap<>();
 
     public ResultOutput createBuildJob(CreateJobInput createJobInput) {
 
@@ -249,6 +241,7 @@ public class BuildService {
         Integer type = environment.getType();
         String tarName;
         String jarName;
+        String version;
         if (type == 1) {
             //测试环境
             PackageRepository packageRepository = new PackageRepository();
@@ -257,6 +250,7 @@ public class BuildService {
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
             jarName = packageRepository.getJarName();
+            version = packageRepository.getVersion();
         } else {
             PackageRepository packageRepository = new PackageRepository();
             packageRepository.setProjectId(deployJobInput.getProjectId());
@@ -264,11 +258,11 @@ public class BuildService {
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
             jarName = packageRepository.getJarName();
+            version = packageRepository.getVersion();
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(deployJobInput.getProjectId());
         String path = projectRepository.getPathWithNamespace();
-        Project project = projectDao.getProjectById(deployJobInput.getProjectId());
 
         String script = job.getScript();
 //        String shell = String.format(script,path);
@@ -283,7 +277,7 @@ public class BuildService {
         String conf = job.getConf();
         conf = conf.replace("__PACKAGE__", jarName);
         conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update";
+        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update && echo $?";
 
         String serverIds = job.getServerIds();
         serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
@@ -292,8 +286,34 @@ public class BuildService {
         log.info("操作{},目标{},conf{}", option, targetIps, conf);
 
         String str = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
-        System.out.println(str);
-        return ResultOutputUtil.success(str);
+
+        log.info("部署日志:{}",str);
+        String statusStr = str.substring(str.lastIndexOf("\\n") + 2, str.length() - 2);
+        Integer status = 0;
+
+        try {
+            status = Integer.parseInt(statusStr);
+        } catch (Exception e) {
+            log.info("部署状态转换失败:{}",statusStr);
+        }
+
+        DeployLog deployLog = new DeployLog();
+        deployLog.setTeamId(job.getTeamId());
+        deployLog.setJobId(job.getId());
+        deployLog.setEnvId(environment.getId());
+        deployLog.setBranch(deployJobInput.getBranch());
+        deployLog.setTag(deployJobInput.getTag());
+        deployLog.setVersion(version);
+        deployLog.setProjectId(job.getProjectId());
+        deployLog.setRemark(deployJobInput.getRemark());
+        deployLog.setStatus(status);
+        deployLog.setOutput(str);
+        deployLog.setOperatorId(GuestUtil.getGuestId());
+        deployLog.setOperatorName(GuestUtil.getName());
+        deployLogDao.createDeployLog(deployLog);
+        DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
+
+        return ResultOutputUtil.success(deployLogOutput);
     }
 
 
@@ -311,7 +331,7 @@ public class BuildService {
         return ResultOutputUtil.success(result);
     }
 
-    public ResultOutput getBuildLogsByTeamId(BuildLogsInput buildLogsInput) {
+    public ResultOutput getBuildLogsByTeamId(BuildLogInput buildLogsInput) {
 
         Integer maxSize = Integer.parseInt(buildLogSize);
         Integer size = buildLogsInput.getSize();
@@ -399,13 +419,22 @@ public class BuildService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
     }
 
+    public ResultOutput getDeployLogs(DeployLogInput deployLogInput) {
+
+        Integer maxSize = Integer.parseInt(buildLogSize);
+        Integer size = deployLogInput.getSize();
+        Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
+        Integer start = deployLogInput.getPage() == 0 ? null : (deployLogInput.getPage() - 1) * pageSize;
+        List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(),start,size);
+
+        return ResultOutputUtil.success(deployLogOutputs);
+    }
+
+
     public ResultOutput getProjectDeployConf(Integer projectId, Integer envId) {
 
         Project project = projectDao.getProjectById(projectId);
         String slug = project.getSlug();
-//        Team team = teamDao.getTeamById(project.getTeamId());
-//        Group group = groupDao.getGroupById(project.getGroupId());
-//        String path = team.getSlug() + "-" + group.getSlug() + "-" + project.getSlug();
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         String path = projectRepository.getPathWithNamespace();
         Environment environment = environmentDao.getEnvironmentById(envId);
@@ -448,8 +477,8 @@ public class BuildService {
         String script = stringBuilder.toString();
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         String path = projectRepository.getPathWithNamespace();
-        String prePath = path.substring(0,path.lastIndexOf("/"));
-        script = String.format(script, path,prePath);
+        String prePath = path.substring(0, path.lastIndexOf("/"));
+        script = String.format(script, path, prePath);
         script = StringEscapeUtils.unescapeXml(script);
         Map<String, Object> result = new HashMap<>();
 
@@ -620,144 +649,10 @@ public class BuildService {
         packageRepositoryService.createPackageRepository(buildLog);
     }
 
-    class DeployLogRunner implements Runnable {
-
-        private String jobName;
-
-        private Integer teamId;
-
-        private Integer projectId;
-
-        private String account;
-
-        private String passwordOrToken;
-
-        private Integer operatorId;
-
-        private Integer number;
-
-        private Integer type;
-
-        private String serverIds;
-
-        public DeployLogRunner(String jobName, Integer teamId, Integer projectId, Integer operatorId, String account, String passwordOrToken, Integer number, Integer type, String serverIds) {
-            this.jobName = jobName;
-            this.projectId = projectId;
-            this.account = account;
-            this.passwordOrToken = passwordOrToken;
-            this.operatorId = operatorId;
-            this.number = number;
-            this.type = type;
-            this.teamId = teamId;
-            this.serverIds = serverIds;
-        }
-
-        @Override
-        public void run() {
-            Build build = null;
-            JenkinsServer jenkinsServer = jenkinsUtil.getJenkinsServer(account, passwordOrToken);
-
-            if (jenkinsServer == null) {
-                return;
-            }
-            //获取最后一个任务num
-            Build lastBuild = jenkinsUtil.getLastBuild(jobName, jenkinsServer);
-            if (lastBuild == null) {
-                return;
-            }
-
-            Integer last = lastBuild.getNumber();
-            Integer newNumber = number;
-
-            if (last < number) {
-                //num < number 等待
-                for (int i = 0; i < 10; i++) {
-
-                    try {
-                        Thread.sleep(6000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    build = jenkinsUtil.getBuild(jobName, jenkinsServer, number);
-
-                    if (build != null) {
-                        break;
-                    }
-                }
-
-                if (build != null) {
-                    saveDeployLog(build, teamId, jobName, operatorId, account, projectId, number, serverIds);
-                }
-            } else if (last == number) {
-                //num = number 将num插入数据库
-                saveDeployLog(lastBuild, teamId, jobName, operatorId, account, projectId, number, serverIds);
-            } else {
-                //num > number 查询number-num的所有任务
-
-                for (int i = number; i <= last; i++) {
-                    build = jenkinsUtil.getBuild(jobName, jenkinsServer, i);
-
-                    if (build != null) {
-                        saveDeployLog(build, teamId, jobName, operatorId, account, projectId, i, serverIds);
-                    }
-                }
-
-                newNumber = last;
-            }
-
-            Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 2, 0, newNumber);
-
-            if (count == 0) {
-                log.info("{}的{}的deployLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, number, newNumber);
-            }
-
-            jenkinsUtil.close(jenkinsServer);
-        }
-    }
-
-    public void saveDeployLog(Build build, Integer teamId, String jobName, Integer operatorId, String account, Integer projectId, Integer number, String serverIds) {
-
-        JenkinsHttpConnection client = build.getClient();
-        String logUrl = String.format(jenkinsBuildLogUrl, jobName, number);
-        BuildWithDetails buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client, logUrl);
-        client = buildWithDetails.getClient();
-        String output = jenkinsUtil.getConsoleOutputText(client, logUrl + jenkinsBuildOutputPath);
-        String result = buildWithDetails.getResult().name();
-        Map<String, String> params = buildWithDetails.getParameters();
-        String branch = params.get("branch");
-        DeployLog deployLog = new DeployLog();
-        deployLog.setTeamId(teamId);
-        deployLog.setJobName(jobName);
-        deployLog.setServerIds(serverIds);
-        deployLog.setBranch(branch);
-        deployLog.setNumber(build.getNumber());
-        deployLog.setProjectId(projectId);
-        deployLog.setRemark(deployRemarks.get(projectId + "" + number));
-        deployLog.setOperatorId(operatorId);
-        deployLog.setOperatorName(account);
-        deployLog.setOutput(output);
-        deployLog.setDeployAt(buildWithDetails.getTimestamp());
-
-        if (output.indexOf("versionStart") != -1) {
-            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
-            deployLog.setVersion(version);
-        }
-
-        if ("success".equalsIgnoreCase(result)) {
-            deployLog.setStatus(0);
-        } else {
-            deployLog.setStatus(1);
-        }
-
-        deployLogDao.createDeployLog(deployLog);
-        deployRemarks.remove(projectId + "" + number);
-    }
-
     public static void main(String[] args) {
-        String str = "abc/a/c";
+        String str = "Cloning into 'config'...\\nNo config updates to processes\\n0";
 
-        str = str.substring(0,str.lastIndexOf("/"));
-        System.out.println(str);
+        String last = str.substring(str.lastIndexOf("\\n") + 2);
+        System.out.println(last);
     }
 }

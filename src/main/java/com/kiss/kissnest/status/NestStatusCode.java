@@ -84,6 +84,8 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer CREATE_MEMBER_APITOKEN_FAILED = 9003;
     public static final Integer UPDATE_MEMBER_APITOKEN_FAILED = 9004;
     public static final Integer MEMBER_APITOKEN_IS_EMPTY = 9005;
+    public static final Integer MEMBER_ACCOUNT_HAS_NOT_BEEN_ACTIVATED= 9006;
+
 
     public static final Integer CREATE_JENKINS_JOB_ERROR = 10001;
     public static final Integer BUILD_JENKINS_JOB_ERROR = 10002;

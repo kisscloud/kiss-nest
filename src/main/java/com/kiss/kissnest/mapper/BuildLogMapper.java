@@ -3,6 +3,7 @@ package com.kiss.kissnest.mapper;
 import com.kiss.kissnest.entity.BuildLog;
 import com.kiss.kissnest.output.BuildLogOutput;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public interface BuildLogMapper {
 
     BuildLog getLastBuildByJobNameAndProjectId(Map params);
 
-    List<BuildLogOutput> getBuildLogsByTeamId(Map params);
+    List<BuildLogOutput> getBuildLogsByTeamId(@Param("teamId") Integer teamId,@Param("start") Integer start,@Param("size") Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer id);
 

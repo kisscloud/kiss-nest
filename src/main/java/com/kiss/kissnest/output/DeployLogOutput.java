@@ -1,19 +1,19 @@
-package com.kiss.kissnest.entity;
+package com.kiss.kissnest.output;
 
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
-public class DeployLog {
+public class DeployLogOutput {
 
     private Integer id;
 
     private Integer teamId;
 
-    private Integer jobId;
+    private String jobId;
 
-    private Integer envId;
+    private String envId;
+
+    private String serverIds;
 
     private String branch;
 
@@ -22,6 +22,8 @@ public class DeployLog {
     private String version;
 
     private Integer projectId;
+
+    private String projectName;
 
     private String remark;
 
@@ -33,7 +35,7 @@ public class DeployLog {
 
     private String operatorName;
 
-    private Date createdAt;
+    private Long createdAt;
 
-    private Date updatedAt;
+    private Long updatedAt;
 }

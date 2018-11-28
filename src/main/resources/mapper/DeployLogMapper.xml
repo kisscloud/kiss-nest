@@ -5,46 +5,11 @@
 <!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.DeployLogMapper">
-    <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog">
-        insert into deploylogs (teamId,jobName,serverIds,branch,number,version,projectId,remark,status,output,operatorId,operatorName,deployAt)
+    <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog" keyProperty="id" useGeneratedKeys="true">
+        insert into deploylogs (teamId,jobId,envId,branch,tag,version,projectId,remark,status,output,operatorId,operatorName)
         value
-        (#{teamId},#{jobName},#{serverIds},#{branch},#{number},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName},#{deployAt})
+        (#{teamId},#{jobId},#{envId},#{branch},#{tag},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName})
     </insert>
-
-    <delete id="deleteDeployLogById" parameterType="java.lang.Integer">
-        delete from deploylogs where id = #{id}
-    </delete>
-
-    <update id="updateDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog">
-        update deploylogs
-        set
-        id = #{id}
-        <if test="serverIds != null">
-            serverIds = #{serverIds}
-        </if>
-        <if test="branch != null">
-            branch = #{branch}
-        </if>
-        <if test="version != null">
-            version = #{version}
-        </if>
-        <if test="projectId != null">
-            projectId = #{projectId}
-        </if>
-        <if test="remark != null">
-            remark = #{remark}
-        </if>
-        <if test="status != null">
-            status = #{status}
-        </if>
-        <if test="operationId != null">
-            operationId = #{operationId}
-        </if>
-        <if test="operatorName != null">
-            operatorName = #{operatorName}
-        </if>
-        where id = #{id}
-    </update>
 
     <select id="getDeployLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.DeployLog">
         select * from deploylogs where id = #{id};
@@ -52,5 +17,28 @@
 
     <select id="getDeployLogs" resultType="com.kiss.kissnest.entity.DeployLog">
         select * from deploylogs;
+    </select>
+    
+    <select id="getDeployLogOutputById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.DeployLogOutput">
+        select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.output,de.operatorId,de.operatorName,de.remark,
+        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt from deploylogs de
+        left join jobs jo
+        on de.jobId = jo.id
+        left join projects pr
+        on de.projectId = pr.id
+        where de.id = #{id}
+    </select>
+    
+    <select id="getDeployLogsOutputByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.DeployLogOutput">
+        select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.output,de.operatorId,de.operatorName,de.remark,
+        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt from deploylogs de
+        left join jobs jo
+        on de.jobId = jo.id
+        left join projects pr
+        on de.projectId = pr.id
+        where de.teamId = #{teamId}
+        <if test="start != null">
+            limit #{start},#{size}
+        </if>
     </select>
 </mapper>
