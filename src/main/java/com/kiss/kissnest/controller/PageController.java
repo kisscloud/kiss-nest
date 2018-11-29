@@ -26,7 +26,7 @@ public class PageController {
     private ProjectService projectService;
 
     @Autowired
-    private BuildService buildService;
+    private JobService buildService;
 
     @Autowired
     private ProjectRepositoryService projectRepositoryService;

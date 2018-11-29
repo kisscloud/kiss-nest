@@ -276,6 +276,8 @@ public class MemberService {
         List<MemberTeamInput> memberInputs = createMemberTeamInput.getMemberTeamInputs();
         Map<Integer, Integer> memberAccount = new HashMap<>();
         Map<String,Integer> gitlabMember = new HashMap<>();
+        Map<String,String> memberName = new HashMap<>();
+
 
         for (MemberTeamInput memberInput : memberInputs) {
 
@@ -320,6 +322,7 @@ public class MemberService {
                 memberTeam.setOperatorName(guest.getName());
                 memberTeams.add(memberTeam);
                 gitlabMember.put(memberInput.getUsername(),memberInput.getRole());
+                memberName.put(memberInput.getUsername(),memberInput.getName());
             }
         }
 
@@ -337,7 +340,7 @@ public class MemberService {
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
         for (Map.Entry<String,Integer> entry : gitlabMember.entrySet()) {
-            gitlabApiUtil.addMember(team.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Group);
+            gitlabApiUtil.addMember(team.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Group,memberName.get(entry.getKey()));
         }
 
         return ResultOutputUtil.success();
@@ -386,7 +389,7 @@ public class MemberService {
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
         for (Map.Entry<String,Integer> entry : gitlabGroup.entrySet()) {
-            gitlabApiUtil.addMember(group.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.SubGroup);
+            gitlabApiUtil.addMember(group.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.SubGroup,null);
         }
 
         return ResultOutputUtil.success();
@@ -434,7 +437,7 @@ public class MemberService {
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
         for (Map.Entry<String,Integer> entry : gitlabProject.entrySet()) {
-            gitlabApiUtil.addMember(projectRepository.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Project);
+            gitlabApiUtil.addMember(projectRepository.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Project,null);
         }
 
         return ResultOutputUtil.success();

@@ -1,9 +1,8 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.input.*;
-import com.kiss.kissnest.service.BuildService;
+import com.kiss.kissnest.service.JobService;
 import com.kiss.kissnest.service.PackageRepositoryService;
-import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,13 +19,10 @@ import java.io.IOException;
 public class JobController {
 
     @Autowired
-    private BuildService buildService;
+    private JobService jobService;
 
     @Autowired
     private JobValidator jobValidator;
-
-    @Autowired
-    private JenkinsUtil jenkinsUtil;
 
     @Autowired
     private PackageRepositoryService packageRepositoryService;
@@ -41,62 +37,68 @@ public class JobController {
     @ApiOperation(value = "创建构建任务")
     public ResultOutput createBuildJob(@Validated @RequestBody CreateJobInput createJobInput) {
 
-        return buildService.createBuildJob(createJobInput);
+        return jobService.createBuildJob(createJobInput);
     }
 
     @PostMapping("/job/build/exec")
     @ApiOperation(value = "执行构建任务")
     public ResultOutput execBuildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
-        return buildService.buildJob(buildJobInput);
+        return jobService.buildJob(buildJobInput);
     }
 
     @GetMapping("/job/exist")
     public ResultOutput validateJobExist(@RequestParam("projectId") Integer projectId, @RequestParam("type") Integer type) {
 
-        return buildService.validateJobExist(projectId, type);
+        return jobService.validateJobExist(projectId, type);
     }
 
     @PostMapping("/job/build/logs")
-    public ResultOutput getBuildLogs(@Validated @RequestBody BuildLogsInput buildLogsInput) {
+    public ResultOutput getBuildLogs(@Validated @RequestBody BuildLogInput buildLogsInput) {
 
-        return buildService.getBuildLogsByTeamId(buildLogsInput);
+        return jobService.getBuildLogsByTeamId(buildLogsInput);
     }
 
     @GetMapping("/job/build/result")
     public ResultOutput getBuildRecentLog(@RequestParam("id") Integer id) {
 
-        return buildService.getBuildRecentLog(id);
+        return jobService.getBuildRecentLog(id);
     }
 
     @PostMapping("/job/deploy")
     public ResultOutput createDeployJob(@RequestBody CreateDeployInput createDeployInput) {
 
-        return buildService.createDeployJob(createDeployInput);
+        return jobService.createDeployJob(createDeployInput);
     }
 
     @PutMapping("/job/deploy")
     public ResultOutput updateDeployJob(@RequestBody UpdateDeployInput updateDeployInput) {
 
-        return buildService.updateDeployJob(updateDeployInput);
+        return jobService.updateDeployJob(updateDeployInput);
     }
 
     @PostMapping("/job/deploy/exec")
     public ResultOutput execDeployJob(@RequestBody DeployJobInput deployJobInput) throws IOException {
 
-        return buildService.deployJob(deployJobInput);
+        return jobService.deployJob(deployJobInput);
+    }
+
+    @PostMapping("/job/deploy/logs")
+    public ResultOutput getDeployLogs(@Validated @RequestBody DeployLogInput deployLogInput) {
+
+        return jobService.getDeployLogs(deployLogInput);
     }
 
     @GetMapping("/jobs")
     public ResultOutput getJobsByTeamId(@RequestParam("teamId") Integer teamId,@RequestParam("type") Integer type) {
 
-        return buildService.getJobsByTeamId(teamId,type);
+        return jobService.getJobsByTeamId(teamId,type);
     }
 
     @PutMapping("/job/build")
     public ResultOutput updateBuildJob(@Validated @RequestBody UpdateJobInput updateJobInput) {
 
-        return buildService.updateBuildJob(updateJobInput);
+        return jobService.updateBuildJob(updateJobInput);
     }
 
     @GetMapping("/job/package/repository/branches")
@@ -114,12 +116,12 @@ public class JobController {
     @GetMapping("/job/deploy/conf")
     public ResultOutput getProjectDeployConf(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
 
-        return buildService.getProjectDeployConf(projectId,envId);
+        return jobService.getProjectDeployConf(projectId,envId);
     }
 
     @GetMapping("/job/deploy/script")
     public ResultOutput getProjectDeployScript(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
 
-        return buildService.getProjectDeployScript(projectId,envId);
+        return jobService.getProjectDeployScript(projectId,envId);
     }
 }

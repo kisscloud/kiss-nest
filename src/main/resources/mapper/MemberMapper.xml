@@ -84,10 +84,10 @@
     </select>
 
     <insert id="createMembers" parameterType="java.util.List" keyProperty="id" useGeneratedKeys="true">
-        insert into members (accountId,teamId,accessToken,operatorId,operatorName)
+        insert into members (accountId,name,teamId,accessToken,operatorId,operatorName)
         values
         <foreach collection="list" item="m" separator=",">
-            (#{m.accountId},#{m.teamId},#{m.accessToken},#{m.operatorId},#{m.operatorName})
+            (#{m.accountId},#{m.name},#{m.teamId},#{m.accessToken},#{m.operatorId},#{m.operatorName})
         </foreach>
     </insert>
 

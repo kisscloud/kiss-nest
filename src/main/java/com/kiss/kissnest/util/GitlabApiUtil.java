@@ -16,6 +16,8 @@ import org.gitlab.api.TokenType;
 import org.gitlab.api.models.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import utils.ThreadLocalUtil;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
@@ -154,13 +156,14 @@ public class GitlabApiUtil {
         }
     }
 
-    public void addMember(Integer repositoryId, String accessToken,String username, Integer level,RepositoryType type) {
+    public void addMember(Integer repositoryId, String accessToken,String username, Integer level,RepositoryType type,String name) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
             String users = getUser(username,accessToken);
 
             if (users == null) {
-                return;
+                ThreadLocalUtil.setString("member_account_has_not_been_activated",name);
+                throw new TransactionalException(NestStatusCode.MEMBER_ACCOUNT_HAS_NOT_BEEN_ACTIVATED);
             }
 
             JSONArray jsonArray = JSONObject.parseArray(users);

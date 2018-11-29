@@ -40,11 +40,12 @@ public class JobValidator implements Validator {
 
         return clazz.equals(CreateJobInput.class) ||
                 clazz.equals(BuildJobInput.class) ||
-                clazz.equals(BuildLogsInput.class) ||
+                clazz.equals(BuildLogInput.class) ||
                 clazz.equals(CreateDeployInput.class) ||
                 clazz.equals(UpdateJobInput.class) ||
                 clazz.equals(UpdateDeployInput.class) ||
-                clazz.equals(DeployJobInput.class);
+                clazz.equals(DeployJobInput.class) ||
+                clazz.equals(DeployLogInput.class);
     }
 
     @Override
@@ -60,8 +61,8 @@ public class JobValidator implements Validator {
             validateProjectId(buildJobInput.getProjectId(), errors);
             validateBranch(buildJobInput.getBranch(), errors);
             validateExecType(buildJobInput.getType(), errors);
-        } else if (BuildLogsInput.class.isInstance(target)) {
-            BuildLogsInput buildLogsInput = (BuildLogsInput) target;
+        } else if (BuildLogInput.class.isInstance(target)) {
+            BuildLogInput buildLogsInput = (BuildLogInput) target;
             teamValidaor.validateId(buildLogsInput.getTeamId(), "teamId", errors);
             validatePage(buildLogsInput.getPage(), errors);
         } else if (UpdateJobInput.class.isInstance(target)) {
@@ -97,6 +98,10 @@ public class JobValidator implements Validator {
             validateType(updateDeployInput.getType(), errors);
         } else if (DeployJobInput.class.isInstance(target)) {
 
+        } else if (DeployLogInput.class.isInstance(target)) {
+            DeployLogInput deployLogInput = (DeployLogInput) target;
+            teamValidaor.validateId(deployLogInput.getTeamId(), "teamId", errors);
+            validatePage(deployLogInput.getPage(), errors);
         }
     }
 

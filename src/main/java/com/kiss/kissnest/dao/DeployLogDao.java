@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.DeployLog;
+import com.kiss.kissnest.output.DeployLogOutput;
 
 import java.util.List;
 
@@ -8,11 +9,11 @@ public interface DeployLogDao {
 
     Integer createDeployLog(DeployLog deployLog);
 
-    Integer deleteDeployLogById(Integer id);
-
-    Integer updateDeployLog(DeployLog deployLog);
-
     DeployLog getDeployLogById(Integer id);
 
     List<DeployLog> getDeployLogs();
+
+    DeployLogOutput getDeployLogOutputById(Integer id);
+
+    List<DeployLogOutput> getDeployLogsOutputByTeamId(Integer teamId, Integer start, Integer size);
 }
