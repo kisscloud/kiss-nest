@@ -28,52 +28,52 @@ public class TeamValidaor implements Validator {
 
         if (CreateTeamInput.class.isInstance(target)) {
             CreateTeamInput createTeamInput = (CreateTeamInput) target;
-            validateName(createTeamInput.getName(),errors);
-            validateSlug(createTeamInput.getSlug(),errors);
+            validateName(createTeamInput.getName(), errors);
+            validateSlug(createTeamInput.getSlug(), errors);
         } else if (UpdateTeamInput.class.isInstance(target)) {
             UpdateTeamInput updateTeamInput = (UpdateTeamInput) target;
-            validateId(updateTeamInput.getId(),"id",errors);
-            validateName(updateTeamInput.getName(),errors);
+            validateId(updateTeamInput.getId(), "id", errors);
+            validateName(updateTeamInput.getName(), errors);
         } else {
-            errors.rejectValue("name", "", "数据绑定错误");
+            errors.rejectValue("name", null);
         }
     }
 
-    public void validateName (String name,Errors errors) {
+    public void validateName(String name, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.TEAM_NAME_IS_EMPTY),"团队名字不能为空");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.TEAM_NAME_IS_EMPTY));
             return;
         }
 
         Team team = teamDao.getTeamByName(name);
 
         if (team != null) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.TEAM_NAME_EXIST),"团队名字已经存在");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.TEAM_NAME_EXIST));
         }
     }
 
-    public boolean validateId (Integer id,String idName,Errors errors) {
+    public boolean validateId(Integer id, String idName, Errors errors) {
 
         if (id == null) {
-            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAMID_IS_EMPTY),"团队id不能为空");
+            errors.rejectValue(idName, String.valueOf(NestStatusCode.TEAMID_IS_EMPTY));
             return false;
         }
 
         Team team = teamDao.getTeamById(id);
 
         if (team == null) {
-            errors.rejectValue(idName,String.valueOf(NestStatusCode.TEAM_NOT_EXIST),"团队不存在");
+            errors.rejectValue(idName, String.valueOf(NestStatusCode.TEAM_NOT_EXIST));
             return false;
         }
 
         return true;
     }
 
-    public void validateSlug (String slug,Errors errors) {
+    public void validateSlug(String slug, Errors errors) {
 
         if (StringUtils.isEmpty(slug)) {
-            errors.rejectValue("slug",String.valueOf(NestStatusCode.TEAM_SLUG_IS_EMPTY),"项目路径不能为空");
+            errors.rejectValue("slug", String.valueOf(NestStatusCode.TEAM_SLUG_IS_EMPTY));
         }
     }
 }
