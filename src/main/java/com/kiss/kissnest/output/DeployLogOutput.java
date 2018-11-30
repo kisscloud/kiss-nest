@@ -41,6 +41,8 @@ public class DeployLogOutput {
 
     private String groupName;
 
+    private String branchPath;
+
     private Long createdAt;
 
     private Long updatedAt;

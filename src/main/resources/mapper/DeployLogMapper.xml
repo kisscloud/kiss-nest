@@ -32,7 +32,7 @@
     
     <select id="getDeployLogsOutputByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.DeployLogOutput">
         select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.operatorId,de.operatorName,de.remark,
-        UNIX_TIMESTAMP(de.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(de.updatedAt) * 1000 as updatedAt,env.name as envName,pr.groupId,gr.name as groupName,de.statusText from deploylogs de
+        UNIX_TIMESTAMP(de.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(de.updatedAt) * 1000 as updatedAt,env.name as envName,pr.groupId,gr.name as groupName,de.statusText,pp.pathWithNamespace as branchPath from deploylogs de
         left join jobs jo
         on de.jobId = jo.id
         left join projects pr
@@ -41,6 +41,8 @@
         on pr.groupId = gr.id
         left join environments env
         on de.envId = env.id
+        left join projectrepository pp
+        on de.projectId = pp.projectId and de.teamId = pp.teamId
         where de.teamId = #{teamId}
         order by de.createdAt desc
         <if test="start != null">
