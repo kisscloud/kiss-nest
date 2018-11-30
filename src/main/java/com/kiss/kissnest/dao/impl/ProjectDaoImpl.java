@@ -4,6 +4,7 @@ import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.mapper.ProjectMapper;
+import com.kiss.kissnest.output.ProjectOutput;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -130,5 +131,11 @@ public class ProjectDaoImpl implements ProjectDao {
     public List<Project> getProjectsByGroupId(Integer groupId) {
 
         return projectMapper.getProjectsByGroupId(groupId);
+    }
+
+    @Override
+    public List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId) {
+
+        return projectMapper.getProjectOutputs(teamId,groupId);
     }
 }

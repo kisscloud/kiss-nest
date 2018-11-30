@@ -2,6 +2,8 @@ package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.output.ProjectOutput;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -18,11 +20,11 @@ public interface ProjectDao {
 
     Project getProjectById(Integer id);
 
-    List<Project> getProjects(Integer teamId,Integer groupId);
+    List<Project> getProjects(Integer teamId, Integer groupId);
 
-    Project getProjectByNameAndTeamId(String name,Integer teamId);
+    Project getProjectByNameAndTeamId(String name, Integer teamId);
 
-    Project getProjectBySlugAndTeamId(String slug,Integer teamId);
+    Project getProjectBySlugAndTeamId(String slug, Integer teamId);
 
     Integer addRepositoryIdById(Project project);
 
@@ -41,4 +43,6 @@ public interface ProjectDao {
     String getProjectNameByServerId(String serverId);
 
     List<Project> getProjectsByGroupId(Integer groupId);
+
+    List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId);
 }

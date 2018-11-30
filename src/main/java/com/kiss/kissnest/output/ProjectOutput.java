@@ -15,6 +15,8 @@ public class ProjectOutput {
 
     private Integer groupId;
 
+    private String groupName;
+
     private Integer membersCount;
 
     private Integer needsCount;

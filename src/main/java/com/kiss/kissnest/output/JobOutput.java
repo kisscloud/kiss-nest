@@ -13,6 +13,10 @@ public class JobOutput {
 
     private String projectName;
 
+    private String groupName;
+
+    private Integer groupId;
+
     private String jobName;
 
     private String script;

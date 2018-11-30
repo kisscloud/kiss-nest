@@ -2,7 +2,9 @@ package com.kiss.kissnest.mapper;
 
 import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.output.ProjectOutput;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -43,4 +45,6 @@ public interface ProjectMapper {
     String getProjectNameByServerId(String serverId);
 
     List<Project> getProjectsByGroupId(Integer groupId);
+
+    List<ProjectOutput> getProjectOutputs(@Param("teamId") Integer teamId,@Param("groupId") Integer groupId);
 }

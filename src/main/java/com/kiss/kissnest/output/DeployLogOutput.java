@@ -37,6 +37,10 @@ public class DeployLogOutput {
 
     private String operatorName;
 
+    private Integer groupId;
+
+    private String groupName;
+
     private Long createdAt;
 
     private Long updatedAt;

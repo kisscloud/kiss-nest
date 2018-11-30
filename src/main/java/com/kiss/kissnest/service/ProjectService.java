@@ -164,9 +164,7 @@ public class ProjectService {
 
     public ResultOutput getProjects(Integer teamId, Integer groupId) {
 
-        List<Project> projects = projectDao.getProjects(teamId, groupId);
-        List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class, BeanCopyUtil.defaultFieldNames);
-
+        List<ProjectOutput> projectOutputs = projectDao.getProjectOutputs(teamId, groupId);
         projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
 
         return ResultOutputUtil.success(projectOutputs);

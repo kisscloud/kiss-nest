@@ -25,6 +25,10 @@ public class BuildLogOutput {
 
     private String projectName;
 
+    private Integer groupId;
+
+    private String groupName;
+
     private String remark;
 
     private Integer status;

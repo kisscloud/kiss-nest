@@ -455,8 +455,6 @@ public class JobService {
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = deployLogInput.getPage() == 0 ? null : (deployLogInput.getPage() - 1) * pageSize;
         List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(), start, size);
-
-        deployLogOutputs.forEach(deployLogOutput -> deployLogOutput.setStatusText(codeUtil.getEnumsMessage("deploy.status", String.valueOf(deployLogOutput.getStatus()))));
         Integer count = deployLogDao.getDeployLogsCount(deployLogInput.getTeamId());
 
         GetDeployLogOutput getDeployLogOutput = new GetDeployLogOutput();

@@ -81,11 +81,18 @@
     </select>
 
     <select id="getBuildLogOutputsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
-        select bu.*,pr.pathWithNamespace as commitPath,po.name as projectName from buildlogs bu
+        select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
+        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
+        bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
+        UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt,
+        po.groupId,gr.name as groupName
+        from buildlogs bu
         left join projectrepository pr
         on bu.projectId = pr.projectId and bu.teamId = pr.teamId
         left join projects po
         on bu.projectId = po.id and bu.teamId = po.teamId
+        left join groups gr
+        on po.groupId = gr.id
         where bu.teamId = #{teamId} order by bu.buildAt desc
         <if test="start != null">
             limit #{start},#{size}
@@ -96,12 +103,15 @@
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
         bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
-        UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt
+        UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt,
+        po.groupId,gr.name as groupName
         from buildlogs bu
         left join projectrepository pr
         on bu.projectId = pr.projectId and bu.teamId = pr.teamId
         left join projects po
         on bu.projectId = po.id and bu.teamId = po.teamId
+        left join groups gr
+        on po.groupId = gr.id
         where bu.id = #{id};
     </select>
 

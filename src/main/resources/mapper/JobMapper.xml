@@ -71,9 +71,11 @@
     <select id="getJobOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.JobOutput">
         select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.conf,jo.status,jo.number,
         UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
-        pr.name as projectName,en.name as envName from jobs jo
+        pr.name as projectName,en.name as envName,pr.groupId,gr.name as groupName from jobs jo
         left join projects pr
         on jo.projectId = pr.id
+        left join groups gr
+        on pr.groupId = gr.id
         left join environments en
         on jo.envId = en.id
         where jo.teamId = #{teamId} and jo.type = #{type};
