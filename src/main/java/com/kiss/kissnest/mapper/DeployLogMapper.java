@@ -19,4 +19,6 @@ public interface DeployLogMapper {
     DeployLogOutput getDeployLogOutputById(Integer id);
 
     List<DeployLogOutput> getDeployLogsOutputByTeamId(@Param("teamId") Integer teamId,@Param("start") Integer start,@Param("size") Integer size);
+
+    Integer getDeployLogsCount(Integer teamId);
 }

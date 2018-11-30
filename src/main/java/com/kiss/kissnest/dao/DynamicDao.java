@@ -9,4 +9,6 @@ public interface DynamicDao {
     Integer createDynamic(Dynamic dynamic);
 
     List<Dynamic> getDynamics(Dynamic dynamic);
+
+    Integer getDynamicsCount(Dynamic dynamic);
 }

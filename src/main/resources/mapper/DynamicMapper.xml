@@ -30,4 +30,24 @@
             targetType = #{targetType}
         </if>
     </select>
+    
+    <select id="getDynamicsCount" parameterType="com.kiss.kissnest.entity.Dynamic" resultType="java.lang.Integer">
+        select count(*) from dynamics
+        where 1=1
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="teamId != null">
+            and teamId = #{teamId}
+        </if>
+        <if test="groupId != null">
+            and teamId = #{teamId}
+        </if>
+        <if test="projectId != null">
+            and projectId  = #{projectId}
+        </if>
+        <if test="targetType != null">
+            targetType = #{targetType}
+        </if>
+    </select>
 </mapper>

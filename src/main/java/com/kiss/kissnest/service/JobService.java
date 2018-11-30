@@ -5,10 +5,7 @@ import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
-import com.kiss.kissnest.output.BuildLogOutput;
-import com.kiss.kissnest.output.DeployLogOutput;
-import com.kiss.kissnest.output.GetBuildLogOutput;
-import com.kiss.kissnest.output.JobOutput;
+import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
@@ -428,8 +425,13 @@ public class JobService {
         List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(), start, size);
 
         deployLogOutputs.forEach(deployLogOutput -> deployLogOutput.setStatusText(codeUtil.getEnumsMessage("deploy.status",String.valueOf(deployLogOutput.getStatus()))));
+        Integer count = deployLogDao.getDeployLogsCount(deployLogInput.getTeamId());
 
-        return ResultOutputUtil.success(deployLogOutputs);
+        GetDeployLogOutput getDeployLogOutput = new GetDeployLogOutput();
+        getDeployLogOutput.setDeployLogOutputs(deployLogOutputs);
+        getDeployLogOutput.setCount(count);
+
+        return ResultOutputUtil.success(getDeployLogOutput);
     }
 
 

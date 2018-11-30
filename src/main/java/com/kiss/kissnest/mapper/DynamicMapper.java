@@ -11,4 +11,6 @@ public interface DynamicMapper {
     Integer createDynamic(Dynamic dynamic);
 
     List<Dynamic> getDynamics(Dynamic dynamic);
+
+    Integer getDynamicsCount(Dynamic dynamic);
 }

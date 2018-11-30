@@ -43,4 +43,8 @@
             limit #{start},#{size}
         </if>
     </select>
+    
+    <select id="getDeployLogsCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*) from deploylogs where teamId = #{teamId};
+    </select>
 </mapper>

@@ -25,4 +25,10 @@ public class DynamicDaoImpl implements DynamicDao {
 
         return dynamicMapper.getDynamics(dynamic);
     }
+
+    @Override
+    public Integer getDynamicsCount(Dynamic dynamic) {
+
+        return dynamicMapper.getDynamicsCount(dynamic);
+    }
 }
