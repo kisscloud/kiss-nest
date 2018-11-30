@@ -13,6 +13,8 @@ public class DeployLogOutput {
 
     private String envId;
 
+    private String envName;
+
     private String serverIds;
 
     private String branch;
@@ -28,6 +30,8 @@ public class DeployLogOutput {
     private String remark;
 
     private Integer status;
+
+    private String statusText;
 
     private String output;
 

@@ -5,6 +5,7 @@ import com.kiss.kissnest.dao.DynamicDao;
 import com.kiss.kissnest.dao.OperationLogDao;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.output.DynamicOutput;
+import com.kiss.kissnest.output.GetDynamicOutput;
 import com.kiss.kissnest.output.OperationLogOutput;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
@@ -178,7 +179,12 @@ public class OperationLogService {
         dynamic.setProjectId(projectId);
         List<Dynamic> dynamics = dynamicDao.getDynamics(dynamic);
         List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics, DynamicOutput.class, BeanCopyUtil.defaultFieldNames);
+        Integer count = dynamicDao.getDynamicsCount(dynamic);
 
-        return ResultOutputUtil.success(dynamicOutputs);
+        GetDynamicOutput getDynamicOutput = new GetDynamicOutput();
+        getDynamicOutput.setDynamicOutputs(dynamicOutputs);
+        getDynamicOutput.setCount(count);
+
+        return ResultOutputUtil.success(getDynamicOutput);
     }
 }
