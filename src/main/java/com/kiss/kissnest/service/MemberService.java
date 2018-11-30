@@ -183,7 +183,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setName(guest.getName());
-                member.setUsername(guest.getUsername());
+                member.setUsername(guest.getName());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 member.setAccessToken(accessToken);
@@ -224,7 +224,7 @@ public class MemberService {
                 member = new Member();
                 member.setAccountId(guest.getId());
                 member.setName(guest.getName());
-                member.setUsername(guest.getUsername());
+                member.setUsername(guest.getName());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 member.setApiToken(apiToken);

@@ -138,7 +138,7 @@ public class JobService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -212,7 +212,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
-        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
@@ -221,7 +221,7 @@ public class JobService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
         String[] urlStr = location.split("/");
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getUsername(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
+        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getName(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);

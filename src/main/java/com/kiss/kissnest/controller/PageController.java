@@ -172,12 +172,14 @@ public class PageController {
 
     @ApiOperation(value = "获取成员页面参数")
     @GetMapping("/members")
-    public ResultOutput GetPageMembersParams(@RequestParam("teamId") Integer teamId) {
+    public ResultOutput GetPageMembersParams(@RequestParam("teamId") Integer teamId, Integer groupId, Integer projectId) {
 
         ResultOutput teamRoles = memberService.getMemberRoles(1);
         ResultOutput groupRoles = memberService.getMemberRoles(2);
         ResultOutput projectRoles = memberService.getMemberRoles(3);
         ResultOutput members = memberService.getMembers(teamId, null, null);
+        ResultOutput group = groupService.getGroupById(groupId);
+        ResultOutput project = projectService.getProjectById(projectId);
 
         Map<String, Object> result = new HashMap<>();
 
@@ -185,6 +187,8 @@ public class PageController {
         result.put("teamRoles", teamRoles.getData());
         result.put("groupRoles", groupRoles.getData());
         result.put("projectRoles", projectRoles.getData());
+        result.put("group", group.getData());
+        result.put("project", project.getData());
 
         return ResultOutputUtil.success(result);
     }
