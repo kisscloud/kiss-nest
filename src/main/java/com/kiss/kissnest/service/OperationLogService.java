@@ -12,6 +12,7 @@ import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
 
@@ -171,13 +172,14 @@ public class OperationLogService {
         return ResultOutputUtil.success(operationLogOutputs);
     }
 
-    public ResultOutput getDynamics(Integer teamId, Integer groupId, Integer projectId) {
+    public ResultOutput getDynamics(Integer teamId, Integer page, Integer size, Integer groupId, Integer projectId) {
 
+        Integer start = page == null ? null : (page - 1) * size;
         Dynamic dynamic = new Dynamic();
         dynamic.setTeamId(teamId);
         dynamic.setGroupId(groupId);
         dynamic.setProjectId(projectId);
-        List<Dynamic> dynamics = dynamicDao.getDynamics(dynamic);
+        List<Dynamic> dynamics = dynamicDao.getDynamics(teamId,start,size,groupId,projectId);
         List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics, DynamicOutput.class, BeanCopyUtil.defaultFieldNames);
         Integer count = dynamicDao.getDynamicsCount(dynamic);
 

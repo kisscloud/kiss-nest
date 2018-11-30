@@ -6,7 +6,9 @@ import com.kiss.kissnest.mapper.DynamicMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DynamicDaoImpl implements DynamicDao {
@@ -21,9 +23,15 @@ public class DynamicDaoImpl implements DynamicDao {
     }
 
     @Override
-    public List<Dynamic> getDynamics(Dynamic dynamic) {
+    public List<Dynamic> getDynamics(Integer teamId, Integer start, Integer size, Integer groupId, Integer projectId) {
 
-        return dynamicMapper.getDynamics(dynamic);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("start", start);
+        params.put("size", size);
+        params.put("groupId", groupId);
+        params.put("projectId", projectId);
+        return dynamicMapper.getDynamics(params);
     }
 
     @Override

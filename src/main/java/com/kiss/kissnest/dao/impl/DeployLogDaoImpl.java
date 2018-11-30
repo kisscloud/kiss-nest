@@ -50,4 +50,10 @@ public class DeployLogDaoImpl implements DeployLogDao {
 
         return deployLogMapper.getDeployLogsCount(teamId);
     }
+
+    @Override
+    public String getDeployLogOutputTextById(Integer id) {
+
+        return deployLogMapper.getDeployLogOutputTextById(id);
+    }
 }

@@ -59,6 +59,12 @@ public class JobController {
         return jobService.getBuildLogsByTeamId(buildLogsInput);
     }
 
+    @GetMapping("/job/build/log/output")
+    public ResultOutput getBuildLogOutputById(@RequestParam("id") Integer id) {
+
+        return jobService.getDeployLogOutputTextById(id);
+    }
+
     @GetMapping("/job/build/result")
     public ResultOutput getBuildRecentLog(@RequestParam("id") Integer id) {
 
@@ -87,6 +93,12 @@ public class JobController {
     public ResultOutput getDeployLogs(@Validated @RequestBody DeployLogInput deployLogInput) {
 
         return jobService.getDeployLogs(deployLogInput);
+    }
+
+    @GetMapping("/job/deploy/log/output")
+    public ResultOutput getDeployLogOutputText(@RequestParam("id") Integer id) {
+
+        return jobService.getDeployLogOutputText(id);
     }
 
     @GetMapping("/jobs")
@@ -123,5 +135,10 @@ public class JobController {
     public ResultOutput getProjectDeployScript(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
 
         return jobService.getProjectDeployScript(projectId,envId);
+    }
+
+    @GetMapping("/job/get")
+    public ResultOutput get(){
+        return jobService.get();
     }
 }

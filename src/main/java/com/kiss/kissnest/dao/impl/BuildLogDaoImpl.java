@@ -58,9 +58,9 @@ public class BuildLogDaoImpl implements BuildLogDao {
     }
 
     @Override
-    public List<BuildLogOutput> getBuildLogsByTeamId(Integer teamId, Integer start, Integer size) {
+    public List<BuildLogOutput> getBuildLogOutputsByTeamId(Integer teamId, Integer start, Integer size) {
 
-        return buildLogMapper.getBuildLogsByTeamId(teamId,start,size);
+        return buildLogMapper.getBuildLogOutputsByTeamId(teamId,start,size);
     }
 
     @Override
@@ -79,5 +79,11 @@ public class BuildLogDaoImpl implements BuildLogDao {
     public Integer getBuildLogCountByTeamId(Integer teamId) {
 
         return buildLogMapper.getBuildLogCountByTeamId(teamId);
+    }
+
+    @Override
+    public String getDeployLogOutputTextById(Integer id) {
+
+        return buildLogMapper.getDeployLogOutputTextById(id);
     }
 }

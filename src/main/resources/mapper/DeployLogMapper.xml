@@ -6,9 +6,9 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.DeployLogMapper">
     <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog" keyProperty="id" useGeneratedKeys="true">
-        insert into deploylogs (teamId,jobId,envId,branch,tag,version,projectId,remark,status,output,operatorId,operatorName)
+        insert into deploylogs (teamId,jobId,envId,branch,tag,version,projectId,remark,status,statusText,output,operatorId,operatorName)
         value
-        (#{teamId},#{jobId},#{envId},#{branch},#{tag},#{version},#{projectId},#{remark},#{status},#{output},#{operatorId},#{operatorName})
+        (#{teamId},#{jobId},#{envId},#{branch},#{tag},#{version},#{projectId},#{remark},#{status},#{statusText},#{output},#{operatorId},#{operatorName})
     </insert>
 
     <select id="getDeployLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.DeployLog">
@@ -21,17 +21,18 @@
     
     <select id="getDeployLogOutputById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.DeployLogOutput">
         select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.output,de.operatorId,de.operatorName,de.remark,
-        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt from deploylogs de
+        UNIX_TIMESTAMP(de.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(de.updatedAt) * 1000 as updatedAt from deploylogs de
         left join jobs jo
         on de.jobId = jo.id
         left join projects pr
         on de.projectId = pr.id
         where de.id = #{id}
+        order by de.createdAt desc
     </select>
     
     <select id="getDeployLogsOutputByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.DeployLogOutput">
-        select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.output,de.operatorId,de.operatorName,de.remark,
-        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,env.name as envName from deploylogs de
+        select de.id,de.teamId,de.jobId,de.envId,jo.serverIds,de.branch,de.tag,de.version,de.projectId,pr.name as projectName,de.status,de.operatorId,de.operatorName,de.remark,
+        UNIX_TIMESTAMP(de.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(de.updatedAt) * 1000 as updatedAt,env.name as envName from deploylogs de
         left join jobs jo
         on de.jobId = jo.id
         left join projects pr
@@ -46,5 +47,9 @@
     
     <select id="getDeployLogsCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         select count(*) from deploylogs where teamId = #{teamId};
+    </select>
+
+    <select id="getDeployLogOutputTextById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select output from deploylogs where id = #{id};
     </select>
 </mapper>

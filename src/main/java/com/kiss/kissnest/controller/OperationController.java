@@ -15,10 +15,11 @@ public class OperationController {
 
     @Autowired
     private OperationLogService operationLogService;
+
     @GetMapping("/operation/dynamics")
     @ApiOperation(value = "获取动态记录")
-    public ResultOutput getDynamics (@RequestParam("teamId") Integer teamId,Integer groupId,Integer projectId) {
+    public ResultOutput getDynamics(@RequestParam("teamId") Integer teamId, @RequestParam("page") Integer page, @RequestParam("size") Integer size, Integer groupId, Integer projectId) {
 
-        return operationLogService.getDynamics(teamId,groupId,projectId);
+        return operationLogService.getDynamics(teamId, page, size, groupId, projectId);
     }
 }

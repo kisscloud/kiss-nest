@@ -1,6 +1,8 @@
 package com.kiss.kissnest.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
@@ -75,6 +77,9 @@ public class JobService {
 
     @Value("${gitlab.server.commitPath}")
     private String gitlabCommitPath;
+
+    @Value("${gitlab.server.branchPath}")
+    private String gitlabBranchPath;
 
     @Value("${package.nginx.url}")
     private String packageUrl;
@@ -282,16 +287,31 @@ public class JobService {
 
         log.info("操作{},目标{},conf{}", option, targetIps, conf);
 
-        String str = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
 
-        log.info("部署日志:{}", str);
-        String statusStr = str.substring(str.lastIndexOf("\\n") + 2, str.length() - 2);
-        Integer status = 1;
+        log.info("部署日志:{}", response);
 
-        try {
-            status = Integer.parseInt(statusStr);
-        } catch (Exception e) {
-            log.info("部署状态转换失败:{}", statusStr);
+        Integer success = 0;
+        Integer total = 0;
+        if (!StringUtils.isEmpty(response)) {
+            JSONObject returnJson = JSONObject.parseObject(response);
+            JSONArray returnArray = returnJson.getJSONArray("return");
+            JSONObject node = returnArray.getJSONObject(0);
+            String[] target = targetIps.split(",");
+
+            for (int i = 0; i < target.length; i++) {
+                String message = node.getString(target[i]);
+                System.out.println(message);
+                System.out.println(message.lastIndexOf("\n"));
+                String status = message.substring(message.lastIndexOf("\n") + 1);
+                log.info("status:{}",status);
+
+                if (status.equals("0")) {
+                    success ++;
+                }
+
+                total ++;
+            }
         }
 
         DeployLog deployLog = new DeployLog();
@@ -303,8 +323,9 @@ public class JobService {
         deployLog.setVersion(version);
         deployLog.setProjectId(job.getProjectId());
         deployLog.setRemark(deployJobInput.getRemark());
-        deployLog.setStatus(status == 0 ? 1 : 0);
-        deployLog.setOutput(str);
+        deployLog.setStatus(1);
+        deployLog.setStatusText(success + "/" + total);
+        deployLog.setOutput(response);
         deployLog.setOperatorId(GuestUtil.getGuestId());
         deployLog.setOperatorName(GuestUtil.getName());
         deployLogDao.createDeployLog(deployLog);
@@ -334,12 +355,14 @@ public class JobService {
         Integer size = buildLogsInput.getSize();
         Integer pageSize = (StringUtils.isEmpty(size) || size > maxSize) ? maxSize : size;
         Integer start = buildLogsInput.getPage() == 0 ? null : (buildLogsInput.getPage() - 1) * pageSize;
-        List<BuildLogOutput> buildLogOutputList = buildLogDao.getBuildLogsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
+        List<BuildLogOutput> buildLogOutputList = buildLogDao.getBuildLogOutputsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
 
         buildLogOutputList.forEach(buildLogOutput -> {
             buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
             String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
+            String branchPath = gitlabUrl + String.format(gitlabBranchPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getBranch());
             buildLogOutput.setCommitPath(commitPath);
+            buildLogOutput.setBranchPath(branchPath);
         });
 
         Integer count = buildLogDao.getBuildLogCountByTeamId(buildLogsInput.getTeamId());
@@ -348,6 +371,15 @@ public class JobService {
         buildLogOutputs.setCount(count);
 
         return ResultOutputUtil.success(buildLogOutputs);
+    }
+
+    public ResultOutput getDeployLogOutputTextById(Integer id) {
+
+        String output = buildLogDao.getDeployLogOutputTextById(id);
+        Map<String,Object> result = new HashMap<>();
+        result.put("output",output);
+
+        return ResultOutputUtil.success(result);
     }
 
     public ResultOutput getBuildRecentLog(Integer id) {
@@ -424,7 +456,7 @@ public class JobService {
         Integer start = deployLogInput.getPage() == 0 ? null : (deployLogInput.getPage() - 1) * pageSize;
         List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(), start, size);
 
-        deployLogOutputs.forEach(deployLogOutput -> deployLogOutput.setStatusText(codeUtil.getEnumsMessage("deploy.status",String.valueOf(deployLogOutput.getStatus()))));
+        deployLogOutputs.forEach(deployLogOutput -> deployLogOutput.setStatusText(codeUtil.getEnumsMessage("deploy.status", String.valueOf(deployLogOutput.getStatus()))));
         Integer count = deployLogDao.getDeployLogsCount(deployLogInput.getTeamId());
 
         GetDeployLogOutput getDeployLogOutput = new GetDeployLogOutput();
@@ -432,6 +464,15 @@ public class JobService {
         getDeployLogOutput.setCount(count);
 
         return ResultOutputUtil.success(getDeployLogOutput);
+    }
+
+    public ResultOutput getDeployLogOutputText(Integer id) {
+
+        String output = deployLogDao.getDeployLogOutputTextById(id);
+        Map<String,Object> result = new HashMap<>();
+        result.put("output",output);
+
+        return ResultOutputUtil.success(result);
     }
 
 
@@ -653,10 +694,40 @@ public class JobService {
         packageRepositoryService.createPackageRepository(buildLog);
     }
 
-    public static void main(String[] args) {
-        String str = "Cloning into 'config'...\\nNo config updates to processes\\n0";
+    public ResultOutput get() {
 
-        String last = str.substring(str.lastIndexOf("\\n") + 2);
-        System.out.println(last);
+        DeployLog deployLog = deployLogDao.getDeployLogById(8);
+        String response = deployLog.getOutput();
+
+        String targetIps = "node-192-168-0-193";
+        Integer success = 0;
+        Integer total = 0;
+        if (!StringUtils.isEmpty(response)) {
+            JSONObject returnJson = JSONObject.parseObject(response);
+            JSONArray returnArray = returnJson.getJSONArray("return");
+            JSONObject node = returnArray.getJSONObject(0);
+            String[] target = targetIps.split(",");
+
+            for (int i = 0; i < target.length; i++) {
+                String message = node.getString(target[i]);
+                System.out.println(message);
+                System.out.println(message.lastIndexOf("\n"));
+                String status = message.substring(message.lastIndexOf("\n") + 1);
+                log.info("status:{}",status);
+
+                if (status.equals("0")) {
+                    success ++;
+                }
+
+                total ++;
+            }
+        }
+        return ResultOutputUtil.success();
+    }
+
+    public static void main(String[] args) {
+
+//        String last = str.substring(str.lastIndexOf("\\n") + 2);
+//        System.out.println(last);
     }
 }

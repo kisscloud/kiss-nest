@@ -23,11 +23,13 @@ public interface BuildLogMapper {
 
     BuildLog getLastBuildByJobNameAndProjectId(Map params);
 
-    List<BuildLogOutput> getBuildLogsByTeamId(@Param("teamId") Integer teamId,@Param("start") Integer start,@Param("size") Integer size);
+    List<BuildLogOutput> getBuildLogOutputsByTeamId(@Param("teamId") Integer teamId,@Param("start") Integer start,@Param("size") Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer id);
 
     Integer deleteBuildLogsByProjectId(Integer projectId);
 
     Integer getBuildLogCountByTeamId(Integer teamId);
+
+    String getDeployLogOutputTextById(Integer id);
 }

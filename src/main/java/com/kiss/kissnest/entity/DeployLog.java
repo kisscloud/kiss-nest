@@ -27,6 +27,8 @@ public class DeployLog {
 
     private Integer status;
 
+    private String statusText;
+
     private String output;
 
     private Integer operatorId;

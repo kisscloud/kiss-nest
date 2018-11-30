@@ -15,6 +15,8 @@ public class BuildLogOutput {
 
     private String branch;
 
+    private String branchPath;
+
     private Integer number;
 
     private String version;
@@ -28,8 +30,6 @@ public class BuildLogOutput {
     private Integer status;
 
     private String statusText;
-
-    private String output;
 
     private Long queueId;
 

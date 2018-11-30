@@ -33,8 +33,6 @@ public class DeployLogOutput {
 
     private String statusText;
 
-    private String output;
-
     private Integer operatorId;
 
     private String operatorName;

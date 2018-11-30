@@ -19,11 +19,13 @@ public interface BuildLogDao {
 
     BuildLog getLastBuildByJobNameAndProjectId(String jobName,Integer projectId);
 
-    List<BuildLogOutput> getBuildLogsByTeamId(Integer teamId,Integer start,Integer size);
+    List<BuildLogOutput> getBuildLogOutputsByTeamId(Integer teamId,Integer start,Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer id);
 
     Integer deleteBuildLogsByProjectId(Integer projectId);
 
     Integer getBuildLogCountByTeamId(Integer teamId);
+
+    String getDeployLogOutputTextById(Integer id);
 }

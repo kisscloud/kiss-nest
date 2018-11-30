@@ -60,7 +60,7 @@ public class SaltStackUtil {
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .addHeader("Accept", "application/x-yaml")
+                .addHeader("Accept", "application/json")
                 .addHeader("X-Auth-Token",token)
                 .build();
 

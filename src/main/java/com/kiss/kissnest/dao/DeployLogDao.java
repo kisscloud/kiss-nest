@@ -18,4 +18,6 @@ public interface DeployLogDao {
     List<DeployLogOutput> getDeployLogsOutputByTeamId(Integer teamId, Integer start, Integer size);
 
     Integer getDeployLogsCount(Integer teamId);
+
+    String getDeployLogOutputTextById(Integer id);
 }
