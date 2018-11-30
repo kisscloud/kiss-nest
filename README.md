@@ -7,6 +7,7 @@ Nest 是一个基于 KISS CLOUD 架构，整合了 Jenkins、Gitlab、Salt Stuck
 * 团队管理；
 * 项目组管理；
 * 项目管理；
+* 成员管理；
 * 创建项目时自动创建对应的 Git 仓库和 Jenkins 构建任务；
 * 预设构建任务、部署任务模板；
 * 部署环境管理；
