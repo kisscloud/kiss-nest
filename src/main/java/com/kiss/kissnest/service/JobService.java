@@ -330,6 +330,10 @@ public class JobService {
         deployLog.setOperatorName(GuestUtil.getName());
         deployLogDao.createDeployLog(deployLog);
         DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
+        String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
+        String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
+        deployLogOutput.setCommitPath(commitPath);
+        deployLogOutput.setBranchPath(branchPath);
 
         return ResultOutputUtil.success(deployLogOutput);
     }
@@ -456,9 +460,10 @@ public class JobService {
         Integer start = deployLogInput.getPage() == 0 ? null : (deployLogInput.getPage() - 1) * pageSize;
         List<DeployLogOutput> deployLogOutputs = deployLogDao.getDeployLogsOutputByTeamId(deployLogInput.getTeamId(), start, size);
         deployLogOutputs.forEach(deployLogOutput -> {
-            String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getBranchPath() == null ? "" : deployLogOutput.getBranchPath(), deployLogOutput.getBranch());
+            String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
+            String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
             deployLogOutput.setBranchPath(branchPath);
-            deployLogOutput.setBranchPath(branchPath);
+            deployLogOutput.setCommitPath(commitPath);
         });
 
         Integer count = deployLogDao.getDeployLogsCount(deployLogInput.getTeamId());

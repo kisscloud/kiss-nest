@@ -43,6 +43,8 @@ public class DeployLogOutput {
 
     private String branchPath;
 
+    private String commitPath;
+
     private Long createdAt;
 
     private Long updatedAt;
