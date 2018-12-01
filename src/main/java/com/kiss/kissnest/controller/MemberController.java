@@ -77,7 +77,7 @@ public class MemberController {
     }
 
     @PostMapping("/member/group/search")
-    public ResultOutput getGroupMembers(@RequestBody GroupMemberSearchInput groupMemberSearchInput) {
+    public ResultOutput getGroupMembers(@Validated @RequestBody GroupMemberSearchInput groupMemberSearchInput) {
 
         return memberService.getGroupValidMembers(groupMemberSearchInput);
     }

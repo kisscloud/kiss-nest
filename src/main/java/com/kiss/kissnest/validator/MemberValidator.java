@@ -31,6 +31,9 @@ public class MemberValidator implements Validator {
     private TeamValidaor teamValidaor;
 
     @Autowired
+    private GroupValidator groupValidator;
+
+    @Autowired
     private MemberDao memberDao;
 
     @Autowired
@@ -45,7 +48,8 @@ public class MemberValidator implements Validator {
                 || clazz.equals(MemberClientInput.class)
                 || clazz.equals(CreateMemberTeamInput.class)
                 || clazz.equals(BindMemberGroupInput.class)
-                || clazz.equals(BindMemberProjectInput.class);
+                || clazz.equals(BindMemberProjectInput.class)
+                || clazz.equals(GroupMemberSearchInput.class);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class MemberValidator implements Validator {
         } else if (MemberClientInput.class.isInstance(target)) {
             MemberClientInput memberClientInput = (MemberClientInput) target;
             validateClientId(memberClientInput.getClientId(), errors);
-            validateAccountName(memberClientInput.getAccountName(), errors);
+            validateAccountName(memberClientInput.getAccountName(),"name", errors);
         } else if (CreateMemberTeamInput.class.isInstance(target)) {
             CreateMemberTeamInput createMemberTeamInput = (CreateMemberTeamInput) target;
             teamValidaor.validateId(createMemberTeamInput.getTeamId(), "teamId", errors);
@@ -72,6 +76,10 @@ public class MemberValidator implements Validator {
             teamValidaor.validateId(bindMemberProjectInput.getTeamId(), "teamId", errors);
             validateMemberProjectInputList(bindMemberProjectInput.getMemberProjectInputs(),errors);
             validateProjectId(bindMemberProjectInput.getProjectId(),errors);
+        } else if (GroupMemberSearchInput.class.isInstance(target)) {
+            GroupMemberSearchInput groupMemberSearchInput = (GroupMemberSearchInput) target;
+            groupValidator.validateId(groupMemberSearchInput.getGroupId(),"groupId",errors);
+            validateAccountName(groupMemberSearchInput.getAccountName(),"accountName",errors);
         } else {
             errors.rejectValue("password", "", "数据绑定错误");
         }
@@ -96,10 +104,10 @@ public class MemberValidator implements Validator {
         }
     }
 
-    public void validateAccountName(String name, Errors errors) {
+    public void validateAccountName(String name,String nameField, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name", String.valueOf(NestStatusCode.MEMBER_NAME_IS_EMPTY));
+            errors.rejectValue(nameField, String.valueOf(NestStatusCode.MEMBER_NAME_IS_EMPTY));
         }
     }
 

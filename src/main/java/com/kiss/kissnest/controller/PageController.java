@@ -177,7 +177,7 @@ public class PageController {
         ResultOutput teamRoles = memberService.getMemberRoles(1);
         ResultOutput groupRoles = memberService.getMemberRoles(2);
         ResultOutput projectRoles = memberService.getMemberRoles(3);
-        ResultOutput members = memberService.getMembers(teamId, null, null);
+        ResultOutput members = memberService.getMembers(teamId, groupId, projectId);
         ResultOutput group = groupService.getGroupById(groupId);
         ResultOutput project = projectService.getProjectById(projectId);
 
