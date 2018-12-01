@@ -4,6 +4,7 @@ import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateProjectInput;
+import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.output.ProjectTypeOutput;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
+import utils.GuestUtil;
 import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
@@ -264,5 +266,15 @@ public class ProjectService {
         }
 
         return ResultOutputUtil.success(typeList);
+    }
+
+    public ResultOutput addTag(CreateTagInput createTagInput) {
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createTagInput.getProjectId());
+        Integer repositoryId = projectRepository.getRepositoryId();
+        Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
+        gitlabApiUtil.addTag(repositoryId,createTagInput.getTagName(),createTagInput.getRef(),createTagInput.getMessage(),createTagInput.getReleaseDescription(),member.getAccessToken());
+
+        return ResultOutputUtil.success();
     }
 }

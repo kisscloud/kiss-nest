@@ -3,6 +3,7 @@ package com.kiss.kissnest.controller;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.CreateProjectRepositoryInput;
+import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.service.ProjectRepositoryService;
 import com.kiss.kissnest.service.ProjectService;
@@ -93,6 +94,12 @@ public class ProjectController {
     public ResultOutput validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
 
         return projectRepositoryService.validateProjectRepositoryExist(projectId);
+    }
+
+    @PostMapping("/project/tag")
+    public ResultOutput createTag(@Validated @RequestBody CreateTagInput createTagInput) {
+
+        return projectService.addTag(createTagInput);
     }
 
 }

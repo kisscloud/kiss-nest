@@ -1,18 +1,30 @@
 package com.kiss.kissnest.validator;
 
+import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
+import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.dao.TeamDao;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.CreateProjectRepositoryInput;
+import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.status.NestStatusCode;
+import com.kiss.kissnest.util.GitlabApiUtil;
+import lombok.Data;
+import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import utils.GuestUtil;
+
+import java.util.List;
 
 @Component
 public class ProjectValidator implements Validator {
@@ -21,17 +33,27 @@ public class ProjectValidator implements Validator {
     private ProjectDao projectDao;
 
     @Autowired
+    private ProjectRepositoryDao projectRepositoryDao;
+
+    @Autowired
     private TeamValidaor teamValidaor;
 
     @Autowired
     private GroupValidator groupValidator;
+
+    @Autowired
+    private GitlabApiUtil gitlabApiUtil;
+
+    @Autowired
+    private MemberDao memberDao;
 
     @Override
     public boolean supports(Class<?> clazz) {
 
         return clazz.equals(CreateProjectInput.class) ||
                 clazz.equals(UpdateProjectInput.class) ||
-                clazz.equals(CreateProjectRepositoryInput.class);
+                clazz.equals(CreateProjectRepositoryInput.class) ||
+                clazz.equals(CreateTagInput.class);
     }
 
     @Override
@@ -53,18 +75,72 @@ public class ProjectValidator implements Validator {
 
             Integer teamId = updateProjectInput.getTeamId();
             boolean teamIdVal = teamValidaor.validateId(teamId, "teamId", errors);
-            boolean projectVal = validateId(updateProjectInput.getId(),"id",errors);
+            boolean projectVal = validateId(updateProjectInput.getId(), "id", errors);
 
             if (teamIdVal && projectVal) {
-                validateUpdateName(updateProjectInput.getName(), teamId,updateProjectInput.getId(), errors);
+                validateUpdateName(updateProjectInput.getName(), teamId, updateProjectInput.getId(), errors);
             }
 
             groupValidator.validateId(updateProjectInput.getGroupId(), "groupId", errors);
-            validateId(updateProjectInput.getId(),"id", errors);
+            validateId(updateProjectInput.getId(), "id", errors);
             validateType(updateProjectInput.getType(), errors);
         } else if (CreateProjectRepositoryInput.class.isInstance(target)) {
             CreateProjectRepositoryInput createProjectRepositoryInput = (CreateProjectRepositoryInput) target;
-            validateId(createProjectRepositoryInput.getProjectId(),"projectId",errors);
+            validateId(createProjectRepositoryInput.getProjectId(), "projectId", errors);
+        } else if (CreateTagInput.class.isInstance(target)) {
+            CreateTagInput createTagInput = (CreateTagInput) target;
+            boolean projectVal = validateId(createTagInput.getProjectId(), "projectId", errors);
+
+            if (projectVal) {
+                ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createTagInput.getProjectId());
+                Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
+                Integer repositoryId = projectRepository.getRepositoryId();
+                validateBranch(createTagInput.getRef(), repositoryId, member.getAccessToken(), errors);
+                validateTag(createTagInput.getTagName(),repositoryId,member.getAccessToken(),errors);
+            }
+        }
+    }
+
+    public void validateBranch(String ref, Integer repositoryId, String accessToken, Errors errors) {
+
+        if (StringUtils.isEmpty(ref)) {
+            errors.rejectValue("ref",String.valueOf(NestStatusCode.PROJECT_BRANCH_IS_EMPTY),"项目分支为空");
+            return;
+        }
+
+        List<GitlabBranch> branchList = gitlabApiUtil.getBranches(repositoryId, accessToken);
+        boolean branchExist = false;
+
+        for (GitlabBranch gitlabBranch : branchList) {
+            if (gitlabBranch.getName().equals(ref)) {
+                branchExist = true;
+                break;
+            }
+        }
+
+        if (!branchExist) {
+            errors.rejectValue("ref", String.valueOf(NestStatusCode.PROJECT_BRANCH_NOT_EXIST), "项目分支不存在");
+        }
+    }
+
+    public void validateTag(String tagName,Integer repositoryId, String accessToken, Errors errors) {
+
+        if (StringUtils.isEmpty(tagName)) {
+            errors.rejectValue("tagName",String.valueOf(NestStatusCode.PROJECT_TAG_IS_EMPTY),"项目版本号为空");
+            return;
+        }
+
+        List<GitlabTag> gitlabTagList = gitlabApiUtil.getTags(repositoryId,accessToken);
+        boolean tagExist = false;
+
+        for (GitlabTag gitlabTag : gitlabTagList) {
+            if (gitlabTag.getName().equals(tagName)) {
+                tagExist = true;
+            }
+        }
+
+        if (tagExist) {
+            errors.rejectValue("tagName",String.valueOf(NestStatusCode.PROJECT_TAG_NOT_EXIST),"项目版本号已存在");
         }
     }
 
@@ -82,7 +158,7 @@ public class ProjectValidator implements Validator {
         }
     }
 
-    public void validateUpdateName(String name, Integer teamId,Integer id, Errors errors) {
+    public void validateUpdateName(String name, Integer teamId, Integer id, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
             errors.rejectValue("name", String.valueOf(NestStatusCode.PROJECT_NAME_IS_EMPTY), "项目名称不能为空");
@@ -117,7 +193,7 @@ public class ProjectValidator implements Validator {
         }
     }
 
-    public boolean validateId(Integer id,String idName, Errors errors) {
+    public boolean validateId(Integer id, String idName, Errors errors) {
 
         if (id == null) {
             errors.rejectValue(idName, String.valueOf(NestStatusCode.PROJECT_ID_IS_EMPTY), "项目id不能为空");

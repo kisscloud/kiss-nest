@@ -144,6 +144,16 @@ public class GitlabApiUtil {
         }
     }
 
+    public void addTag(Integer projectId, String tagName, String ref, String message, String releaseDescription, String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
+            gitlabAPI.addTag(projectId, tagName, ref, message, releaseDescription);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<GitlabTag> getTags(Integer projectId, String accessToken) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
@@ -156,13 +166,13 @@ public class GitlabApiUtil {
         }
     }
 
-    public void addMember(Integer repositoryId, String accessToken,String username, Integer level,RepositoryType type,String name) {
+    public void addMember(Integer repositoryId, String accessToken, String username, Integer level, RepositoryType type, String name) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
-            String users = getUser(username,accessToken);
+            String users = getUser(username, accessToken);
 
             if (users == null) {
-                ThreadLocalUtil.setString("member_account_has_not_been_activated",name);
+                ThreadLocalUtil.setString("member_account_has_not_been_activated", name);
                 throw new TransactionalException(NestStatusCode.MEMBER_ACCOUNT_HAS_NOT_BEEN_ACTIVATED);
             }
 
@@ -216,15 +226,15 @@ public class GitlabApiUtil {
         }
     }
 
-    public String getUser(String userName,String accessToken) {
+    public String getUser(String userName, String accessToken) {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(String.format(gitlabServerUser,userName));
+        HttpGet httpGet = new HttpGet(String.format(gitlabServerUser, userName));
         CloseableHttpResponse response = null;
         try {
-            httpGet.setHeader("Authorization","Bearer " + accessToken);
+            httpGet.setHeader("Authorization", "Bearer " + accessToken);
             response = httpclient.execute(httpGet);
-            String str = EntityUtils.toString(response.getEntity(),"utf-8");
+            String str = EntityUtils.toString(response.getEntity(), "utf-8");
             return str;
         } catch (Exception e) {
             e.printStackTrace();
@@ -308,14 +318,14 @@ public class GitlabApiUtil {
 //            params.add(new BasicNameValuePair("fun","cmd.run"));
 //            params.add(new BasicNameValuePair("arg","cd /opt && touch test.txt"));
 
-            Map<String,Object> params = new HashMap<>();
+            Map<String, Object> params = new HashMap<>();
 //            params.put("username","salt-api");
 //            params.put("password","12345678");
 //            params.put("eauth","pam");
-            params.put("client","local");
-            params.put("tgt","*");
-            params.put("fun","cmd.run");
-            params.put("arg","cd /opt && touch test.txt");
+            params.put("client", "local");
+            params.put("tgt", "*");
+            params.put("fun", "cmd.run");
+            params.put("arg", "cd /opt && touch test.txt");
 //            String str = HttpUtil.formDataPost("http://47.100.235.203:8000",params);
 
 //            CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -381,7 +391,7 @@ public class GitlabApiUtil {
                     .url("http://47.100.235.203:8000")
                     .post(body)
                     .addHeader("Accept", "application/json")
-                    .addHeader("X-Auth-Token","6c20c994d77ea25946e1a398a58a9df857bbfd8d")
+                    .addHeader("X-Auth-Token", "6c20c994d77ea25946e1a398a58a9df857bbfd8d")
 //                    .addHeader("Cache-Control", "no-cache")
 //                    .addHeader("Postman-Token", "8c1390fe-d567-49f6-aac8-c72eb60e9870")
                     .build();
