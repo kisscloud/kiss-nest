@@ -23,4 +23,6 @@ public class OperationTargetType {
     public static final Integer TYPE__MERGE_REQUEST = 19;
     public static final Integer TYPE__CREATE_DEPLOY_JOB = 20;
     public static final Integer TYPE__DEPLOY_JOB = 21;
+    public static final Integer TYPE__CREATE_PROJECT_TAG = 22;
+
 }

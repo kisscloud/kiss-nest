@@ -80,13 +80,13 @@ public class ProjectService {
 
         groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
         Member member = memberDao.getMemberByAccountId(ThreadLocalUtil.getGuest().getId());
-        memberDao.addCount(member.getId(),1,"projects");
+        memberDao.addCount(member.getId(), 1, "projects");
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
         Integer id = project.getId();
         project = projectDao.getProjectById(id);
-        operationLogService.saveOperationLog(project.getTeamId(),guest,null,project,"id",OperationTargetType.TYPE_CREATE_PROJECT);
-        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_CREATE_PROJECT,project);
+        operationLogService.saveOperationLog(project.getTeamId(), guest, null, project, "id", OperationTargetType.TYPE_CREATE_PROJECT);
+        operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_CREATE_PROJECT, project);
         return ResultOutputUtil.success(projectOutput);
     }
 
@@ -119,7 +119,7 @@ public class ProjectService {
                     throw new TransactionalException(NestStatusCode.DELETE_JOB_FAILED);
                 }
 
-                jenkinsUtil.deleteJob(job.getJobName(),guest.getName(),member.getApiToken());
+                jenkinsUtil.deleteJob(job.getJobName(), guest.getName(), member.getApiToken());
             });
         }
 
@@ -127,11 +127,11 @@ public class ProjectService {
 
         if (projectRepository != null) {
             projectRepositoryDao.deleteProjectRepositoryById(projectRepository.getId());
-            gitlabApiUtil.deleteProject(projectRepository.getRepositoryId(),member.getAccessToken());
+            gitlabApiUtil.deleteProject(projectRepository.getRepositoryId(), member.getAccessToken());
         }
 
-        operationLogService.saveOperationLog(project.getTeamId(),ThreadLocalUtil.getGuest(),project,null,"id",OperationTargetType.TYPE_DELETE_PROJECT);
-        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_DELETE_PROJECT,project);
+        operationLogService.saveOperationLog(project.getTeamId(), ThreadLocalUtil.getGuest(), project, null, "id", OperationTargetType.TYPE_DELETE_PROJECT);
+        operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_DELETE_PROJECT, project);
         return ResultOutputUtil.success();
     }
 
@@ -148,8 +148,8 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_PROJECT_FAILED);
         }
 
-        operationLogService.saveOperationLog(project.getTeamId(),guest,oldValue,project,"id",OperationTargetType.TYPE_UPDATE_PROJECT);
-        operationLogService.saveDynamic(guest,project.getTeamId(),project.getGroupId(),project.getId(),OperationTargetType.TYPE_UPDATE_PROJECT,project);
+        operationLogService.saveOperationLog(project.getTeamId(), guest, oldValue, project, "id", OperationTargetType.TYPE_UPDATE_PROJECT);
+        operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_UPDATE_PROJECT, project);
 
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));
@@ -273,7 +273,10 @@ public class ProjectService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createTagInput.getProjectId());
         Integer repositoryId = projectRepository.getRepositoryId();
         Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
-        gitlabApiUtil.addTag(repositoryId,createTagInput.getTagName(),createTagInput.getRef(),createTagInput.getMessage(),createTagInput.getReleaseDescription(),member.getAccessToken());
+        gitlabApiUtil.addTag(repositoryId, createTagInput.getTagName(), createTagInput.getRef(), createTagInput.getMessage(), createTagInput.getReleaseDescription(), member.getAccessToken());
+
+        operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, createTagInput, "id", OperationTargetType.TYPE__CREATE_PROJECT_TAG);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), projectRepository.getTeamId(), null, projectRepository.getProjectId(), OperationTargetType.TYPE__CREATE_PROJECT_TAG, createTagInput);
 
         return ResultOutputUtil.success();
     }
