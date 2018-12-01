@@ -157,8 +157,8 @@ public class JobService {
         job = jobDao.getJobById(job.getId());
 
         JobOutput jobOutput = BeanCopyUtil.copy(job, JobOutput.class);
-        operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_JOB);
-        operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_JOB, job);
+        operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
+        operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_BUILD_JOB, job);
         return ResultOutputUtil.success(jobOutput);
     }
 
@@ -192,6 +192,9 @@ public class JobService {
         jobDao.createJob(job);
         Integer id = job.getId();
         JobOutput jobOutput = jobDao.getJobOutputsById(id);
+
+        operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_DEPLOY_JOB);
+        operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_DEPLOY_JOB, job);
 
         return ResultOutputUtil.success(jobOutput);
     }
@@ -334,6 +337,9 @@ public class JobService {
         String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
         deployLogOutput.setCommitPath(commitPath);
         deployLogOutput.setBranchPath(branchPath);
+
+        operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
 
         return ResultOutputUtil.success(deployLogOutput);
     }
@@ -701,37 +707,6 @@ public class JobService {
         buildLogDao.updateBuildLog(buildLog);
         buildLog.setProjectId(projectId);
         packageRepositoryService.createPackageRepository(buildLog);
-    }
-
-    public ResultOutput get() {
-
-        DeployLog deployLog = deployLogDao.getDeployLogById(8);
-        String response = deployLog.getOutput();
-
-        String targetIps = "node-192-168-0-193";
-        Integer success = 0;
-        Integer total = 0;
-        if (!StringUtils.isEmpty(response)) {
-            JSONObject returnJson = JSONObject.parseObject(response);
-            JSONArray returnArray = returnJson.getJSONArray("return");
-            JSONObject node = returnArray.getJSONObject(0);
-            String[] target = targetIps.split(",");
-
-            for (int i = 0; i < target.length; i++) {
-                String message = node.getString(target[i]);
-                System.out.println(message);
-                System.out.println(message.lastIndexOf("\n"));
-                String status = message.substring(message.lastIndexOf("\n") + 1);
-                log.info("status:{}",status);
-
-                if (status.equals("0")) {
-                    success ++;
-                }
-
-                total ++;
-            }
-        }
-        return ResultOutputUtil.success();
     }
 
     public static void main(String[] args) {

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.kiss.kissnest.dao.DynamicDao;
 import com.kiss.kissnest.dao.OperationLogDao;
 import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.output.DeployLogOutput;
 import com.kiss.kissnest.output.DynamicOutput;
 import com.kiss.kissnest.output.GetDynamicOutput;
 import com.kiss.kissnest.output.OperationLogOutput;
@@ -109,7 +110,7 @@ public class OperationLogService {
             Project project = (Project) object;
             logMap.put("name", project.getName());
             logMap.put("createdAt", new Date().getTime());
-        } else if (targetType == OperationTargetType.TYPE__CREATE_JOB) {
+        } else if (targetType == OperationTargetType.TYPE__CREATE_BUILD_JOB) {
             Job job = (Job) object;
             logMap.put("name", job.getJobName());
             logMap.put("createdAt", new Date().getTime());
@@ -155,6 +156,16 @@ public class OperationLogService {
             logMap.put("operatorName", track.getAuthorName() == null ? track.getAuthorEmail() : track.getAuthorName());
             logMap.put("name", track.getProjectName());
             logMap.put("version", track.getHash());
+        } else if (targetType == OperationTargetType.TYPE__CREATE_DEPLOY_JOB) {
+            Job job = (Job) object;
+            logMap.put("name", job.getJobName());
+            logMap.put("createdAt", new Date().getTime());
+        } else if (targetType == OperationTargetType.TYPE__DEPLOY_JOB) {
+            DeployLogOutput deployLogOutput = (DeployLogOutput) object;
+            logMap.put("projectName", deployLogOutput.getOperatorName());
+            logMap.put("serverIds",deployLogOutput.getServerIds());
+            logMap.put("envName",deployLogOutput.getEnvName());
+            logMap.put("createdAt", new Date().getTime());
         }
 
         dynamic.setLog(JSON.toJSONString(logMap));
@@ -179,7 +190,7 @@ public class OperationLogService {
         dynamic.setTeamId(teamId);
         dynamic.setGroupId(groupId);
         dynamic.setProjectId(projectId);
-        List<Dynamic> dynamics = dynamicDao.getDynamics(teamId,start,size,groupId,projectId);
+        List<Dynamic> dynamics = dynamicDao.getDynamics(teamId, start, size, groupId, projectId);
         List<DynamicOutput> dynamicOutputs = BeanCopyUtil.copyList(dynamics, DynamicOutput.class, BeanCopyUtil.defaultFieldNames);
         Integer count = dynamicDao.getDynamicsCount(dynamic);
 
