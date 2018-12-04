@@ -337,6 +337,7 @@ public class JobService {
         String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
         deployLogOutput.setCommitPath(commitPath);
         deployLogOutput.setBranchPath(branchPath);
+        deployLogOutput.setServerIds("[" + targetIps + "]");
 
         operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
