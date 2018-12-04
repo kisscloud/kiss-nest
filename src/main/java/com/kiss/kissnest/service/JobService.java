@@ -209,7 +209,7 @@ public class JobService {
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
-        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest);
+        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, 2);
 
         if (buildLog == null) {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
@@ -307,13 +307,13 @@ public class JobService {
                 System.out.println(message);
                 System.out.println(message.lastIndexOf("\n"));
                 String status = message.substring(message.lastIndexOf("\n") + 1);
-                log.info("status:{}",status);
+                log.info("status:{}", status);
 
                 if (status.equals("0")) {
-                    success ++;
+                    success++;
                 }
 
-                total ++;
+                total++;
             }
         }
 
@@ -387,8 +387,8 @@ public class JobService {
     public ResultOutput getDeployLogOutputTextById(Integer id) {
 
         String output = buildLogDao.getDeployLogOutputTextById(id);
-        Map<String,Object> result = new HashMap<>();
-        result.put("output",output);
+        Map<String, Object> result = new HashMap<>();
+        result.put("output", output);
 
         return ResultOutputUtil.success(result);
     }
@@ -485,8 +485,8 @@ public class JobService {
     public ResultOutput getDeployLogOutputText(Integer id) {
 
         String output = deployLogDao.getDeployLogOutputTextById(id);
-        Map<String,Object> result = new HashMap<>();
-        result.put("output",output);
+        Map<String, Object> result = new HashMap<>();
+        result.put("output", output);
 
         return ResultOutputUtil.success(result);
     }
@@ -627,7 +627,7 @@ public class JobService {
         }
     }
 
-    public BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest) {
+    public BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest, Integer status) {
 
         BuildLog buildLog = new BuildLog();
         buildLog.setTeamId(teamId);
@@ -636,6 +636,7 @@ public class JobService {
         buildLog.setProjectId(projectId);
         buildLog.setOperatorId(guest.getId());
         buildLog.setOperatorName(guest.getName());
+        buildLog.setStatus(status);
         Integer count = buildLogDao.createBuildLog(buildLog);
 
         if (count == 0) {
