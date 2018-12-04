@@ -215,7 +215,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
-        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getName(), member.getApiToken());
+        String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
