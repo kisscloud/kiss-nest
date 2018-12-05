@@ -12,7 +12,7 @@
         (#{groupId},#{accountId},#{operatorId},#{operatorName})
     </insert>
     
-    <delete id="deleteGroupMemberById" parameterType="com.kiss.kissnest.entity">
+    <delete id="deleteGroupMemberById" parameterType="com.kiss.kissnest.entity.GroupMember">
         delete from groupsmembers where id = #{id}
     </delete>
 
