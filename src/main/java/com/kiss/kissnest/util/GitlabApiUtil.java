@@ -44,6 +44,11 @@ public class GitlabApiUtil {
         map.put("username", account);
         map.put("password", password);
         String accessTokenStr = HttpUtil.doPost(gitlabServerUrl + tokenPath, JSONObject.toJSONString(map));
+
+        if (accessTokenStr == null) {
+            return null;
+        }
+
         String accessToken = JSONObject.parseObject(accessTokenStr).getString("access_token");
 
         return accessToken;

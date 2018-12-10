@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.MemberMapper">
 
     <insert id="createMember" parameterType="com.kiss.kissnest.entity.Member" keyProperty="id" useGeneratedKeys="true">
-        insert into members (accountId,name,teamId,operatorId,operatorName)
+        insert into members (accountId,name,teamId,accessToken,operatorId,operatorName)
         value
-        (#{accountId},#{name},#{teamId},#{operatorId},#{operatorName})
+        (#{accountId},#{name},#{teamId},#{accessToken},#{operatorId},#{operatorName})
     </insert>
     
     <delete id="deleteMemberById" parameterType="java.lang.Integer">
