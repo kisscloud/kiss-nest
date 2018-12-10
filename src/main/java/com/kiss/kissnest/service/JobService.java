@@ -138,7 +138,7 @@ public class JobService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -438,7 +438,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getName(), member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
