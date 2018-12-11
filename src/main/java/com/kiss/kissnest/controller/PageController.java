@@ -198,12 +198,12 @@ public class PageController {
     public ResultOutput GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
 
         ResultOutput project = projectService.getProjectById(projectId);
-        ResultOutput branchs = projectService.getProjectBranches(projectId);
+        ResultOutput branches = projectService.getProjectBranches(projectId);
         ResultOutput tags = projectService.getProjectTags(projectId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("project", project.getData());
-        result.put("branches", branchs.getData());
+        result.put("branches", branches.getData());
         result.put("tags", tags.getData());
 
         return ResultOutputUtil.success(result);
