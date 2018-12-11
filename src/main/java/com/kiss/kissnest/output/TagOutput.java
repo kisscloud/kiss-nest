@@ -9,5 +9,7 @@ public class TagOutput {
 
     private String description;
 
+    private String message;
+
     private Long createdAt;
 }

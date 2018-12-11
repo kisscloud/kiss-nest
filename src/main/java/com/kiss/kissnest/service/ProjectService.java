@@ -223,9 +223,11 @@ public class ProjectService {
                     TagOutput tagOutput = new TagOutput();
                     GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
                     GitlabRelease gitlabRelease = gitlabTag.getRelease();
-                    tagOutput.setDescription(gitlabRelease.getTagName());
+                    tagOutput.setTagName(gitlabRelease.getTagName());
                     tagOutput.setDescription(gitlabRelease.getDescription());
+                    tagOutput.setMessage(gitlabTag.getMessage());
                     tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
+
                     branches.add(tagOutput);
                 }
             }
@@ -298,8 +300,9 @@ public class ProjectService {
         TagOutput tagOutput = new TagOutput();
         GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
         GitlabRelease gitlabRelease = gitlabTag.getRelease();
-        tagOutput.setDescription(gitlabRelease.getTagName());
+        tagOutput.setTagName(gitlabRelease.getTagName());
         tagOutput.setDescription(gitlabRelease.getDescription());
+        tagOutput.setMessage(gitlabTag.getMessage());
         tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
 
         return ResultOutputUtil.success(tagOutput);
