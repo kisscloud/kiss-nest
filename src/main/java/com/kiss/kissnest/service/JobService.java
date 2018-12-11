@@ -710,15 +710,4 @@ public class JobService {
         buildLog.setProjectId(projectId);
         packageRepositoryService.createPackageRepository(buildLog);
     }
-
-    public ResultOutput test() {
-
-        return ResultOutputUtil.success(codeUtil.getEnumsMessage("group.status", "1"));
-    }
-
-    public static void main(String[] args) {
-
-//        String last = str.substring(str.lastIndexOf("\\n") + 2);
-//        System.out.println(last);
-    }
 }

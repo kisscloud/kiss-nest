@@ -31,6 +31,8 @@ public class ProjectRepositoryOutput {
 
     private Integer memberCount;
 
+    private Integer mergeRequestCount;
+
     private Long createdAt;
 
     private Long updatedAt;

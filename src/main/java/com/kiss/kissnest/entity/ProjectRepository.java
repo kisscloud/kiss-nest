@@ -33,6 +33,8 @@ public class ProjectRepository {
 
     private Integer memberCount;
 
+    private Integer mergeRequestCount;
+
     private Integer operatorId;
 
     private String operatorName;

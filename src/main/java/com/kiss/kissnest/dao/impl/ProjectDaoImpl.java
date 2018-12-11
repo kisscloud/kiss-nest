@@ -138,4 +138,10 @@ public class ProjectDaoImpl implements ProjectDao {
 
         return projectMapper.getProjectOutputs(teamId,groupId);
     }
+
+    @Override
+    public ProjectOutput getProjectOutputById(Integer id) {
+
+        return projectMapper.getProjectOutputById(id);
+    }
 }

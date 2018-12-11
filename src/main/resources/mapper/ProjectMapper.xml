@@ -156,4 +156,15 @@
             and pr.groupId = #{groupId}
         </if>
     </select>
+
+    <select id="getProjectOutputById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.ProjectOutput">
+        select pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.slug,gr.name as groupName,
+        UNIX_TIMESTAMP(pr.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(pr.updatedAt) * 1000 as updatedAt
+        from projects pr
+        left join groups gr
+        on pr.groupId = gr.id
+        where
+        pr.id = #{id}
+    </select>
+
 </mapper>
