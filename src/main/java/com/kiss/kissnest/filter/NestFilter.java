@@ -44,11 +44,11 @@ public class NestFilter implements Filter {
 
         preFilterChain.doFilter(httpServletRequest, httpServletResponse, preFilterChain);
 
-        Guest operator = new Guest();
-        operator.setId(120);
-        operator.setName("小钱");
-        operator.setName("xiaoqian");
-        GuestUtil.setGuest(operator);
+//        Guest operator = new Guest();
+//        operator.setId(120);
+//        operator.setName("小钱");
+//        operator.setName("xiaoqian");
+//        GuestUtil.setGuest(operator);
 
         chain.doFilter(httpServletRequest, responseWrapper);
         InnerFilterChain suffixFilterChain = new InnerFilterChain();

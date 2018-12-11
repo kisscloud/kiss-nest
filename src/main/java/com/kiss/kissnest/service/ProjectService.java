@@ -15,6 +15,7 @@ import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
+import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabTag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ProjectService {
 
     @Autowired
@@ -220,6 +222,7 @@ public class ProjectService {
             }
         }
 
+        log.info("gitlabTags：" + gitlabTags);
         return ResultOutputUtil.success(branches);
     }
 

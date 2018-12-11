@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.status.NestStatusCode;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
+@Slf4j
 public class GitlabApiUtil {
 
     @Value("${gitlab.server.url}")
@@ -166,6 +168,7 @@ public class GitlabApiUtil {
 
             return gitlabTags;
         } catch (Exception e) {
+            log.info("获取tag失败了");
             e.printStackTrace();
             return null;
         }
