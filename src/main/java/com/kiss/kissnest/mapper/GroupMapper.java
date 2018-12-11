@@ -26,4 +26,6 @@ public interface GroupMapper {
     Group getGroupBySlugAndTeamId(Map params);
 
     Integer addRepositoryIdById(Group group);
+
+    Group getGroupByProjectId(Integer projectId);
 }

@@ -73,4 +73,11 @@
         repositoryId = #{repositoryId}
         where id = #{id};
     </update>
+
+    <select id="getGroupByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Group">
+        select gr.id,gr.name from groups gr
+        left join projects pr
+        on gr.id = pr.groupId
+        where pr.id = #{projectId}
+    </select>
 </mapper>

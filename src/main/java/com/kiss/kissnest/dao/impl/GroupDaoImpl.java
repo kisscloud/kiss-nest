@@ -83,4 +83,10 @@ public class GroupDaoImpl implements GroupDao {
 
         return groupMapper.addRepositoryIdById(group);
     }
+
+    @Override
+    public Group getGroupByProjectId(Integer projectId) {
+
+        return groupMapper.getGroupByProjectId(projectId);
+    }
 }
