@@ -79,27 +79,38 @@ public class ProjectController {
     }
 
     @GetMapping("/project/branches")
+    @ApiOperation(value = "查询项目的所有分支")
     public ResultOutput getProjectBranches(@RequestParam("projectId") Integer projectId) {
 
         return projectService.getProjectBranches(projectId);
     }
 
     @GetMapping("/project/tags")
+    @ApiOperation(value = "查询项目的所有版本")
     public ResultOutput getProjectTags(@RequestParam("projectId") Integer projectId) {
 
         return projectService.getProjectTags(projectId);
     }
 
     @GetMapping("/project/repository/validate")
+    @ApiOperation(value = "校验项目仓库是否存在")
     public ResultOutput validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
 
         return projectRepositoryService.validateProjectRepositoryExist(projectId);
     }
 
     @PostMapping("/project/tag")
+    @ApiOperation(value = "创建项目版本")
     public ResultOutput createTag(@Validated @RequestBody CreateTagInput createTagInput) {
 
         return projectService.addTag(createTagInput);
+    }
+
+    @GetMapping("/project")
+    @ApiOperation(value = "查询项目详情")
+    public ResultOutput getProjectById(@RequestParam("id") Integer id) {
+
+        return projectService.getProjectById(id);
     }
 
 }

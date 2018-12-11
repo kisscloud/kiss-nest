@@ -117,14 +117,14 @@ public class JenkinsUtil {
         }
     }
 
-    public boolean updateJob(String jobName, String shell, String sshUrl, String account, String passwordOrToken) {
+    public boolean updateJob(String jobName, String path, String shell, String sshUrl, String account, String passwordOrToken) {
         JenkinsServer server = null;
 
         try {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
             StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(), sshUrl, jobName, jenkinBinIp, formatShell);
+            String script = String.format(builder.toString(), sshUrl, jobName, path, jenkinBinIp, formatShell);
 
             if (builder == null) {
                 return false;

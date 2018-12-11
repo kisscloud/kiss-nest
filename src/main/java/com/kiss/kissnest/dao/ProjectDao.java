@@ -45,4 +45,6 @@ public interface ProjectDao {
     List<Project> getProjectsByGroupId(Integer groupId);
 
     List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId);
+
+    ProjectOutput getProjectOutputById(Integer id);
 }

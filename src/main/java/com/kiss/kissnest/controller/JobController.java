@@ -136,10 +136,4 @@ public class JobController {
 
         return jobService.getProjectDeployScript(projectId,envId);
     }
-
-    @GetMapping("/test")
-    public ResultOutput test() {
-
-        return jobService.test();
-    }
 }

@@ -92,6 +92,9 @@ public class ProjectRepositoryService {
         projectRepository.setOperatorId(ThreadLocalUtil.getGuest().getId());
         projectRepository.setOperatorName(ThreadLocalUtil.getGuest().getName());
         projectRepository.setBranchCount(1);
+        projectRepository.setCommitCount(0);
+        projectRepository.setMemberCount(1);
+        projectRepository.setMergeRequestCount(0);
         projectRepository.setPathWithNamespace(gitlabProject.getPathWithNamespace());
         projectRepository.setProjectName(project.getName());
 

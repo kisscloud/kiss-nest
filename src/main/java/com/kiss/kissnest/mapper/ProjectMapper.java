@@ -47,4 +47,6 @@ public interface ProjectMapper {
     List<Project> getProjectsByGroupId(Integer groupId);
 
     List<ProjectOutput> getProjectOutputs(@Param("teamId") Integer teamId,@Param("groupId") Integer groupId);
+
+    ProjectOutput getProjectOutputById(Integer id);
 }
