@@ -108,9 +108,9 @@ public class ProjectController {
 
     @GetMapping("/project")
     @ApiOperation(value = "查询项目详情")
-    public ResultOutput getProjectById(@RequestParam("id") Integer id) {
+    public ResultOutput getProjectById(@RequestParam("projectId") Integer projectId) {
 
-        return projectService.getProjectById(id);
+        return projectService.getProjectById(projectId);
     }
 
 }
