@@ -438,7 +438,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
@@ -713,7 +713,7 @@ public class JobService {
 
     public ResultOutput test() {
 
-        return ResultOutputUtil.success(codeUtil.getEnumsMessage("group.status","1"));
+        return ResultOutputUtil.success(codeUtil.getEnumsMessage("group.status", "1"));
     }
 
     public static void main(String[] args) {
