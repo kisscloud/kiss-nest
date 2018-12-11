@@ -226,6 +226,7 @@ public class ProjectService {
                     tagOutput.setDescription(gitlabRelease.getTagName());
                     tagOutput.setDescription(gitlabRelease.getDescription());
                     tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
+                    branches.add(tagOutput);
                 }
             }
         }
