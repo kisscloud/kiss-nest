@@ -192,4 +192,20 @@ public class PageController {
 
         return ResultOutputUtil.success(result);
     }
+
+    @ApiOperation(value = "获取项目版本页面参数")
+    @GetMapping("/tags")
+    public ResultOutput GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
+
+        ResultOutput project = projectService.getProjectById(projectId);
+        ResultOutput branches = projectService.getProjectBranches(projectId);
+        ResultOutput tags = projectService.getProjectTags(projectId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("project", project.getData());
+        result.put("branches", branches.getData());
+        result.put("tags", tags.getData());
+
+        return ResultOutputUtil.success(result);
+    }
 }
