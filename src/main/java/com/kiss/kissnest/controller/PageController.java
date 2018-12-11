@@ -203,7 +203,7 @@ public class PageController {
 
         Map<String, Object> result = new HashMap<>();
         result.put("project", project.getData());
-        result.put("branchs", branchs.getData());
+        result.put("branches", branchs.getData());
         result.put("tags", tags.getData());
 
         return ResultOutputUtil.success(result);
