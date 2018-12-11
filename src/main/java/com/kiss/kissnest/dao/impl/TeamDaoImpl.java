@@ -33,9 +33,9 @@ public class TeamDaoImpl implements TeamDao {
     }
 
     @Override
-    public Integer addGroupsCount(Integer id) {
+    public Integer addCount(String type, Integer increments, Integer id) {
 
-        return teamMapper.addGroupsCount(id);
+        return teamMapper.addCount(type, increments, id);
     }
 
     @Override

@@ -17,6 +17,10 @@ public class Team {
 
     private Integer groupsCount;
 
+    private Integer membersCount;
+
+    private Integer projectsCount;
+
     private Integer operatorId;
 
     private String operatorName;

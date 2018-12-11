@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.GroupMapper">
 
     <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group" keyProperty="id" useGeneratedKeys="true">
-        insert into groups (name,teamId,slug,membersCount,operatorId,operatorName,status)
+        insert into groups (name,teamId,slug,membersCount,projectsCount,operatorId,operatorName,status)
         value
-        (#{name},#{teamId},#{slug},#{membersCount},#{operatorId},#{operatorName},#{status})
+        (#{name},#{teamId},#{slug},#{membersCount},#{projectsCount},#{operatorId},#{operatorName},#{status})
     </insert>
 
     <delete id="deleteGroupById" parameterType="java.lang.Integer">

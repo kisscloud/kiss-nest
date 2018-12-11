@@ -277,11 +277,12 @@ public class MemberService {
         Map<Integer, Integer> memberAccount = new HashMap<>();
         Map<String,Integer> gitlabMember = new HashMap<>();
         Map<String,String> memberName = new HashMap<>();
-
+        List<MemberOutput> memberOutputs = new ArrayList<>();
 
         for (MemberTeamInput memberInput : memberInputs) {
 
             Member member = memberDao.getMemberByAccountId(memberInput.getId());
+            MemberOutput memberOutput;
 
             if (member == null) {
                 member = new Member();
@@ -292,9 +293,18 @@ public class MemberService {
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
                 members.add(member);
+                memberOutput = new MemberOutput();
+                memberOutput.setName(member.getName());
+                memberOutput.setRoleId(memberInput.getRole());
+                memberOutput.setGroupsCount(0);
+                memberOutput.setProjectsCount(0);
             } else {
                 memberAccount.put(member.getAccountId(), member.getId());
+                memberOutput = BeanCopyUtil.copy(member,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
             }
+
+            memberOutput.setRoleText(codeUtil.getEnumsMessage("member.role",String.valueOf(memberInput.getRole())));
+            memberOutputs.add(memberOutput);
         }
 
         if (members.size() != 0) {
@@ -343,7 +353,7 @@ public class MemberService {
             gitlabApiUtil.addMember(team.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Group,memberName.get(entry.getKey()));
         }
 
-        return ResultOutputUtil.success();
+        return ResultOutputUtil.success(memberOutputs);
     }
 
     @Transactional

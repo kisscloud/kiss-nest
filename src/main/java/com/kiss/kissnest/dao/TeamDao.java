@@ -12,7 +12,7 @@ public interface TeamDao {
 
     Integer updateTeam(Team team);
 
-    Integer addGroupsCount(Integer id);
+    Integer addCount(String type, Integer increments, Integer id);
 
     Team getTeamById(Integer id);
 

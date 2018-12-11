@@ -9,6 +9,7 @@ import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.output.ProjectTypeOutput;
+import com.kiss.kissnest.output.TagOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -17,6 +18,8 @@ import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.models.GitlabBranch;
+import org.gitlab.api.models.GitlabBranchCommit;
+import org.gitlab.api.models.GitlabRelease;
 import org.gitlab.api.models.GitlabTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -210,14 +213,19 @@ public class ProjectService {
 
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
         List<GitlabTag> gitlabTags = gitlabApiUtil.getTags(projectRepository.getRepositoryId(), accessToken);
-        List<String> branches = new ArrayList<>();
+        List<TagOutput> branches = new ArrayList<>();
 
         if (gitlabTags != null) {
 
             for (GitlabTag gitlabTag : gitlabTags) {
 
                 if (!StringUtils.isEmpty(gitlabTag.getName())) {
-                    branches.add(gitlabTag.getName());
+                    TagOutput tagOutput = new TagOutput();
+                    GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
+                    GitlabRelease gitlabRelease = gitlabTag.getRelease();
+                    tagOutput.setDescription(gitlabRelease.getTagName());
+                    tagOutput.setDescription(gitlabRelease.getDescription());
+                    tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
                 }
             }
         }
@@ -277,11 +285,22 @@ public class ProjectService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createTagInput.getProjectId());
         Integer repositoryId = projectRepository.getRepositoryId();
         Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
-        gitlabApiUtil.addTag(repositoryId, createTagInput.getTagName(), createTagInput.getRef(), createTagInput.getMessage(), createTagInput.getReleaseDescription(), member.getAccessToken());
+        GitlabTag gitlabTag = gitlabApiUtil.addTag(repositoryId, createTagInput.getTagName(), createTagInput.getRef(), createTagInput.getMessage(), createTagInput.getReleaseDescription(), member.getAccessToken());
+
+        if (gitlabTag == null) {
+            return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_TAG_FAILED);
+        }
 
         operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, createTagInput, "id", OperationTargetType.TYPE__CREATE_PROJECT_TAG);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), projectRepository.getTeamId(), null, projectRepository.getProjectId(), OperationTargetType.TYPE__CREATE_PROJECT_TAG, createTagInput);
 
-        return ResultOutputUtil.success();
+        TagOutput tagOutput = new TagOutput();
+        GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
+        GitlabRelease gitlabRelease = gitlabTag.getRelease();
+        tagOutput.setDescription(gitlabRelease.getTagName());
+        tagOutput.setDescription(gitlabRelease.getDescription());
+        tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
+
+        return ResultOutputUtil.success(tagOutput);
     }
 }

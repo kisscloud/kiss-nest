@@ -56,6 +56,7 @@ public class GroupService {
         Guest guest = ThreadLocalUtil.getGuest();
         group.setStatus(1);
         group.setMembersCount(1);
+        group.setProjectsCount(0);
         group.setOperatorId(guest.getId());
         group.setOperatorName(guest.getName());
         Integer count = groupDao.createGroup(group);
@@ -64,9 +65,9 @@ public class GroupService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_GROUP_FAILED);
         }
 
-        teamDao.addGroupsCount(group.getTeamId());
+        teamDao.addCount("groups", 1, group.getTeamId());
         Member member = memberDao.getMemberByAccountId(ThreadLocalUtil.getGuest().getId());
-        memberDao.addCount(member.getId(),1,"groups");
+        memberDao.addCount(member.getId(), 1, "groups");
 
         String accessToken = member.getAccessToken();
         Integer parentId = teamDao.getRepositoryIdByTeamId(group.getTeamId());
@@ -85,8 +86,8 @@ public class GroupService {
         groupDao.addRepositoryIdById(group);
         Integer id = group.getId();
         group = groupDao.getGroupById(id);
-        operationLogService.saveOperationLog(group.getTeamId(),guest,null,group,"id",OperationTargetType.TYPE_CREATE_GROUP);
-        operationLogService.saveDynamic(guest,group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_CREATE_GROUP,group);
+        operationLogService.saveOperationLog(group.getTeamId(), guest, null, group, "id", OperationTargetType.TYPE_CREATE_GROUP);
+        operationLogService.saveDynamic(guest, group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_CREATE_GROUP, group);
         GroupOutput groupOutput = BeanCopyUtil.copy(group, GroupOutput.class);
         groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus())));
 
@@ -115,14 +116,14 @@ public class GroupService {
         }
 
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
-        boolean flag = gitlabApiUtil.deleteGroup(group.getRepositoryId(),accessToken);
+        boolean flag = gitlabApiUtil.deleteGroup(group.getRepositoryId(), accessToken);
 
         if (!flag) {
             throw new TransactionalException(NestStatusCode.DELETE_GROUP_REPOSITORY_FAILED);
         }
 
-        operationLogService.saveOperationLog(group.getTeamId(),ThreadLocalUtil.getGuest(),group,null,"id",OperationTargetType.TYPE_DELETE_GROUP);
-        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_DELETE_GROUP,group);
+        operationLogService.saveOperationLog(group.getTeamId(), ThreadLocalUtil.getGuest(), group, null, "id", OperationTargetType.TYPE_DELETE_GROUP);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_DELETE_GROUP, group);
 
         return ResultOutputUtil.success();
     }
@@ -141,8 +142,8 @@ public class GroupService {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_GROUP_FAILED);
         }
 
-        operationLogService.saveOperationLog(group.getTeamId(),guest,oldValue,group,"id",OperationTargetType.TYPE_UPDATE_GROUP);
-        operationLogService.saveDynamic(guest,group.getTeamId(),group.getId(),null,OperationTargetType.TYPE_UPDATE_GROUP,group);
+        operationLogService.saveOperationLog(group.getTeamId(), guest, oldValue, group, "id", OperationTargetType.TYPE_UPDATE_GROUP);
+        operationLogService.saveDynamic(guest, group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_UPDATE_GROUP, group);
 
         return ResultOutputUtil.success(BeanCopyUtil.copy(group, GroupOutput.class));
     }
