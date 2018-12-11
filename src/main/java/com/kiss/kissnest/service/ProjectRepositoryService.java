@@ -5,7 +5,7 @@ import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.entity.Group;
-import com.kiss.kissnest.entity.OperationTargetType;
+import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.input.CreateProjectRepositoryInput;

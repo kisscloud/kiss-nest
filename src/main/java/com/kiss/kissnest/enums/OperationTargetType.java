@@ -1,4 +1,4 @@
-package com.kiss.kissnest.entity;
+package com.kiss.kissnest.enums;
 
 public class OperationTargetType {
 

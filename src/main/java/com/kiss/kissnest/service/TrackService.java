@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
 import com.kiss.kissnest.dao.TrackDao;
-import com.kiss.kissnest.entity.OperationTargetType;
+import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Track;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
-import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
