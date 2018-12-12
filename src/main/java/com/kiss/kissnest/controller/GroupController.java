@@ -35,7 +35,7 @@ public class GroupController {
 
     @PostMapping("/group")
     @ApiOperation(value = "添加组织")
-    public ResultOutput createGroup (@Validated @RequestBody CreateGroupInput createGroupInput) {
+    public ResultOutput createGroup(@Validated @RequestBody CreateGroupInput createGroupInput) {
 
         ResultOutput createOutput = groupService.createGroup(createGroupInput);
 
@@ -44,28 +44,35 @@ public class GroupController {
 
     @PostMapping("/group/projects")
     @ApiOperation(value = "组织绑定项目")
-    public ResultOutput bindGroupProjects (@Validated @RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
+    public ResultOutput bindGroupProjects(@Validated @RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
 
         return groupProjectService.bindGroupProjects(bindGroupProjectsInput);
     }
 
     @DeleteMapping("/group")
     @ApiOperation(value = "删除组织")
-    public ResultOutput deleteGroup (@RequestParam("id") Integer id) {
+    public ResultOutput deleteGroup(@RequestParam("id") Integer id) {
 
         return groupService.deleteGroup(id);
     }
 
     @PutMapping("/group")
     @ApiOperation(value = "更新组织")
-    public ResultOutput updateGroup (@Validated @RequestBody UpdateGroupInput updateGroupInput) {
+    public ResultOutput updateGroup(@Validated @RequestBody UpdateGroupInput updateGroupInput) {
 
         return groupService.updateGroup(updateGroupInput);
     }
 
-    @GetMapping("/groups")
+    @GetMapping("/group")
     @ApiOperation(value = "获取组织")
-    public ResultOutput getGroups (@RequestParam("teamId") Integer teamId) {
+    public ResultOutput getGroup(@RequestParam("groupId") Integer groupId) {
+
+        return groupService.getGroupById(groupId);
+    }
+
+    @GetMapping("/groups")
+    @ApiOperation(value = "获取组织列表")
+    public ResultOutput getGroups(@RequestParam("teamId") Integer teamId) {
 
         return groupService.getGroups(teamId);
     }
