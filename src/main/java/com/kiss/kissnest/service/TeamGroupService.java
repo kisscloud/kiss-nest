@@ -48,8 +48,8 @@ public class TeamGroupService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_TEAMGROUP_FAILED);
         }
 
-        teamDao.addGroupsCount(teamGroup.getTeamId());
+        teamDao.addCount("groups", 1, teamGroup.getTeamId());
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(teamGroup,TeamGroupOutput.class));
+        return ResultOutputUtil.success(BeanCopyUtil.copy(teamGroup, TeamGroupOutput.class));
     }
 }

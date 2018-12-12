@@ -55,6 +55,7 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer PROJECT_TAG_NOT_EXIST = 5015;
     public static final Integer PROJECT_BRANCH_IS_EMPTY = 5016;
     public static final Integer PROJECT_TAG_IS_EMPTY = 5017;
+    public static final Integer CREATE_PROJECT_TAG_FAILED = 5018;
 
 
     public static final Integer MEMBER_NAME_EXIST = 6001;

@@ -151,13 +151,15 @@ public class GitlabApiUtil {
         }
     }
 
-    public void addTag(Integer projectId, String tagName, String ref, String message, String releaseDescription, String accessToken) {
+    public GitlabTag addTag(Integer projectId, String tagName, String ref, String message, String releaseDescription, String accessToken) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
-            gitlabAPI.addTag(projectId, tagName, ref, message, releaseDescription);
+            GitlabTag gitlabTag = gitlabAPI.addTag(projectId, tagName, ref, message, releaseDescription);
 
+            return gitlabTag;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -326,14 +328,14 @@ public class GitlabApiUtil {
 //            params.add(new BasicNameValuePair("fun","cmd.run"));
 //            params.add(new BasicNameValuePair("arg","cd /opt && touch test.txt"));
 
-            Map<String, Object> params = new HashMap<>();
-//            params.put("username","salt-api");
-//            params.put("password","12345678");
-//            params.put("eauth","pam");
-            params.put("client", "local");
-            params.put("tgt", "*");
-            params.put("fun", "cmd.run");
-            params.put("arg", "cd /opt && touch test.txt");
+//            Map<String, Object> params = new HashMap<>();
+////            params.put("username","salt-api");
+////            params.put("password","12345678");
+////            params.put("eauth","pam");
+//            params.put("client", "local");
+//            params.put("tgt", "*");
+//            params.put("fun", "cmd.run");
+//            params.put("arg", "cd /opt && touch test.txt");
 //            String str = HttpUtil.formDataPost("http://47.100.235.203:8000",params);
 
 //            CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -391,24 +393,42 @@ public class GitlabApiUtil {
 ////            JSONArray jsonArray = JSONObject.parseArray(jsonObject.getString("return"));
 //            JSONObject tokenJson = jsonArray.getJSONObject(0);
 //            System.out.println(tokenJson.getString("token"));
-            OkHttpClient client = new OkHttpClient();
+//            OkHttpClient client = new OkHttpClient();
+////
+//            MediaType mediaType = MediaType.parse("application/json");
+//            RequestBody body = RequestBody.create(mediaType, JSONObject.toJSONString(params));
+//            Request request = new Request.Builder()
+//                    .url("http://47.100.235.203:8000")
+//                    .post(body)
+//                    .addHeader("Accept", "application/json")
+//                    .addHeader("X-Auth-Token", "6c20c994d77ea25946e1a398a58a9df857bbfd8d")
+////                    .addHeader("Cache-Control", "no-cache")
+////                    .addHeader("Postman-Token", "8c1390fe-d567-49f6-aac8-c72eb60e9870")
+//                    .build();
 //
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType, JSONObject.toJSONString(params));
-            Request request = new Request.Builder()
-                    .url("http://47.100.235.203:8000")
-                    .post(body)
-                    .addHeader("Accept", "application/json")
-                    .addHeader("X-Auth-Token", "6c20c994d77ea25946e1a398a58a9df857bbfd8d")
-//                    .addHeader("Cache-Control", "no-cache")
-//                    .addHeader("Postman-Token", "8c1390fe-d567-49f6-aac8-c72eb60e9870")
-                    .build();
-
-            Response response = client.newCall(request).execute();
-            System.out.println(response.code());
-            System.out.println(response.body());
-            System.out.println(response.body().string());
+//            Response response = client.newCall(request).execute();
+//            System.out.println(response.code());
+//            System.out.println(response.body());
+//            System.out.println(response.body().string());
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect("http://git.kisscloud.io", "988e3ea19084cff69511c1b03a50e92b7c2134a52fe516890674edf55d489dbf", TokenType.ACCESS_TOKEN);
+            List<GitlabTag> gitlabTags = gitlabAPI.getTags(3);
+
+            gitlabTags.forEach(gitlabTag -> {
+                System.out.println(gitlabTag.getName());
+                System.out.println(gitlabTag.getName());
+                System.out.println(gitlabTag.getMessage());
+                GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
+                GitlabRelease gitlabRelease = gitlabTag.getRelease();
+
+                System.out.println();
+            });
+        } catch (Exception e) {
+            log.info("获取tag失败了");
             e.printStackTrace();
         }
     }

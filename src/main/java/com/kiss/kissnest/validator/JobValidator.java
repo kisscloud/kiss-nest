@@ -183,7 +183,7 @@ public class JobValidator implements Validator {
             return;
         }
 
-        if (type != 0 && type != 1) {
+        if (type != 1 && type != 2) {
             errors.rejectValue("type", String.valueOf(NestStatusCode.EXECJOB_TYPE_ERROR), "版本类型错误");
         }
 

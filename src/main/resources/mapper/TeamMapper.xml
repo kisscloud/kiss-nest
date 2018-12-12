@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.TeamMapper">
 
     <insert id="createTeam" parameterType="com.kiss.kissnest.entity.Team" useGeneratedKeys="true" keyProperty="id">
-        insert into teams (name,slug,operatorId,operatorName)
+        insert into teams (name,slug,operatorId,operatorName,groupsCount,membersCount,projectsCount)
         value
-        (#{name},#{slug},#{operatorId},#{operatorName})
+        (#{name},#{slug},#{operatorId},#{operatorName},#{groupsCount},#{membersCount},#{projectsCount})
     </insert>
 
     <delete id="deleteTeamById" parameterType="java.lang.Integer">
@@ -32,10 +32,18 @@
         where id = #{id}
     </update>
     
-    <update id="addGroupsCount" parameterType="java.lang.Integer">
+    <update id="addCount" parameterType="java.lang.Object">
         update teams
         set
-        groupsCount = groupsCount + 1
+        <if test="type == 'groups'">
+            groupsCount = groupsCount + #{increments}
+        </if>
+        <if test="type == 'projects'">
+            projectsCount = projectsCount + #{increments}
+        </if>
+        <if test="type == 'members'">
+            membersCount = membersCount + #{increments}
+        </if>
         where id = #{id}
     </update>
 

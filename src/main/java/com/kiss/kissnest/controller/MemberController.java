@@ -95,13 +95,13 @@ public class MemberController {
     }
 
     @PostMapping("/member/group")
-    public ResultOutput bindMemberGroup(@RequestBody BindMemberGroupInput bindMemberGroupInput) {
+    public ResultOutput bindMemberGroup(@Validated @RequestBody BindMemberGroupInput bindMemberGroupInput) {
 
         return memberService.createMemberGroup(bindMemberGroupInput);
     }
 
     @PostMapping("/member/project")
-    public ResultOutput bindMemberGroup(@RequestBody BindMemberProjectInput bindMemberProjectInput) {
+    public ResultOutput bindMemberGroup(@Validated @RequestBody BindMemberProjectInput bindMemberProjectInput) {
 
         return memberService.createMemberProject(bindMemberProjectInput);
     }

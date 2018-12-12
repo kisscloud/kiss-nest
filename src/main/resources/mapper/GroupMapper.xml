@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.GroupMapper">
 
     <insert id="createGroup" parameterType="com.kiss.kissnest.entity.Group" keyProperty="id" useGeneratedKeys="true">
-        insert into groups (name,teamId,slug,membersCount,operatorId,operatorName,status)
+        insert into groups (name,teamId,slug,membersCount,projectsCount,operatorId,operatorName,status)
         value
-        (#{name},#{teamId},#{slug},#{membersCount},#{operatorId},#{operatorName},#{status})
+        (#{name},#{teamId},#{slug},#{membersCount},#{projectsCount},#{operatorId},#{operatorName},#{status})
     </insert>
 
     <delete id="deleteGroupById" parameterType="java.lang.Integer">
@@ -73,4 +73,11 @@
         repositoryId = #{repositoryId}
         where id = #{id};
     </update>
+
+    <select id="getGroupByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Group">
+        select gr.id,gr.name from groups gr
+        left join projects pr
+        on gr.id = pr.groupId
+        where pr.id = #{projectId}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.kiss.kissnest.mapper;
 
 import com.kiss.kissnest.entity.Team;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface TeamMapper {
 
     Integer updateTeam(Team team);
 
-    Integer addGroupsCount(Integer id);
+    Integer addCount(@Param("type") String type, @Param("increments") Integer increments, @Param("id") Integer id);
 
     Team getTeamById(Integer id);
 

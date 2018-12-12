@@ -25,6 +25,10 @@ public class MemberOutput {
 
     private Integer operatorId;
 
+    private Integer roleId;
+
+    private String roleText;
+
     private String operatorName;
 
     private Long createdAt;

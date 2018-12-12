@@ -118,6 +118,9 @@ public class JobService {
     @Autowired
     private SaltStackUtil saltStackUtil;
 
+    @Autowired
+    private GroupDao groupDao;
+
 
     public static Map<String, String> buildRemarks = new HashMap<>();
 
@@ -229,6 +232,7 @@ public class JobService {
         thread.start();
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
+        Group group = groupDao.getGroupByProjectId(buildJobInput.getProjectId());
         Map<String, Object> result = new HashMap<>();
         result.put("id", buildLog.getId());
         result.put("projectName", project.getName());
@@ -238,6 +242,8 @@ public class JobService {
         result.put("status", 2);
         result.put("statusText", codeUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
+        result.put("groupId",group.getId());
+        result.put("groupName",group.getName());
         return ResultOutputUtil.success(result);
     }
 

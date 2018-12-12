@@ -9,6 +9,7 @@ import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateTeamInput;
 import com.kiss.kissnest.input.UpdateTeamInput;
+import com.kiss.kissnest.mapper.TeamMapper;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -52,6 +53,9 @@ public class TeamService {
         Guest guest = ThreadLocalUtil.getGuest();
         team.setOperatorId(guest.getId());
         team.setOperatorName(guest.getName());
+        team.setGroupsCount(0);
+        team.setMembersCount(1);
+        team.setProjectsCount(0);
         Integer count = teamDao.createTeam(team);
 
         if (count == 0) {
