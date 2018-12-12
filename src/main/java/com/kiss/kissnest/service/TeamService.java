@@ -85,6 +85,8 @@ public class TeamService {
 
         team.setRepositoryId(gitlabGroup.getId());
         teamDao.addRepositoryIdById(team);
+        memberDao.addCount(member.getId(),1,"teams");
+
         Integer id = team.getId();
         team = teamDao.getTeamById(id);
         operationLogService.saveOperationLog(team.getId(),guest,null,team,"id",OperationTargetType.TYPE_CREATE_TEAM);
@@ -186,6 +188,7 @@ public class TeamService {
         memberTeam.setTeamId(teamId);
         memberTeam.setOperatorId(guest.getId());
         memberTeam.setOperatorName(guest.getName());
+        memberTeam.setRole(1);
 
         return memberTeam;
     }

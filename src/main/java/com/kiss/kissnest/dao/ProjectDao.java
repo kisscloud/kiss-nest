@@ -16,7 +16,7 @@ public interface ProjectDao {
 
     Integer updateProject(Project project);
 
-    Integer addCount(Map map);
+    Integer addCount(Integer id, String type, Integer increments);
 
     Project getProjectById(Integer id);
 
