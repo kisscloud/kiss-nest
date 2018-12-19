@@ -38,6 +38,9 @@
     <update id="addCount" parameterType="java.util.Map">
         update members
         set
+        <if test="type == 'teams'">
+            teamCount = teamCount + #{increment}
+        </if>
         <if test="type == 'groups'">
             groupsCount = groupsCount + #{increment}
         </if>

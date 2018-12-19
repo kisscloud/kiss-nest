@@ -48,13 +48,13 @@
         update projects
         set 
         <if test="type == 'members'">
-            membersCount = membersCount + 1
+            membersCount = membersCount + #{increments}
         </if>
         <if test="type == 'needs'">
-            needsCount = needsCount + 1
+            needsCount = needsCount + #{increments}
         </if>
         <if test="type == 'issues'">
-            issuesCount = issuesCount + 1
+            issuesCount = issuesCount + #{increments}
         </if>
         where id = #{id}
     </update>

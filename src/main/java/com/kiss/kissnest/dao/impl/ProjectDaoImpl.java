@@ -38,9 +38,14 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
-    public Integer addCount(Map map) {
+    public Integer addCount(Integer id, String type, Integer increments) {
 
-        return projectMapper.addCount(map);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("type", type);
+        params.put("increments", increments);
+
+        return projectMapper.addCount(params);
     }
 
     @Override
@@ -50,21 +55,21 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
-    public List<Project> getProjects(Integer teamId,Integer groupId) {
+    public List<Project> getProjects(Integer teamId, Integer groupId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("groupId",groupId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("groupId", groupId);
 
         return projectMapper.getProjects(params);
     }
 
     @Override
-    public Project getProjectByNameAndTeamId(String name,Integer teamId) {
+    public Project getProjectByNameAndTeamId(String name, Integer teamId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("name",name);
-        params.put("teamId",teamId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("teamId", teamId);
 
         return projectMapper.getProjectByNameAndTeamId(params);
     }
@@ -72,9 +77,9 @@ public class ProjectDaoImpl implements ProjectDao {
     @Override
     public Project getProjectBySlugAndTeamId(String slug, Integer teamId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("slug",slug);
-        params.put("teamId",teamId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("slug", slug);
+        params.put("teamId", teamId);
 
         return projectMapper.getProjectBySlugAndTeamId(params);
     }
@@ -136,7 +141,7 @@ public class ProjectDaoImpl implements ProjectDao {
     @Override
     public List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId) {
 
-        return projectMapper.getProjectOutputs(teamId,groupId);
+        return projectMapper.getProjectOutputs(teamId, groupId);
     }
 
     @Override

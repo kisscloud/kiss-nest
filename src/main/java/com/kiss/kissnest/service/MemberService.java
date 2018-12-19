@@ -64,6 +64,9 @@ public class MemberService {
     private ProjectRepositoryDao projectRepositoryDao;
 
     @Autowired
+    private ProjectDao projectDao;
+
+    @Autowired
     private CodeUtil codeUtil;
 
     @Value("${member.roles}")
@@ -275,8 +278,8 @@ public class MemberService {
         List<MemberTeam> memberTeams = new ArrayList<>();
         List<MemberTeamInput> memberInputs = createMemberTeamInput.getMemberTeamInputs();
         Map<Integer, Integer> memberAccount = new HashMap<>();
-        Map<String,Integer> gitlabMember = new HashMap<>();
-        Map<String,String> memberName = new HashMap<>();
+        Map<String, Integer> gitlabMember = new HashMap<>();
+        Map<String, String> memberName = new HashMap<>();
         List<MemberOutput> memberOutputs = new ArrayList<>();
 
         for (MemberTeamInput memberInput : memberInputs) {
@@ -300,10 +303,10 @@ public class MemberService {
                 memberOutput.setProjectsCount(0);
             } else {
                 memberAccount.put(member.getAccountId(), member.getId());
-                memberOutput = BeanCopyUtil.copy(member,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
+                memberOutput = BeanCopyUtil.copy(member, MemberOutput.class, BeanCopyUtil.defaultFieldNames);
             }
 
-            memberOutput.setRoleText(codeUtil.getEnumsMessage("member.role",String.valueOf(memberInput.getRole())));
+            memberOutput.setRoleText(codeUtil.getEnumsMessage("member.role", String.valueOf(memberInput.getRole())));
             memberOutputs.add(memberOutput);
         }
 
@@ -331,8 +334,8 @@ public class MemberService {
                 memberTeam.setOperatorId(guest.getId());
                 memberTeam.setOperatorName(guest.getName());
                 memberTeams.add(memberTeam);
-                gitlabMember.put(memberInput.getUsername(),memberInput.getRole());
-                memberName.put(memberInput.getUsername(),memberInput.getName());
+                gitlabMember.put(memberInput.getUsername(), memberInput.getRole());
+                memberName.put(memberInput.getUsername(), memberInput.getName());
             }
         }
 
@@ -346,11 +349,17 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.TEAM_MEMBER_IS_EXIST);
         }
 
+        teamDao.addCount("members", memberTeams.size(), createMemberTeamInput.getTeamId());
+
+        for (MemberTeam memberTeam : memberTeams) {
+            memberDao.addCount(memberTeam.getMemberId(), 1, "teams");
+        }
+
         Team team = teamDao.getTeamById(createMemberTeamInput.getTeamId());
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
-        for (Map.Entry<String,Integer> entry : gitlabMember.entrySet()) {
-            gitlabApiUtil.addMember(team.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Group,memberName.get(entry.getKey()));
+        for (Map.Entry<String, Integer> entry : gitlabMember.entrySet()) {
+            gitlabApiUtil.addMember(team.getRepositoryId(), operator.getAccessToken(), entry.getKey(), entry.getValue(), RepositoryType.Group, memberName.get(entry.getKey()));
         }
 
         return ResultOutputUtil.success(memberOutputs);
@@ -362,7 +371,7 @@ public class MemberService {
         Guest guest = ThreadLocalUtil.getGuest();
         List<MemberGroup> memberGroups = new ArrayList<>();
         List<MemberGroupInput> memberGroupInputs = bindMemberGroupInput.getMemberGroupInputs();
-        Map<String,Integer> gitlabGroup = new HashMap<>();
+        Map<String, Integer> gitlabGroup = new HashMap<>();
 
         for (MemberGroupInput memberGroupInput : memberGroupInputs) {
             MemberGroup memberGroup = memberGroupDao.getMemberGroup(bindMemberGroupInput.getTeamId(), bindMemberGroupInput.getGroupId(), memberGroupInput.getMemberId());
@@ -377,7 +386,7 @@ public class MemberService {
                 memberGroup.setGroupId(bindMemberGroupInput.getGroupId());
                 memberGroups.add(memberGroup);
                 Member member = memberDao.getMemberById(memberGroupInput.getMemberId());
-                gitlabGroup.put(member.getUsername(),memberGroupInput.getRole());
+                gitlabGroup.put(member.getUsername(), memberGroupInput.getRole());
             }
         }
 
@@ -395,11 +404,17 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.GROUP_MEMBER_IS_EXIST);
         }
 
+        groupDao.addCount(bindMemberGroupInput.getGroupId(), "members", memberGroups.size());
+
+        for (MemberGroup memberGroup : memberGroups) {
+            memberDao.addCount(memberGroup.getMemberId(), 1, "groups");
+        }
+
         Group group = groupDao.getGroupById(bindMemberGroupInput.getGroupId());
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
-        for (Map.Entry<String,Integer> entry : gitlabGroup.entrySet()) {
-            gitlabApiUtil.addMember(group.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.SubGroup,null);
+        for (Map.Entry<String, Integer> entry : gitlabGroup.entrySet()) {
+            gitlabApiUtil.addMember(group.getRepositoryId(), operator.getAccessToken(), entry.getKey(), entry.getValue(), RepositoryType.SubGroup, null);
         }
 
         return ResultOutputUtil.success();
@@ -411,7 +426,7 @@ public class MemberService {
         Guest guest = ThreadLocalUtil.getGuest();
         List<MemberProject> memberProjects = new ArrayList<>();
         List<MemberProjectInput> memberProjectInputs = bindMemberProjectInput.getMemberProjectInputs();
-        Map<String,Integer> gitlabProject = new HashMap<>();
+        Map<String, Integer> gitlabProject = new HashMap<>();
 
         for (MemberProjectInput memberProjectInput : memberProjectInputs) {
             MemberProject memberProject = memberProjectDao.getMemberProject(bindMemberProjectInput.getTeamId(), bindMemberProjectInput.getProjectId(), memberProjectInput.getMemberId());
@@ -426,7 +441,7 @@ public class MemberService {
                 memberProject.setProjectId(bindMemberProjectInput.getProjectId());
                 memberProjects.add(memberProject);
                 Member member = memberDao.getMemberById(memberProjectInput.getMemberId());
-                gitlabProject.put(member.getUsername(),memberProjectInput.getRole());
+                gitlabProject.put(member.getUsername(), memberProjectInput.getRole());
             }
         }
 
@@ -443,11 +458,17 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
         }
 
+        projectDao.addCount(bindMemberProjectInput.getProjectId(),"members",memberProjects.size());
+
+        for (MemberProject memberProject : memberProjects) {
+            memberDao.addCount(memberProject.getMemberId(),1,"projects");
+        }
+
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(bindMemberProjectInput.getProjectId());
         Member operator = memberDao.getMemberByAccountId(guest.getId());
 
-        for (Map.Entry<String,Integer> entry : gitlabProject.entrySet()) {
-            gitlabApiUtil.addMember(projectRepository.getRepositoryId(),operator.getAccessToken(),entry.getKey(),entry.getValue(),RepositoryType.Project,null);
+        for (Map.Entry<String, Integer> entry : gitlabProject.entrySet()) {
+            gitlabApiUtil.addMember(projectRepository.getRepositoryId(), operator.getAccessToken(), entry.getKey(), entry.getValue(), RepositoryType.Project, null);
         }
 
         return ResultOutputUtil.success();
@@ -496,16 +517,16 @@ public class MemberService {
 
     public ResultOutput getGroupValidMembers(GroupMemberSearchInput groupMemberSearchInput) {
 
-        List<Member> members = memberDao.getGroupValidMembers(groupMemberSearchInput.getGroupId(),groupMemberSearchInput.getAccountName());
-        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class);
+        List<Member> members = memberDao.getGroupValidMembers(groupMemberSearchInput.getGroupId(), groupMemberSearchInput.getAccountName());
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class);
 
         return ResultOutputUtil.success(memberOutputs);
     }
 
     public ResultOutput getProjectValidMembers(ProjectMemberSearchInput projectMemberSearchInput) {
 
-        List<Member> members = memberDao.getProjectValidMembers(projectMemberSearchInput.getProjectId(),projectMemberSearchInput.getAccountName());
-        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class);
+        List<Member> members = memberDao.getProjectValidMembers(projectMemberSearchInput.getProjectId(), projectMemberSearchInput.getAccountName());
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class);
 
         return ResultOutputUtil.success(memberOutputs);
     }

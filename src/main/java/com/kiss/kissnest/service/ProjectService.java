@@ -71,6 +71,12 @@ public class ProjectService {
     @Autowired
     private OperationLogService operationLogService;
 
+    @Autowired
+    private TeamDao teamDao;
+
+    @Autowired
+    private MemberProjectDao memberProjectDao;
+
     public ResultOutput createProject(CreateProjectInput createProjectInput) {
 
         Project project = BeanCopyUtil.copy(createProjectInput, Project.class);
@@ -84,9 +90,24 @@ public class ProjectService {
             return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
         }
 
-        groupDao.addCount(project.getTeamId(), project.getGroupId(), "projects", 1);
+        teamDao.addCount("projects", 1, project.getTeamId());
+        groupDao.addCount(project.getGroupId(), "projects", 1);
         Member member = memberDao.getMemberByAccountId(ThreadLocalUtil.getGuest().getId());
         memberDao.addCount(member.getId(), 1, "projects");
+
+        MemberProject memberProject = new MemberProject();
+        memberProject.setProjectId(project.getId());
+        memberProject.setMemberId(member.getId());
+        memberProject.setOperatorId(guest.getId());
+        memberProject.setOperatorName(guest.getName());
+        memberProject.setRole(1);
+        memberProject.setTeamId(project.getTeamId());
+        Integer memberGroupCount = memberProjectDao.createMemberProject(memberProject);
+
+        if (memberGroupCount == 0) {
+            throw new TransactionalException(NestStatusCode.CREATE_MEMBER_PROJECT_FAILED);
+        }
+
         ProjectOutput projectOutput = projectDao.getProjectOutputById(project.getId());
         projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
         Integer id = project.getId();

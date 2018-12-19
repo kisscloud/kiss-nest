@@ -198,10 +198,10 @@ public class GitlabApiUtil {
             GitlabAccessLevel accessLevel;
 
             switch (level) {
-                case 0:
+                case 1:
                     accessLevel = GitlabAccessLevel.Master;
                     break;
-                case 1:
+                case 2:
                     accessLevel = GitlabAccessLevel.Developer;
                     break;
                 default:

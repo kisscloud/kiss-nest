@@ -48,7 +48,7 @@
         <if test="type == 'issueSolved'">
             issueSolvedCount = issueSolvedCount + #{increment}
         </if>
-        where teamId = #{teamId} and id = #{id}
+        where id = #{id}
     </update>
 
     <select id="getGroupById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Group">

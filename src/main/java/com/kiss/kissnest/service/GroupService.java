@@ -49,6 +49,9 @@ public class GroupService {
     @Autowired
     private OperationLogService operationLogService;
 
+    @Autowired
+    private MemberGroupDao memberGroupDao;
+
     @Transactional
     public ResultOutput createGroup(CreateGroupInput createGroupInput) {
 
@@ -74,6 +77,19 @@ public class GroupService {
 
         if (parentId == null) {
             throw new TransactionalException(NestStatusCode.GROUP_PARENTID_LOSED);
+        }
+
+        MemberGroup memberGroup = new MemberGroup();
+        memberGroup.setGroupId(group.getId());
+        memberGroup.setMemberId(member.getId());
+        memberGroup.setOperatorId(guest.getId());
+        memberGroup.setOperatorName(guest.getName());
+        memberGroup.setRole(1);
+        memberGroup.setTeamId(group.getTeamId());
+        Integer memberGroupCount = memberGroupDao.createMemberGroup(memberGroup);
+
+        if (memberGroupCount == 0) {
+            throw new TransactionalException(NestStatusCode.CREATE_MEMBER_GROUP_FAILED);
         }
 
         GitlabGroup gitlabGroup = gitlabApiUtil.createSubGroup(group.getSlug(), accessToken, parentId);
