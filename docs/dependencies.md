@@ -119,12 +119,13 @@ $ yum install salt-api -y
 
 ```
 $ useradd -M -s /sbin/nologin salt-api
-$  passwd salt-api
+$ passwd salt-api
 ```
 
 **编辑 API 配置：**
 
 ```
+$ mkdir /etc/salt/master.d
 $ vim /etc/salt/master.d/api.conf
 ```
 
@@ -132,7 +133,8 @@ $ vim /etc/salt/master.d/api.conf
 
 ```
 rest_cherrypy:
-  port: 8000
+  port: 8671
+  disable_ssl: true
 ```
 
 **编辑授权配置：**
@@ -146,7 +148,7 @@ $ vim /etc/salt/master.d/eauth.conf
 ```
 external_auth:
   pam:
-    saltapi:
+    salt-api:
       - .*
       - '@wheel'
       - '@runner'
@@ -159,11 +161,7 @@ $ salt-master -d
 $ salt-api -d
 ```
 
-
-
 **测试:**
-
-查看用户TOKEN：
 
 ```
 curl -k http://127.0.0.1:8000/login -H "Accept: application/x-yaml"  -d username='salt-api' -d password='12345678'  -d eauth='pam'
