@@ -122,7 +122,7 @@ $ useradd -M -s /sbin/nologin salt-api
 $  passwd salt-api
 ```
 
-**配置：**
+**编辑 API 配置：**
 
 ```
 $ vim /etc/salt/master.d/api.conf
@@ -134,6 +134,8 @@ $ vim /etc/salt/master.d/api.conf
 rest_cherrypy:
   port: 8000
 ```
+
+**编辑授权配置：**
 
 ```
 $ vim /etc/salt/master.d/eauth.conf
