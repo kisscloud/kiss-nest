@@ -63,7 +63,7 @@ ts=`date '+%%Y-%%m-%%d-%%H-%%M-%%S'`&#x000A;
 newName=$name-$ts`echo ${default##__PACKAGE__}`&#x000A;
 mv __PACKAGE__* $newName&#x000A;
 tar -zcvf $newName.tar.gz $newName*&#x000A;
-ansible $binIp -u root -m shell -a "if [ ! -d "/opt/apps/$path" ];then mkdir -p /opt/apps/$path;fi"&#x000A;
+ansible $binIp -u root -m shell -a "if [ ! -d "/packages/$path" ];then mkdir -p /packages/$path;fi"&#x000A;
 rsync -v $newName.tar.gz root@$binIp:/packages/$path/&#x000A;
 echo "jarNameStart="$newName"=jarNameEnd"&#x000A;
 echo "tarNameStart="$newName.tar.gz"=tarNameEnd"&#x000A;
