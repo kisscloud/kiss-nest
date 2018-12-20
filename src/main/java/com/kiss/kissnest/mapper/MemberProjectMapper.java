@@ -1,5 +1,6 @@
 package com.kiss.kissnest.mapper;
 
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberProject;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,4 +17,8 @@ public interface MemberProjectMapper {
     List<MemberProject> getMemberProjects(Map params);
 
     MemberProject getMemberProject(Map params);
+
+    List<Member> getMemberProjectsByProjectId(Integer projectId);
+
+    Integer deleteMemberProjectsByProjectId(Integer projectId);
 }

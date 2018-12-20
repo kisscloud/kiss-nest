@@ -1,10 +1,12 @@
 package com.kiss.kissnest.service;
 
 import com.kiss.account.input.ClientAccountInput;
+import com.kiss.account.output.AccountOutput;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
+import com.kiss.kissnest.feign.AccountServiceFeign;
 import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.MemberOutput;
@@ -16,6 +18,7 @@ import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -77,6 +80,9 @@ public class MemberService {
 
     @Value("${project.roles}")
     private String projectRoles;
+
+    @Autowired
+    private AccountServiceFeign accountServiceFeign;
 
     public ResultOutput createMember(Member member) {
 
@@ -280,6 +286,7 @@ public class MemberService {
         Map<Integer, Integer> memberAccount = new HashMap<>();
         Map<String, Integer> gitlabMember = new HashMap<>();
         Map<String, String> memberName = new HashMap<>();
+        Map<Integer, AccountOutput> accountOutputMap = new HashMap<>();
         List<MemberOutput> memberOutputs = new ArrayList<>();
 
         for (MemberTeamInput memberInput : memberInputs) {
@@ -290,8 +297,15 @@ public class MemberService {
             if (member == null) {
                 member = new Member();
                 member.setAccountId(memberInput.getId());
-                member.setName(memberInput.getName());
-                member.setUsername(memberInput.getUsername());
+                ResultOutput accountResponse = accountServiceFeign.getAccountById(memberInput.getId());
+
+                if (accountResponse.getCode() == 200) {
+                    JSONObject jsonObject = JSONObject.fromObject(accountResponse.getData());
+                    AccountOutput accountOutput = (AccountOutput) JSONObject.toBean(jsonObject, AccountOutput.class);
+                    member.setName(accountOutput.getName());
+                    accountOutputMap.put(memberInput.getId(), accountOutput);
+                }
+
                 member.setTeamId(createMemberTeamInput.getTeamId());
                 member.setOperatorId(guest.getId());
                 member.setOperatorName(guest.getName());
@@ -334,8 +348,13 @@ public class MemberService {
                 memberTeam.setOperatorId(guest.getId());
                 memberTeam.setOperatorName(guest.getName());
                 memberTeams.add(memberTeam);
-                gitlabMember.put(memberInput.getUsername(), memberInput.getRole());
-                memberName.put(memberInput.getUsername(), memberInput.getName());
+                AccountOutput accountOutput = accountOutputMap.get(memberInput.getId());
+
+                if (accountOutput != null) {
+                    gitlabMember.put(accountOutput.getUsername(), memberInput.getRole());
+                    memberName.put(accountOutput.getUsername(), accountOutput.getName());
+                }
+
             }
         }
 
@@ -458,10 +477,10 @@ public class MemberService {
             return ResultOutputUtil.error(NestStatusCode.PROJCET_MEMBER_IS_EXIST);
         }
 
-        projectDao.addCount(bindMemberProjectInput.getProjectId(),"members",memberProjects.size());
+        projectDao.addCount(bindMemberProjectInput.getProjectId(), "members", memberProjects.size());
 
         for (MemberProject memberProject : memberProjects) {
-            memberDao.addCount(memberProject.getMemberId(),1,"projects");
+            memberDao.addCount(memberProject.getMemberId(), 1, "projects");
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(bindMemberProjectInput.getProjectId());
@@ -515,6 +534,13 @@ public class MemberService {
         return ResultOutputUtil.success(memberOutputs);
     }
 
+    public ResultOutput getMemberTeamsByTeamId(Integer teamId) {
+        List<Member> members = memberTeamDao.getMemberTeamsByTeamId(teamId);
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class, BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(memberOutputs);
+    }
+
     public ResultOutput getGroupValidMembers(GroupMemberSearchInput groupMemberSearchInput) {
 
         List<Member> members = memberDao.getGroupValidMembers(groupMemberSearchInput.getGroupId(), groupMemberSearchInput.getAccountName());
@@ -530,5 +556,4 @@ public class MemberService {
 
         return ResultOutputUtil.success(memberOutputs);
     }
-
 }

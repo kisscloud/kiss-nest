@@ -1,5 +1,6 @@
 package com.kiss.kissnest.dao;
 
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberGroup;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface MemberGroupDao {
 
     MemberGroup getMemberGroup(Integer teamId, Integer groupId, Integer memberId);
 
+    List<Member> getMemberGroupsByGroupId(Integer groupId);
+
+    Integer deleteMemberGroupsByGroupId(Integer groupId);
 }

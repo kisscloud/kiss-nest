@@ -35,4 +35,6 @@ public interface MemberDao {
     List<Member> getGroupValidMembers(Integer groupId, String name);
 
     List<Member> getProjectValidMembers(Integer projectId, String name);
+
+    Integer deleteCount(Integer id, Integer incrememt, String type);
 }

@@ -19,12 +19,22 @@
         </foreach>
     </insert>
 
-    <select id="getMemberProject" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
+    <select id="getMemberProjects" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
         select * from memberprojects where teamId = #{teamId} and projectId = #{projectId};
     </select>
 
-    <select id="getMemberGroup" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
+    <select id="getMemberProject" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberProject">
         select * from memberprojects where teamId = #{teamId} and projectId = #{projectId} and memberId = #{memberId};
     </select>
 
+    <select id="getMemberProjectsByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select ms.* from memberprojects me
+        left join members ms
+        on me.memberId = ms.id
+        where me.projectId = #{projectId};
+    </select>
+
+    <delete id="deleteMemberProjectsByProjectId" parameterType="java.lang.Integer">
+        delete from memberprojects where projectId = #{projectId}
+    </delete>
 </mapper>

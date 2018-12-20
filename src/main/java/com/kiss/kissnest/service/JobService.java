@@ -70,9 +70,6 @@ public class JobService {
     @Value("${build.log.maxSize}")
     private String buildLogSize;
 
-    @Value("${code.bin.ip}")
-    private String codeIps;
-
     @Value("${gitlab.server.url}")
     private String gitlabUrl;
 

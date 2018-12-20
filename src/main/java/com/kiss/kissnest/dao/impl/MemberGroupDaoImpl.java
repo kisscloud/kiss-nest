@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.MemberGroupDao;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberGroup;
 import com.kiss.kissnest.mapper.MemberGroupMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,17 @@ public class MemberGroupDaoImpl implements MemberGroupDao {
         params.put("memberId", memberId);
 
         return memberGroupMapper.getMemberGroup(params);
+    }
+
+    @Override
+    public List<Member> getMemberGroupsByGroupId(Integer groupId) {
+
+        return memberGroupMapper.getMemberGroupsByGroupId(groupId);
+    }
+
+    @Override
+    public Integer deleteMemberGroupsByGroupId(Integer groupId) {
+
+        return memberGroupMapper.deleteMemberGroupsByGroupId(groupId);
     }
 }

@@ -126,10 +126,6 @@ public class MemberValidator implements Validator {
             if (memberTeamInput.getRole() == null) {
                 errors.rejectValue("memberTeamInputs",String.valueOf(NestStatusCode.MEMBER_ACCOUNT_ROLE_IS_EMPTY),"添加成员的角色为空");
             }
-
-            if (StringUtils.isEmpty(memberTeamInput.getName())) {
-                errors.rejectValue("memberTeamInputs",String.valueOf(NestStatusCode.MEMBER_ACCOUNT_NAME_IS_EMPTY),"添加成员的名字为空");
-            }
         });
     }
 

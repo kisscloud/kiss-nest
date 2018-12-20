@@ -1,5 +1,6 @@
 package com.kiss.kissnest.dao;
 
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberTeam;
 import com.kiss.kissnest.entity.Team;
 
@@ -15,4 +16,6 @@ public interface MemberTeamDao {
     List<Team> getMemberTeams(Integer accountId);
 
     MemberTeam getMemberTeam(Integer teamId,Integer memberId);
+
+    List<Member> getMemberTeamsByTeamId(Integer teamId);
 }

@@ -78,10 +78,15 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer MEMBER_ACCOUNT_NAME_IS_EMPTY = 6018;
 
 
+
     public static final Integer CREATE_GROUP_PROJECT_FAILED = 7001;
 
     public static final Integer BIND_ACCOUNT_TEAM_FAILED = 8001;
     public static final Integer CREATE_MEMBER_TEAM_FAILED = 8002;
+    public static final Integer DELETE_MEMBER_GROUP_FAILED = 8003;
+    public static final Integer DELETE_MEMBER_GROUP_COUNT_FAILED = 8004;
+    public static final Integer DELETE_MEMBER_PROJECT_FAILED = 8005;
+    public static final Integer DELETE_MEMBER_PROJECT_COUNT_FAILED = 8006;
 
 
     public static final Integer CREATE_MEMBER_ACCESS_FAILED = 9001;

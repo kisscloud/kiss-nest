@@ -32,4 +32,11 @@
     <select id="getMemberTeam" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.MemberTeam">
         select * from memberTeams where teamId = #{teamId} and memberId = #{memberId};
     </select>
+
+    <select id="getMemberTeamsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select me.* from memberTeams mt
+        left join members me
+        on mt.memberId = me.id
+        where mt.teamId = #{teamId}
+    </select>
 </mapper>

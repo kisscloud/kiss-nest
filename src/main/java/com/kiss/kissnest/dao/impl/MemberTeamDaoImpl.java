@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.MemberTeamDao;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberTeam;
 import com.kiss.kissnest.entity.Team;
 import com.kiss.kissnest.mapper.MemberTeamMapper;
@@ -43,5 +44,10 @@ public class MemberTeamDaoImpl implements MemberTeamDao {
         params.put("memberId",memberId);
 
         return memberTeamMapper.getMemberTeam(params);
+    }
+
+    @Override
+    public List<Member> getMemberTeamsByTeamId(Integer teamId) {
+        return memberTeamMapper.getMemberTeamsByTeamId(teamId);
     }
 }

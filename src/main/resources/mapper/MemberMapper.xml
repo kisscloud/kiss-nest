@@ -127,4 +127,40 @@
         on mg.memberId = me.id
         where pr.id = #{projectId} and me.name like #{name}
     </select>
+
+    <update id="deleteCount" parameterType="java.util.Map">
+        update members
+        set
+        <if test="type == 'teams'">
+            teamCount = teamCount - #{increment}
+        </if>
+        <if test="type == 'groups'">
+            groupsCount = groupsCount - #{increment}
+        </if>
+        <if test="type == 'projects'">
+            projectsCount = projectsCount - #{increment}
+        </if>
+        <if test="type == 'needs'">
+            needsCount = needsCount - #{increment}
+        </if>
+        <if test="type == 'issues'">
+            issuesCount = issuesCount - #{increment}
+        </if>
+        where id = #{id}
+        <if test="type == 'teams'">
+            and teamCount > 1
+        </if>
+        <if test="type == 'groups'">
+            and groupsCount > 1
+        </if>
+        <if test="type == 'projects'">
+            and projectsCount > 1
+        </if>
+        <if test="type == 'needs'">
+            and needsCount > 1
+        </if>
+        <if test="type == 'issues'">
+            and issuesCount > 1
+        </if>
+    </update>
 </mapper>

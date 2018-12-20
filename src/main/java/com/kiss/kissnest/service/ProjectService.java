@@ -7,6 +7,7 @@ import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.output.MemberOutput;
 import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.output.ProjectTypeOutput;
 import com.kiss.kissnest.output.TagOutput;
@@ -134,6 +135,23 @@ public class ProjectService {
 
         buildLogDao.deleteBuildLogsByProjectId(project.getId());
 
+        List<MemberProject> memberProjects = memberProjectDao.getMemberProjects(project.getTeamId(),id);
+
+        for (MemberProject memberProject : memberProjects) {
+
+            Integer memberCount = memberDao.deleteCount(memberProject.getMemberId(),1,"projects");
+
+            if (memberCount == 0) {
+                throw new TransactionalException(NestStatusCode.DELETE_MEMBER_PROJECT_COUNT_FAILED);
+            }
+        }
+
+        Integer memberProjectCount = memberProjectDao.deleteMemberProjectsByProjectId(id);
+
+        if (memberProjectCount == 0) {
+            throw new TransactionalException(NestStatusCode.DELETE_MEMBER_PROJECT_FAILED);
+        }
+
         List<Job> jobs = jobDao.getJobByProjectId(project.getId());
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
@@ -159,6 +177,7 @@ public class ProjectService {
 
         operationLogService.saveOperationLog(project.getTeamId(), ThreadLocalUtil.getGuest(), project, null, "id", OperationTargetType.TYPE_DELETE_PROJECT);
         operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_DELETE_PROJECT, project);
+
         return ResultOutputUtil.success();
     }
 
@@ -327,5 +346,13 @@ public class ProjectService {
         tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
 
         return ResultOutputUtil.success(tagOutput);
+    }
+
+    public ResultOutput getMemberProjectsByProjectId(Integer projectId) {
+
+        List<Member> members = memberProjectDao.getMemberProjectsByProjectId(projectId);
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
+
+        return ResultOutputUtil.success(memberOutputs);
     }
 }

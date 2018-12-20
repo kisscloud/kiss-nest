@@ -37,4 +37,6 @@ public interface MemberMapper {
     List<Member> getGroupValidMembers(Map params);
 
     List<Member> getProjectValidMembers(Map params);
+
+    Integer deleteCount(Map params);
 }

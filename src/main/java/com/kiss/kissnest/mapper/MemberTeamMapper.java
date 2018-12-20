@@ -1,5 +1,6 @@
 package com.kiss.kissnest.mapper;
 
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberTeam;
 import com.kiss.kissnest.entity.Team;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,4 +18,6 @@ public interface MemberTeamMapper {
     List<Team> getMemberTeams(Integer accountId);
 
     MemberTeam getMemberTeam(Map params);
+
+    List<Member> getMemberTeamsByTeamId(Integer teamId);
 }

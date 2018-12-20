@@ -7,9 +7,5 @@ public class MemberTeamInput {
 
     private Integer id;
 
-    private String name;
-
-    private String username;
-
     private Integer role;
 }
