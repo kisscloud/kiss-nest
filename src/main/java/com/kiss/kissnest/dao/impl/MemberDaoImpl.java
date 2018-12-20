@@ -39,12 +39,12 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Integer addCount(Integer id,Integer increment,String type) {
+    public Integer addCount(Integer id, Integer increment, String type) {
 
-        Map<String,Object> map = new HashMap();
-        map.put("id",id);
-        map.put("increment",increment);
-        map.put("type",type);
+        Map<String, Object> map = new HashMap();
+        map.put("id", id);
+        map.put("increment", increment);
+        map.put("type", type);
 
         return memberMapper.addCount(map);
     }
@@ -56,12 +56,12 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> getMembers(Integer teamId,Integer groupId,Integer projectId) {
+    public List<Member> getMembers(Integer teamId, Integer groupId, Integer projectId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("groupId",groupId);
-        params.put("projectId",projectId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("groupId", groupId);
+        params.put("projectId", projectId);
 
         return memberMapper.getMembers(params);
     }
@@ -75,9 +75,9 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public Integer updateAccessTokenByAccountId(Integer accountId, String accessToken) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("accountId",accountId);
-        params.put("accessToken",accessToken);
+        Map<String, Object> params = new HashMap<>();
+        params.put("accountId", accountId);
+        params.put("accessToken", accessToken);
 
         Integer count = memberMapper.updateAccessTokenByAccountId(params);
 
@@ -93,9 +93,9 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public Integer updateApiTokenByAccountId(Integer accountId, String apiToken) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("accountId",accountId);
-        params.put("apiToken",apiToken);
+        Map<String, Object> params = new HashMap<>();
+        params.put("accountId", accountId);
+        params.put("apiToken", apiToken);
 
         Integer count = memberMapper.updateApiTokenByAccountId(params);
 
@@ -117,8 +117,8 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public List<Member> getGroupValidMembers(Integer groupId, String name) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("groupId",groupId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("groupId", groupId);
         params.put("name", name + "%");
 
         return memberMapper.getGroupValidMembers(params);
@@ -127,10 +127,21 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public List<Member> getProjectValidMembers(Integer projectId, String name) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("projectId",projectId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("projectId", projectId);
         params.put("name", name + "%");
 
         return memberMapper.getProjectValidMembers(params);
+    }
+
+    @Override
+    public Integer deleteCount(Integer id, Integer incrememt, String type) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("increment", incrememt);
+        params.put("type", type);
+
+        return memberMapper.deleteCount(params);
     }
 }

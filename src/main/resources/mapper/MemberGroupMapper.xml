@@ -27,4 +27,15 @@
         select * from membergroups where teamId = #{teamId} and groupId = #{groupId} and memberId = #{memberId};
     </select>
 
+    <select id="getMemberGroupsByGroupId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Member">
+        select ms.* from membergroups me
+        left join members ms
+        on me.memberId = ms.id
+        where me.groupId = #{groupId};
+    </select>
+
+    <delete id="deleteMemberGroupsByGroupId" parameterType="java.lang.Integer">
+        delete from membergroups where groupId = #{groupId}
+    </delete>
+
 </mapper>

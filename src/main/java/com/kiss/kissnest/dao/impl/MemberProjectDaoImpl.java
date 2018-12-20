@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.MemberProjectDao;
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberProject;
 import com.kiss.kissnest.mapper.MemberProjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,17 @@ public class MemberProjectDaoImpl implements MemberProjectDao {
         params.put("memberId", memberId);
 
         return memberProjectMapper.getMemberProject(params);
+    }
+
+    @Override
+    public List<Member> getMemberProjectsByProjectId(Integer projectId) {
+
+        return memberProjectMapper.getMemberProjectsByProjectId(projectId);
+    }
+
+    @Override
+    public Integer deleteMemberProjectsByProjectId(Integer projectId) {
+
+        return memberProjectMapper.deleteMemberProjectsByProjectId(projectId);
     }
 }

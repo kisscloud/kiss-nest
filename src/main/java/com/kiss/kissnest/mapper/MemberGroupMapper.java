@@ -1,5 +1,6 @@
 package com.kiss.kissnest.mapper;
 
+import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.MemberGroup;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,4 +18,7 @@ public interface MemberGroupMapper {
 
     MemberGroup getMemberGroup(Map params);
 
+    List<Member> getMemberGroupsByGroupId(Integer groupId);
+
+    Integer deleteMemberGroupsByGroupId(Integer groupId);
 }
