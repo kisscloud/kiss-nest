@@ -85,15 +85,6 @@ public class JobService {
     @Value("${package.config.url}")
     private String configUrl;
 
-    @Value(("${saltstack.url}"))
-    private String saltStackUrl;
-
-    @Value(("${saltstack.username}"))
-    private String saltStatckUsername;
-
-    @Value(("${saltstack.password}"))
-    private String saltStatckPassword;
-
     @Autowired
     private DeployLogDao deployLogDao;
 
