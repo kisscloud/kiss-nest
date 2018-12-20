@@ -211,3 +211,55 @@ $ salt-minion -d
 $ salt-key -L
 $ salt-key -a node-192-168-0-56
 ```
+
+## 7. 安装 rsync
+
+在 jenkins 机器上和存放部署包的机器上安装 rsync。
+
+```
+$ yum install rsync -y
+```
+
+**配置：**
+
+首先需要将 jenkins 机器的公钥放到部署包机器上的 /root/.ssh/authorized_keys 文件中。然后：
+
+```
+$ vim /etc/rsync.conf
+```
+
+追加内容：
+
+```
+uid = root
+gid = root
+use chroot = no
+max connections = 4
+lock file=/var/run/rsyncd.lock
+log file = /var/log/rsyncd.log 
+exclude = lost+found/
+transfer logging = yes
+timeout = 900
+ignore nonreadable = yes 
+dont compress   = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2 
+```
+
+**启动：**
+
+在两台机器上分别执行：
+
+```
+$ rsync --daemon
+```
+
+## 8 安装 Ansible
+
+在 jenkins 机器上安装。
+
+```
+$ yum install ansible -y
+```
+
+
+
+
