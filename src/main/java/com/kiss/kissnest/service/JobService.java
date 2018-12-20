@@ -85,15 +85,6 @@ public class JobService {
     @Value("${package.config.url}")
     private String configUrl;
 
-    @Value(("${saltstack.url}"))
-    private String saltStackUrl;
-
-    @Value(("${saltstack.username}"))
-    private String saltStatckUsername;
-
-    @Value(("${saltstack.password}"))
-    private String saltStatckPassword;
-
     @Autowired
     private DeployLogDao deployLogDao;
 
@@ -139,7 +130,8 @@ public class JobService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        boolean success = jenkinsUtil.createJobByShell(project.getSlug(), projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        String jobName = projectRepository.getPathWithNamespace().replaceAll("/","-");
+        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -147,7 +139,7 @@ public class JobService {
 
         Job job = new Job();
         job.setTeamId(project.getTeamId());
-        job.setJobName(project.getSlug());
+        job.setJobName(jobName);
         job.setProjectId(projectId);
         job.setScript(createJobInput.getScript());
         job.setType(createJobInput.getType());
