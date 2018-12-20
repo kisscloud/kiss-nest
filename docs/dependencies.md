@@ -214,7 +214,7 @@ $ salt-key -a node-192-168-0-56
 
 ## 7. 安装 rsync
 
-在 jenkins 机器上和存放部署包的机器上安装 rsync。
+在 jenkins 容器和存放部署包的机器上安装 rsync。
 
 ```
 $ yum install rsync -y
@@ -222,7 +222,7 @@ $ yum install rsync -y
 
 **配置：**
 
-首先需要将 jenkins 机器的公钥放到部署包机器上的 /root/.ssh/authorized_keys 文件中。然后：
+首先需要将 jenkins 容器的公钥放到部署包机器上的 /root/.ssh/authorized_keys 文件中。然后：
 
 ```
 $ vim /etc/rsync.conf
@@ -252,13 +252,23 @@ dont compress   = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2
 $ rsync --daemon
 ```
 
+**测试：**
+
+```
+$ rsync -v ok.txt root@192.168.0.80:/root/
+```
+
 ## 8 安装 Ansible
 
-在 jenkins 机器上安装。
+在 jenkins 容器里安装。
+
 
 ```
 $ yum install ansible -y
 ```
+
+> 注意配置映射到容器里的 ansible hosts 配置文件，写入部署机器的 IP 地址。
+
 
 
 
