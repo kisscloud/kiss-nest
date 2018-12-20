@@ -267,7 +267,7 @@ $ rsync -v ok.txt root@192.168.0.80:/root/
 $ yum install ansible -y
 ```
 
-> 注意配置映射到容器里的 ansible hosts 配置文件，写入部署机器的 IP 地址。
+> 注意配置映射到容器里的 ansible hosts 配置文件，写入部署包机器的 IP 地址。
 
 
 
