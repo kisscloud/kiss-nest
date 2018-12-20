@@ -40,142 +40,151 @@ public class ServerValidator implements Validator {
 
         if (CreateEnvironmentInput.class.isInstance(target)) {
             CreateEnvironmentInput environmentInput = (CreateEnvironmentInput) target;
-            boolean teamVal = teamValidaor.validateId(environmentInput.getTeamId(),"teamId",errors);
+            boolean teamVal = teamValidaor.validateId(environmentInput.getTeamId(), "teamId", errors);
 
             if (teamVal) {
-                validateCreateEnvironmentName(environmentInput.getTeamId(),environmentInput.getName(),errors);
+                validateCreateEnvironmentName(environmentInput.getTeamId(), environmentInput.getName(), errors);
             }
 
-            validateType(environmentInput.getType(),errors);
+            validateType(environmentInput.getType(), errors);
         } else if (CreateServerInput.class.isInstance(target)) {
             CreateServerInput serverInput = (CreateServerInput) target;
-            boolean teamVal = teamValidaor.validateId(serverInput.getTeamId(),"teamId",errors);
+            boolean teamVal = teamValidaor.validateId(serverInput.getTeamId(), "teamId", errors);
 
             if (teamVal) {
-                validateServerName(serverInput.getName(),serverInput.getTeamId(),errors);
+                validateServerName(serverInput.getName(), serverInput.getTeamId(), errors);
             }
 
-            validateEnvId(serverInput.getEnvId(),errors);
-            validateInnerIp(serverInput.getInnerIp(),errors);
+            validateEnvId(serverInput.getEnvId(), errors);
+            validateInnerIp(serverInput.getInnerIp(), errors);
         } else if (UpdateServerInput.class.isInstance(target)) {
             UpdateServerInput updateServerInput = (UpdateServerInput) target;
-            boolean teamVal = teamValidaor.validateId(updateServerInput.getTeamId(),"teamId",errors);
-            boolean idVal = validateId(updateServerInput.getId(),errors);
+            boolean teamVal = teamValidaor.validateId(updateServerInput.getTeamId(), "teamId", errors);
+            boolean idVal = validateId(updateServerInput.getId(), errors);
 
             if (teamVal && idVal) {
-                validateServerName(updateServerInput.getName(),updateServerInput.getTeamId(),updateServerInput.getId(),errors);
+                validateServerName(updateServerInput.getName(), updateServerInput.getTeamId(), updateServerInput.getId(), errors);
             }
 
-            validateEnvId(updateServerInput.getEnvId(),errors);
-            validateInnerIp(updateServerInput.getInnerIp(),errors);
+            validateEnvId(updateServerInput.getEnvId(), errors);
+            validateInnerIp(updateServerInput.getInnerIp(), errors);
         } else if (UpdateEnvironmentInput.class.isInstance(target)) {
             UpdateEnvironmentInput updateEnvironmentInput = (UpdateEnvironmentInput) target;
-            boolean envIdVal = validateEnvId(updateEnvironmentInput.getId(),errors);
-            boolean teamVal = teamValidaor.validateId(updateEnvironmentInput.getTeamId(),"teamId",errors);
+            boolean envIdVal = validateEnvId(updateEnvironmentInput.getId(), errors);
+            boolean teamVal = teamValidaor.validateId(updateEnvironmentInput.getTeamId(), "teamId", errors);
 
             if (teamVal && envIdVal) {
-                validateUpdateEnvironmentName(updateEnvironmentInput.getTeamId(),updateEnvironmentInput.getId(),updateEnvironmentInput.getName(),errors);
+                validateUpdateEnvironmentName(updateEnvironmentInput.getTeamId(), updateEnvironmentInput.getId(), updateEnvironmentInput.getName(), errors);
             }
+
+            validateEnvironmemtType(updateEnvironmentInput.getType(), errors);
         }
     }
 
-    public void validateCreateEnvironmentName(Integer teamId,String name,Errors errors) {
+    public void validateCreateEnvironmentName(Integer teamId, String name, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY),"环境名称不能为空");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY), "环境名称不能为空");
         }
 
-        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId,name);
+        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId, name);
 
         if (environment != null) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
         }
     }
 
-    public void validateType(Integer type,Errors errors) {
+    public void validateType(Integer type, Errors errors) {
 
         if (type == null) {
-            errors.rejectValue("type",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_TYPE_IS_EMPTY));
+            errors.rejectValue("type", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_TYPE_IS_EMPTY));
         }
     }
 
-    public void validateServerName(String name,Integer teamId,Errors errors) {
+    public void validateServerName(String name, Integer teamId, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_SERVER_NAME_IS_EMPTY),"服务器名称不能为空");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_SERVER_NAME_IS_EMPTY), "服务器名称不能为空");
         }
 
-        Server server = serverDao.getServerByNameAndTeamId(teamId,name);
+        Server server = serverDao.getServerByNameAndTeamId(teamId, name);
 
         if (server != null) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_SERVER_NAME_EXIST),"服务器名称已存在");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_SERVER_NAME_EXIST), "服务器名称已存在");
         }
     }
 
-    public void validateServerName(String name,Integer teamId,Integer id,Errors errors) {
+    public void validateServerName(String name, Integer teamId, Integer id, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_SERVER_NAME_IS_EMPTY),"服务器名称不能为空");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_SERVER_NAME_IS_EMPTY), "服务器名称不能为空");
         }
 
-        Server server = serverDao.getServerByNameAndTeamId(teamId,name);
+        Server server = serverDao.getServerByNameAndTeamId(teamId, name);
 
         if (server != null && server.getId() != id) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_SERVER_NAME_EXIST),"服务器名称已存在");
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_SERVER_NAME_EXIST), "服务器名称已存在");
         }
     }
 
-    public boolean validateEnvId(Integer envId,Errors errors) {
+    public boolean validateEnvId(Integer envId, Errors errors) {
 
         if (envId == null) {
-            errors.rejectValue("envId",String.valueOf(NestStatusCode.SERVER_ENVID_IS_EMPTY));
+            errors.rejectValue("envId", String.valueOf(NestStatusCode.SERVER_ENVID_IS_EMPTY));
             return false;
         }
 
         Environment environment = environmentDao.getEnvironmentById(envId);
 
         if (environment == null) {
-            errors.rejectValue("envId",String.valueOf(NestStatusCode.SERVER_ENVID_NOT_EXIST));
+            errors.rejectValue("envId", String.valueOf(NestStatusCode.SERVER_ENVID_NOT_EXIST));
             return false;
         }
 
         return true;
     }
 
-    public void validateInnerIp(String innerIp,Errors errors) {
+    public void validateInnerIp(String innerIp, Errors errors) {
 
         if (innerIp == null) {
-            errors.rejectValue("innerIp",String.valueOf(NestStatusCode.SERVER_INNERIP_IS_EMPTY));
+            errors.rejectValue("innerIp", String.valueOf(NestStatusCode.SERVER_INNERIP_IS_EMPTY));
         }
     }
 
-    public boolean validateId(Integer id,Errors errors) {
+    public boolean validateId(Integer id, Errors errors) {
 
         if (id == null) {
-            errors.rejectValue("id",String.valueOf(NestStatusCode.SERVERID_IS_EMPTY),"服务器id不能为空");
+            errors.rejectValue("id", String.valueOf(NestStatusCode.SERVERID_IS_EMPTY), "服务器id不能为空");
             return false;
         }
 
         Server server = serverDao.getServerById(id);
 
         if (server == null) {
-            errors.rejectValue("id",String.valueOf(NestStatusCode.SERVER_NOT_EXIST),"服务器不存在");
+            errors.rejectValue("id", String.valueOf(NestStatusCode.SERVER_NOT_EXIST), "服务器不存在");
             return false;
         }
 
         return true;
     }
 
-    public void validateUpdateEnvironmentName(Integer teamId,Integer envId,String name,Errors errors) {
+    public void validateUpdateEnvironmentName(Integer teamId, Integer envId, String name, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY));
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EMPTY));
         }
 
-        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId,name);
+        Environment environment = environmentDao.getEnvironmentByTeamIdAndName(teamId, name);
 
         if (environment != null && !envId.equals(environment.getId())) {
-            errors.rejectValue("name",String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
+            errors.rejectValue("name", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_NAME_IS_EXIST));
+        }
+    }
+
+    public void validateEnvironmemtType(Integer type, Errors errors) {
+
+        if (type == null) {
+            errors.rejectValue("type", String.valueOf(NestStatusCode.SERVER_ENVIRONMENT_TYPE_IS_EMPTY));
         }
     }
 }
