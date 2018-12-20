@@ -17,5 +17,7 @@ public class UpdateEnvironmentInput {
 
     private String saltUser;
 
+    private Integer type;
+
     private String saltPassword;
 }

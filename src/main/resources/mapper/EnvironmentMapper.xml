@@ -5,7 +5,7 @@
 <!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.EnvironmentMapper">
-    <insert id="createEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
+    <insert id="createEnvironment" parameterType="com.kiss.kissnest.entity.Environment" useGeneratedKeys="true" keyProperty="id">
         insert into environments (teamId,name,type,saltHost,saltVersion,saltUser,saltPassword,operatorId,operatorName)
         value
         (#{teamId},#{name},#{type},#{saltHost},#{saltVersion},#{saltUser},#{saltPassword},#{operatorId},#{operatorName})
@@ -29,7 +29,8 @@
         saltHost = #{saltHost},
         saltVersion = #{saltVersion},
         saltUser = #{saltUser},
-        saltPassword = #{saltPassword}
+        saltPassword = #{saltPassword},
+        type = #{type}
         where id = #{id} and teamId = #{teamId}
     </update>
     

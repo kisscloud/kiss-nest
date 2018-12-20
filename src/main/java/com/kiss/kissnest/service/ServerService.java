@@ -22,6 +22,7 @@ import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import output.ResultOutput;
 import utils.BeanCopyUtil;
@@ -53,6 +54,7 @@ public class ServerService {
     @Value("${server.maxSize}")
     private String serverSize;
 
+    @Transactional
     public ResultOutput createEnvironment(CreateEnvironmentInput environmentInput) {
 
         Environment environment = BeanCopyUtil.copy(environmentInput, Environment.class);
@@ -67,28 +69,32 @@ public class ServerService {
         }
 
         EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment, EnvironmentOutput.class, BeanCopyUtil.defaultFieldNames);
-//        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
-//        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
+        operationLogService.saveOperationLog(environmentInput.getTeamId(),guest,null,environment,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
 
         return ResultOutputUtil.success(environmentOutput);
     }
 
+    @Transactional
     public ResultOutput updateEnvironment(UpdateEnvironmentInput updateEnvironmentInput) {
 
+        Environment oldValue = environmentDao.getEnvironmentById(updateEnvironmentInput.getId());
         Environment environment = BeanCopyUtil.copy(updateEnvironmentInput,Environment.class);
-        environment.setId(updateEnvironmentInput.getId());
         Guest guest = ThreadLocalUtil.getGuest();
-        environment.setOperatorId(guest.getId());
         environment.setOperatorName(guest.getName());
+        environment.setOperatorId(guest.getId());
         Integer count = environmentDao.updateEnvironment(environment);
 
         if (count == 0) {
             return ResultOutputUtil.error(NestStatusCode.UPDATE_SERVER_ENVIRONMENT_FAILED);
         }
 
-        EnvironmentOutput environmentOutput = BeanCopyUtil.copy(environment,EnvironmentOutput.class);
+        Environment newValue = environmentDao.getEnvironmentById(environment.getId());
+        EnvironmentOutput environmentOutput = BeanCopyUtil.copy(newValue,EnvironmentOutput.class,BeanCopyUtil.defaultFieldNames);
         environmentOutput.setTypeText(codeUtil.getEnumsMessage("environment.type",String.valueOf(environmentOutput.getType())));
+        operationLogService.saveOperationLog(updateEnvironmentInput.getTeamId(),guest,oldValue,newValue,"id",OperationTargetType.TYPE__CREATE_ENVIRONMENT);
+        operationLogService.saveDynamic(guest,environment.getTeamId(),null,null,OperationTargetType.TYPE__CREATE_ENVIRONMENT,environment);
 
         return ResultOutputUtil.success(environmentOutput);
     }
