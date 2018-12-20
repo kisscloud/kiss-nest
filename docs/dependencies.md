@@ -172,11 +172,94 @@ curl -k http://127.0.0.1:8000/login -H "Accept: application/x-yaml"  -d username
 
 
 **安装：**
+
 ```
 $ yum install salt-minion -y
 ```
 
+**编辑配置文件：**
+
+```
+$ vim /etc/salt/minion
+```
+
+编辑选项：
+
+```
+# Set the location of the salt master server. If the master server cannot be
+# resolved, then the minion will fail to start.
+master: 192.168.0.58
+
+# Explicitly declare the id for this minion to use, if left commented the id
+# will be the hostname as returned by the python call: socket.getfqdn()
+# Since salt uses detached ids it is possible to run multiple minions on the
+# same machine but with different ids, this can be useful for salt compute
+# clusters.
+id: node-192-168-0-56
+```
+
+
 **启动：**
+
 ```
 $ salt-minion -d
 ```
+
+此时需要在 salt-master 机器接受节点接入请求 :
+
+```
+$ salt-key -L
+$ salt-key -a node-192-168-0-56
+```
+
+## 7. 安装 rsync
+
+在 jenkins 机器上和存放部署包的机器上安装 rsync。
+
+```
+$ yum install rsync -y
+```
+
+**配置：**
+
+首先需要将 jenkins 机器的公钥放到部署包机器上的 /root/.ssh/authorized_keys 文件中。然后：
+
+```
+$ vim /etc/rsync.conf
+```
+
+追加内容：
+
+```
+uid = root
+gid = root
+use chroot = no
+max connections = 4
+lock file=/var/run/rsyncd.lock
+log file = /var/log/rsyncd.log 
+exclude = lost+found/
+transfer logging = yes
+timeout = 900
+ignore nonreadable = yes 
+dont compress   = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2 
+```
+
+**启动：**
+
+在两台机器上分别执行：
+
+```
+$ rsync --daemon
+```
+
+## 8 安装 Ansible
+
+在 jenkins 机器上安装。
+
+```
+$ yum install ansible -y
+```
+
+
+
+
