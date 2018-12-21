@@ -163,6 +163,12 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
         }
 
+        Job exist = jobDao.getDeployJobByProjectIdAndEnvId(projectId,createDeployInput.getEnvId());
+
+        if (exist != null) {
+            return ResultOutputUtil.error(NestStatusCode.DEPLOY_JOB_IS_EXIST);
+        }
+
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 

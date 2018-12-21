@@ -115,6 +115,7 @@ public class NestStatusCode extends CodeEnums {
     public static final Integer UPDATE_DEPLOY_JOB_FAILED = 10016;
     public static final Integer GET_DEPLOY_CONF_FAILED = 10017;
     public static final Integer JOB_DEPLOY_PACKAGE_LOSE = 10018;
+    public static final Integer DEPLOY_JOB_IS_EXIST = 10019;
 
 
 

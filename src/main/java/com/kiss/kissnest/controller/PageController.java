@@ -133,7 +133,7 @@ public class PageController {
 
         ResultOutput jobs = buildService.getJobsByTeamId(teamId, 2);
         ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
-        ResultOutput projects = projectService.getProjectsWithoutDeployJob(teamId);
+        ResultOutput projects = projectService.getProjectsWithBuildJobByTeamId(teamId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("jobs", jobs.getData());

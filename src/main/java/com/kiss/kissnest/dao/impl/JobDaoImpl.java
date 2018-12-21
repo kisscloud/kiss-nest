@@ -121,4 +121,10 @@ public class JobDaoImpl implements JobDao {
 
         return jobMapper.getJobOutputsById(id);
     }
+
+    @Override
+    public Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId) {
+
+        return jobMapper.getDeployJobByProjectIdAndEnvId(projectId,envId);
+    }
 }

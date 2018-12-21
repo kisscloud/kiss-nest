@@ -98,10 +98,10 @@
         and teamId = #{teamId}
     </select>
 
-    <select id="getProjectsWithoutDeployJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectsWithBuildJobByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
         select * from projects
         where id not in
-        (select projectId from jobs where teamId = #{teamId} and type =2)
+        (select distinct projectId from jobs where teamId = #{teamId} and type =1)
         and teamId = #{teamId}
     </select>
 
