@@ -147,9 +147,8 @@ public class JobService {
         job.setNumber(0);
 
         jobDao.createJob(job);
-        job = jobDao.getJobById(job.getId());
 
-        JobOutput jobOutput = BeanCopyUtil.copy(job, JobOutput.class);
+        JobOutput jobOutput = jobDao.getJobOutputsById(job.getId());
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_BUILD_JOB, job);
         return ResultOutputUtil.success(jobOutput);
@@ -260,6 +259,11 @@ public class JobService {
             tarName = packageRepository.getTarName();
             jarName = packageRepository.getJarName();
             version = packageRepository.getVersion();
+        }
+
+        if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(jarName) || StringUtils.isEmpty(version)) {
+
+            return ResultOutputUtil.success(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(deployJobInput.getProjectId());
