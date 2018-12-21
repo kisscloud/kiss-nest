@@ -530,7 +530,7 @@ public class JobService {
         StringBuilder stringBuilder = null;
 
         try {
-            stringBuilder = jenkinsUtil.readFileFromClassPath("/script.tpl");
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/deploy-script.tpl");
 
         } catch (IOException e) {
             e.printStackTrace();
