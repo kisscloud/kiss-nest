@@ -16,13 +16,13 @@ tar -xvf * &#x000A;
 # git clone git@git.jincse.com/youbipay/config-server-staging
 # git clone git@git.jincse.com/youbipay/config-server-production
 
-if [ ! -d "/opt/configs/$prePath/$sufPath" ];then
-  cd /opt/configs/$prePath
-  git clone $preSshUrl/$sufPath.git
-else
-  cd /opt/configs/$prePath/$sufPath
-  git pull
-fi
+if [ ! -d "/opt/configs/$prePath/$sufPath" ];then &#x000A;
+  cd /opt/configs/$prePath &#x000A;
+  git clone $preSshUrl/$sufPath.git &#x000A;
+else &#x000A;
+  cd /opt/configs/$prePath/$sufPath &#x000A;
+  git pull &#x000A;
+fi &#x000A;
 
 if [ ! -d "/opt/logs/$name" ];then &#x000A;
   mkdir -p /opt/logs/$name &#x000A;
