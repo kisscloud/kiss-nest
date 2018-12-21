@@ -508,7 +508,7 @@ public class JobService {
         StringBuilder stringBuilder = null;
 
         try {
-            stringBuilder = jenkinsUtil.readFileFromClassPath("/supervisor.conf");
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/supervisor.tpl");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -530,7 +530,7 @@ public class JobService {
         StringBuilder stringBuilder = null;
 
         try {
-            stringBuilder = jenkinsUtil.readFileFromClassPath("/deploy.conf");
+            stringBuilder = jenkinsUtil.readFileFromClassPath("/script.tpl");
 
         } catch (IOException e) {
             e.printStackTrace();
