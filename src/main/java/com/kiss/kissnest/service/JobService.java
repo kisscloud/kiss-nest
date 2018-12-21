@@ -282,7 +282,7 @@ public class JobService {
         String conf = job.getConf();
         conf = conf.replace("__BIN__", jarName);
         conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl stop " + conf + " && supervisorctl start " + conf + " && echo $?";
+        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl restart " + conf + " && echo $? ";
 
         String serverIds = job.getServerIds();
         serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
