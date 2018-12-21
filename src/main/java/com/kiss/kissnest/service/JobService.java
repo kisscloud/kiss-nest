@@ -280,7 +280,7 @@ public class JobService {
                 + " && ./" + deployJobInput.getProjectId() + ".sh";
 
         String conf = job.getConf();
-        conf = conf.replace("__PACKAGE__", jarName);
+        conf = conf.replace("__BIN__", jarName);
         conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
         option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update && echo $?";
 
@@ -515,7 +515,9 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String conf = String.format(stringBuilder.toString(), slug, slug, path, type, type, type, type, path, slug);
+        String name = path.replaceAll("/","-");
+
+        String conf = String.format(stringBuilder.toString(), name, name, path, type, type, type, type, path, slug);
         conf = StringEscapeUtils.unescapeXml(conf);
         Map<String, Object> result = new HashMap<>();
         result.put("conf", conf);
