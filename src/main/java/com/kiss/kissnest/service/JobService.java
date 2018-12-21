@@ -130,7 +130,7 @@ public class JobService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        String jobName = projectRepository.getPathWithNamespace().replaceAll("/","-");
+        String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
         boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
@@ -230,8 +230,8 @@ public class JobService {
         result.put("status", 2);
         result.put("statusText", codeUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
-        result.put("groupId",group.getId());
-        result.put("groupName",group.getName());
+        result.put("groupId", group.getId());
+        result.put("groupName", group.getName());
         return ResultOutputUtil.success(result);
     }
 
@@ -282,7 +282,7 @@ public class JobService {
         String conf = job.getConf();
         conf = conf.replace("__BIN__", jarName);
         conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update && echo $?";
+        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl stop " + conf + " && supervisorctl start " + conf + " && echo $?";
 
         String serverIds = job.getServerIds();
         serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
@@ -515,7 +515,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String name = path.replaceAll("/","-");
+        String name = path.replaceAll("/", "-");
 
         String conf = String.format(stringBuilder.toString(), name, name, path, type, type, type, type, path, slug);
         conf = StringEscapeUtils.unescapeXml(conf);
@@ -540,8 +540,24 @@ public class JobService {
         String script = stringBuilder.toString();
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         String path = projectRepository.getPathWithNamespace();
-        String prePath = path.substring(0, path.lastIndexOf("/"));
-        script = String.format(script, path, prePath);
+        String prePath = path.substring(0, path.indexOf("/"));
+        String sufPath;
+
+        switch (envId) {
+            case 2:
+                sufPath = "config-server-staging";
+                break;
+            case 3:
+                sufPath = "config-server-production";
+                break;
+            default:
+                sufPath = "config-server-test";
+        }
+
+        String sshUrl = projectRepository.getSshUrl();
+        String preSshUrl = sshUrl.substring(0, sshUrl.indexOf("/"));
+
+        script = String.format(script, path, prePath, sufPath, preSshUrl);
         script = StringEscapeUtils.unescapeXml(script);
         Map<String, Object> result = new HashMap<>();
 
