@@ -13,5 +13,9 @@ public class UpdateJobInput {
 
     private String script;
 
+    private Boolean useSupervisor;
+
+    private String conf;
+
     private Integer type;
 }

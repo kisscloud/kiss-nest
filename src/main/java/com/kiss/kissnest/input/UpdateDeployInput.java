@@ -13,6 +13,8 @@ public class UpdateDeployInput {
 
     private List<Integer> serverIds;
 
+    private Boolean useSupervisor;
+
     private String conf;
 
     private Integer type;

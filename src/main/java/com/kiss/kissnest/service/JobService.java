@@ -183,6 +183,7 @@ public class JobService {
         job.setTeamId(project.getTeamId());
         job.setJobName(project.getSlug());
         job.setProjectId(projectId);
+        job.setUserSupervisor(createDeployInput.getUserSupervisor());
         job.setConf(createDeployInput.getConf());
         job.setType(createDeployInput.getType());
         job.setEnvId(createDeployInput.getEnvId());
