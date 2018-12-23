@@ -22,4 +22,6 @@ public interface EnvironmentMapper {
     Integer addEnvironmentServerCount(Integer id);
 
     Integer deleteEnvironmentById(Integer id);
+
+    List<Environment> getEnvironmentsByProjectId(Integer projectId);
 }

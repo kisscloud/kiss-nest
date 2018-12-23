@@ -35,11 +35,11 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
     }
 
     @Override
-    public Environment getEnvironmentByTeamIdAndName(Integer teamId,String name) {
+    public Environment getEnvironmentByTeamIdAndName(Integer teamId, String name) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("name",name);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("name", name);
 
         return environmentMapper.getEnvironmentByTeamIdAndName(params);
     }
@@ -60,5 +60,11 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
     public Integer deleteEnvironmentById(Integer id) {
 
         return environmentMapper.deleteEnvironmentById(id);
+    }
+
+    @Override
+    public List<Environment> getEnvironmentsByProjectId(Integer projectId) {
+
+        return environmentMapper.getEnvironmentsByProjectId(projectId);
     }
 }

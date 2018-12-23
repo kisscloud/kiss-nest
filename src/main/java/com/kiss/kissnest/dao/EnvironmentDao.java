@@ -13,11 +13,13 @@ public interface EnvironmentDao {
 
     Environment getEnvironmentById(Integer id);
 
-    Environment getEnvironmentByTeamIdAndName(Integer teamId,String name);
+    Environment getEnvironmentByTeamIdAndName(Integer teamId, String name);
 
     Integer updateEnvironment(Environment environment);
 
     Integer addEnvironmentServerCount(Integer id);
 
     Integer deleteEnvironmentById(Integer id);
+
+    List<Environment> getEnvironmentsByProjectId(Integer projectId);
 }

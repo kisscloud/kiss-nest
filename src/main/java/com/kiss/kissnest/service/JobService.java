@@ -21,6 +21,7 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import utils.ThreadLocalUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -130,7 +132,7 @@ public class JobService {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        String jobName = projectRepository.getPathWithNamespace().replaceAll("/","-");
+        String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
         boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
 
         if (!success) {
@@ -230,8 +232,8 @@ public class JobService {
         result.put("status", 2);
         result.put("statusText", codeUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
-        result.put("groupId",group.getId());
-        result.put("groupName",group.getName());
+        result.put("groupId", group.getId());
+        result.put("groupName", group.getName());
         return ResultOutputUtil.success(result);
     }
 
@@ -459,6 +461,19 @@ public class JobService {
         return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
     }
 
+    public ResultOutput getDeployEnvs(Integer projectId) {
+
+        List<Environment> environments = environmentDao.getEnvironmentsByProjectId(projectId);
+        List<EnvironmentOutput> environmentOutputs = new LinkedList<EnvironmentOutput>();
+        for (Environment environment : environments) {
+            EnvironmentOutput environmentOutput = new EnvironmentOutput();
+            BeanUtils.copyProperties(environment, environmentOutput);
+            environmentOutputs.add(environmentOutput);
+        }
+
+        return ResultOutputUtil.success(environmentOutputs);
+    }
+
     public ResultOutput getDeployLogs(DeployLogInput deployLogInput) {
 
         Integer maxSize = Integer.parseInt(buildLogSize);
@@ -515,7 +530,7 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
-        String name = path.replaceAll("/","-");
+        String name = path.replaceAll("/", "-");
 
         String conf = String.format(stringBuilder.toString(), name, name, path, type, type, type, type, path, slug);
         conf = StringEscapeUtils.unescapeXml(conf);

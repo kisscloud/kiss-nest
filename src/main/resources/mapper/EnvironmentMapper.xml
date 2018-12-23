@@ -22,6 +22,10 @@
     <select id="getEnvironmentByTeamIdAndName" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Environment">
         select * from environments where teamId = #{teamId} and name = #{name};
     </select>
+
+    <select id="getEnvironmentsByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where id in (select distinct envId from jobs where projectId= #{projectId});
+    </select>
     
     <update id="updateEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
         update environments
