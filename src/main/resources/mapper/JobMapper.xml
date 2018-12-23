@@ -7,7 +7,7 @@
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
     <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job" keyProperty="id" useGeneratedKeys="true">
-        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor, conf,status,number)
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor,conf,status,number)
         value
         (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{useSupervisor}, #{conf},#{status},#{number})
     </insert>
