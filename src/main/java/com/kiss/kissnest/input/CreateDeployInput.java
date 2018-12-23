@@ -15,6 +15,8 @@ public class CreateDeployInput {
 
     private List<Integer> serverIds;
 
+    private Boolean userSupervisor;
+
     private String conf;
 
     private String script;

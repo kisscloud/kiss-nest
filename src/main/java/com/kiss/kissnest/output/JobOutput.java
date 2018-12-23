@@ -29,6 +29,8 @@ public class JobOutput {
 
     private String serverIds;
 
+    private Boolean userSupervisor;
+
     private String conf;
 
     private Long createdAt;
