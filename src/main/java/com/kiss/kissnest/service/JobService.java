@@ -288,10 +288,16 @@ public class JobService {
         String option = "mkdir -p /opt/option/" + path + " && cd /opt/option/" + path + " && echo '" + script + "' > " + deployJobInput.getProjectId() + ".sh && chmod +x " + deployJobInput.getProjectId() + ".sh"
                 + " && ./" + deployJobInput.getProjectId() + ".sh";
 
-        String conf = job.getConf();
-        conf = conf.replace("__BIN__", jarName);
-        conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl restart " + slug + " && supervisorctl update && echo $? ";
+        String conf = "";
+
+        if (job.getUseSupervisor()) {
+            conf = job.getConf();
+            conf = conf.replace("__BIN__", jarName);
+            conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
+            option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl restart " + slug + " && supervisorctl update && echo $? ";
+        } else {
+            option = option + " && echo $? ";
+        }
 
         String serverIds = job.getServerIds();
         serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
