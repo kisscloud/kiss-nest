@@ -470,7 +470,7 @@ public class JobService {
     public ResultOutput getDeployEnvs(Integer projectId) {
 
         List<Environment> environments = environmentDao.getEnvironmentsByProjectId(projectId);
-        List<EnvironmentOutput> environmentOutputs = new LinkedList<EnvironmentOutput>();
+        List<EnvironmentOutput> environmentOutputs = new LinkedList<>();
         for (Environment environment : environments) {
             EnvironmentOutput environmentOutput = new EnvironmentOutput();
             BeanUtils.copyProperties(environment, environmentOutput);

@@ -89,7 +89,7 @@ public class JobController {
         return jobService.deployJob(deployJobInput);
     }
 
-    @GetMapping("/job/deploy/log/envs")
+    @GetMapping("/job/deploy/envs")
     public ResultOutput getDeployEnvs(@RequestParam("projectId") Integer projectId) {
 
         return jobService.getDeployEnvs(projectId);
