@@ -3,6 +3,7 @@ package com.kiss.kissnest.mapper;
 import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.output.JobOutput;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -35,4 +36,6 @@ public interface JobMapper {
     List<JobOutput> getJobOutputsByTeamId(Map params);
 
     JobOutput getJobOutputsById(Integer id);
+
+    Job getDeployJobByProjectIdAndEnvId(@Param("projectId") Integer projectId,@Param("envId") Integer envId);
 }

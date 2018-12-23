@@ -165,6 +165,12 @@ public class JobService {
             return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
         }
 
+        Job exist = jobDao.getDeployJobByProjectIdAndEnvId(projectId,createDeployInput.getEnvId());
+
+        if (exist != null) {
+            return ResultOutputUtil.error(NestStatusCode.DEPLOY_JOB_IS_EXIST);
+        }
+
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
@@ -284,7 +290,7 @@ public class JobService {
         String conf = job.getConf();
         conf = conf.replace("__BIN__", jarName);
         conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl update && echo $?";
+        option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl restart " + slug + " && supervisorctl update && echo $? ";
 
         String serverIds = job.getServerIds();
         serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
@@ -555,8 +561,24 @@ public class JobService {
         String script = stringBuilder.toString();
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         String path = projectRepository.getPathWithNamespace();
-        String prePath = path.substring(0, path.lastIndexOf("/"));
-        script = String.format(script, path, prePath);
+        String prePath = path.substring(0, path.indexOf("/"));
+        String sufPath;
+
+        switch (envId) {
+            case 2:
+                sufPath = "config-server-staging";
+                break;
+            case 3:
+                sufPath = "config-server-production";
+                break;
+            default:
+                sufPath = "config-server-test";
+        }
+
+        String sshUrl = projectRepository.getSshUrl();
+        String preSshUrl = sshUrl.substring(0, sshUrl.indexOf("/"));
+
+        script = String.format(script, path, prePath, sufPath, preSshUrl);
         script = StringEscapeUtils.unescapeXml(script);
         Map<String, Object> result = new HashMap<>();
 

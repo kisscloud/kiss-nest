@@ -285,9 +285,9 @@ public class ProjectService {
         return ResultOutputUtil.success(projectOutputs);
     }
 
-    public ResultOutput getProjectsWithoutDeployJob(Integer teamId) {
+    public ResultOutput getProjectsWithBuildJobByTeamId(Integer teamId) {
 
-        List<Project> projects = projectDao.getProjectsWithoutDeployJob(teamId);
+        List<Project> projects = projectDao.getProjectsWithBuildJobByTeamId(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
         return ResultOutputUtil.success(projectOutputs);

@@ -91,4 +91,8 @@
         on jo.envId = en.id
         where jo.id = #{id};
     </select>
+
+    <select id="getDeployJobByProjectIdAndEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where projectId = #{projectId} and envId = #{envId} and type = 2 limit 0,1
+    </select>
 </mapper>

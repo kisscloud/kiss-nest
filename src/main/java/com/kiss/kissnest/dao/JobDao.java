@@ -32,4 +32,6 @@ public interface JobDao {
     List<JobOutput> getJobOutputsByTeamId(Integer teamId,Integer type);
 
     JobOutput getJobOutputsById(Integer id);
+
+    Job getDeployJobByProjectIdAndEnvId(Integer projectId,Integer envId);
 }
