@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
     <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job" keyProperty="id" useGeneratedKeys="true">
-        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,userSupervisor, conf,status,number)
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor, conf,status,number)
         value
-        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{userSupervisor}, #{conf},#{status},#{number})
+        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{useSupervisor}, #{conf},#{status},#{number})
     </insert>
 
     <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
@@ -62,7 +62,7 @@
 
     <update id="updateDeployJob" parameterType="com.kiss.kissnest.entity.Job">
         update jobs set
-        userSupervisor = #{userSupervisor},
+        useSupervisor = #{useSupervisor},
         conf = #{conf},
         type = #{type},
         envId = #{envId},
@@ -70,7 +70,7 @@
     </update>
 
     <select id="getJobOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.JobOutput">
-        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.userSupervisor, jo.conf,jo.status,jo.number,
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,
         UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
         pr.name as projectName,en.name as envName,pr.groupId,gr.name as groupName from jobs jo
         left join projects pr
@@ -83,7 +83,7 @@
     </select>
 
     <select id="getJobOutputsById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.JobOutput">
-        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.userSupervisor, jo.conf,jo.status,jo.number,
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,
         UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
         pr.name as projectName,en.name as envName from jobs jo
         left join projects pr

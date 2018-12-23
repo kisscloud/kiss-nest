@@ -23,7 +23,7 @@ public class Job {
 
     private String serverIds;
 
-    private Boolean userSupervisor;
+    private Boolean useSupervisor;
 
     private String conf;
 

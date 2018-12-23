@@ -29,7 +29,7 @@ public class JobOutput {
 
     private String serverIds;
 
-    private Boolean userSupervisor;
+    private Boolean useSupervisor;
 
     private String conf;
 
