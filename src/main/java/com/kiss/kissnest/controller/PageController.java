@@ -118,10 +118,9 @@ public class PageController {
     public ResultOutput GetPageDeployLogsParams(Integer teamId) {
 
         ResultOutput projects = projectService.getProjects(teamId, null);
-        ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("envs", envs.getData());
+
         result.put("projects", projects.getData());
 
         return ResultOutputUtil.success(result);
