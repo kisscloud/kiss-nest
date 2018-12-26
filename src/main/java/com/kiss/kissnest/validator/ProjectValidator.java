@@ -63,10 +63,12 @@ public class ProjectValidator implements Validator {
             CreateProjectInput createProjectInput = (CreateProjectInput) target;
             Integer teamId = createProjectInput.getTeamId();
             boolean teamIdValidated = teamValidaor.validateId(teamId, "teamId", errors);
+            Integer groupId = createProjectInput.getGroupId();
+            boolean groupIdValidated = groupValidator.validateId(groupId, "groupId", errors);
 
-            if (teamIdValidated) {
-                validateCreateName(createProjectInput.getName(), teamId, errors);
-                validateSlug(createProjectInput.getSlug(), teamId, errors);
+            if (teamIdValidated && groupIdValidated) {
+                validateCreateName(createProjectInput.getName(), teamId, groupId, errors);
+                validateSlug(createProjectInput.getSlug(), teamId, groupId, errors);
             }
 
             validateType(createProjectInput.getType(), errors);
@@ -76,12 +78,11 @@ public class ProjectValidator implements Validator {
             Integer teamId = updateProjectInput.getTeamId();
             boolean teamIdVal = teamValidaor.validateId(teamId, "teamId", errors);
             boolean projectVal = validateId(updateProjectInput.getId(), "id", errors);
-
-            if (teamIdVal && projectVal) {
-                validateUpdateName(updateProjectInput.getName(), teamId, updateProjectInput.getId(), errors);
+            boolean groupVal = groupValidator.validateId(updateProjectInput.getGroupId(), "groupId", errors);
+            if (teamIdVal && projectVal && groupVal) {
+                validateUpdateName(updateProjectInput.getName(), updateProjectInput.getGroupId(), teamId, updateProjectInput.getId(), errors);
             }
 
-            groupValidator.validateId(updateProjectInput.getGroupId(), "groupId", errors);
             validateId(updateProjectInput.getId(), "id", errors);
             validateType(updateProjectInput.getType(), errors);
         } else if (CreateProjectRepositoryInput.class.isInstance(target)) {
@@ -96,7 +97,7 @@ public class ProjectValidator implements Validator {
                 Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
                 Integer repositoryId = projectRepository.getRepositoryId();
                 validateBranch(createTagInput.getRef(), repositoryId, member.getAccessToken(), errors);
-                validateTag(createTagInput.getTagName(),repositoryId,member.getAccessToken(),errors);
+                validateTag(createTagInput.getTagName(), repositoryId, member.getAccessToken(), errors);
             }
         }
     }
@@ -104,7 +105,7 @@ public class ProjectValidator implements Validator {
     public void validateBranch(String ref, Integer repositoryId, String accessToken, Errors errors) {
 
         if (StringUtils.isEmpty(ref)) {
-            errors.rejectValue("ref",String.valueOf(NestStatusCode.PROJECT_BRANCH_IS_EMPTY),"项目分支为空");
+            errors.rejectValue("ref", String.valueOf(NestStatusCode.PROJECT_BRANCH_IS_EMPTY), "项目分支为空");
             return;
         }
 
@@ -123,14 +124,14 @@ public class ProjectValidator implements Validator {
         }
     }
 
-    public void validateTag(String tagName,Integer repositoryId, String accessToken, Errors errors) {
+    public void validateTag(String tagName, Integer repositoryId, String accessToken, Errors errors) {
 
         if (StringUtils.isEmpty(tagName)) {
-            errors.rejectValue("tagName",String.valueOf(NestStatusCode.PROJECT_TAG_IS_EMPTY),"项目版本号为空");
+            errors.rejectValue("tagName", String.valueOf(NestStatusCode.PROJECT_TAG_IS_EMPTY), "项目版本号为空");
             return;
         }
 
-        List<GitlabTag> gitlabTagList = gitlabApiUtil.getTags(repositoryId,accessToken);
+        List<GitlabTag> gitlabTagList = gitlabApiUtil.getTags(repositoryId, accessToken);
         boolean tagExist = false;
 
         for (GitlabTag gitlabTag : gitlabTagList) {
@@ -140,32 +141,32 @@ public class ProjectValidator implements Validator {
         }
 
         if (tagExist) {
-            errors.rejectValue("tagName",String.valueOf(NestStatusCode.PROJECT_TAG_NOT_EXIST),"项目版本号已存在");
+            errors.rejectValue("tagName", String.valueOf(NestStatusCode.PROJECT_TAG_NOT_EXIST), "项目版本号已存在");
         }
     }
 
-    public void validateCreateName(String name, Integer teamId, Errors errors) {
+    public void validateCreateName(String name, Integer teamId, Integer groupId, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
             errors.rejectValue("name", String.valueOf(NestStatusCode.PROJECT_NAME_IS_EMPTY), "项目名称不能为空");
             return;
         }
 
-        Project project = projectDao.getProjectByNameAndTeamId(name, teamId);
+        Project project = projectDao.getProjectByNameAndGroupIdAndTeamId(name, groupId, teamId);
 
         if (project != null) {
             errors.rejectValue("name", String.valueOf(NestStatusCode.PROJECT_NAME_EXIST), "项目名称已存在");
         }
     }
 
-    public void validateUpdateName(String name, Integer teamId, Integer id, Errors errors) {
+    public void validateUpdateName(String name, Integer groupId, Integer teamId, Integer id, Errors errors) {
 
         if (StringUtils.isEmpty(name)) {
             errors.rejectValue("name", String.valueOf(NestStatusCode.PROJECT_NAME_IS_EMPTY), "项目名称不能为空");
             return;
         }
 
-        Project project = projectDao.getProjectByNameAndTeamId(name, teamId);
+        Project project = projectDao.getProjectByNameAndGroupIdAndTeamId(name, groupId, teamId);
 
         if (project != null && id != project.getId()) {
             errors.rejectValue("name", String.valueOf(NestStatusCode.PROJECT_NAME_EXIST), "项目名称已存在");
@@ -179,14 +180,14 @@ public class ProjectValidator implements Validator {
         }
     }
 
-    public void validateSlug(String slug, Integer teamId, Errors errors) {
+    public void validateSlug(String slug, Integer teamId, Integer groupId, Errors errors) {
 
         if (StringUtils.isEmpty(slug)) {
             errors.rejectValue("slug", String.valueOf(NestStatusCode.PROJECT_SLUG_EMPTY), "项目路径不能为空");
             return;
         }
 
-        Project project = projectDao.getProjectBySlugAndTeamId(slug, teamId);
+        Project project = projectDao.getProjectBySlugAndGroupIdAndTeamId(slug, groupId, teamId);
 
         if (project != null) {
             errors.rejectValue("slug", String.valueOf(NestStatusCode.PROJECT_SLUG_IS_EXIST), "项目路径已存在");

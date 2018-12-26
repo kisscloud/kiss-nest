@@ -72,12 +72,12 @@
         </if>
     </select>
 
-    <select id="getProjectByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">
-        select * from projects where name = #{name} and teamId = #{teamId} limit 0,1;
+    <select id="getProjectByNameAndGroupIdAndTeamId" parameterType="java.lang.Object" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where name = #{name} and groupId = #{groupId} and teamId = #{teamId};
     </select>
     
-    <select id="getProjectBySlugAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Project">
-        select * from projects where slug = #{slug} and teamId = #{teamId};
+    <select id="getProjectBySlugAndGroupIdAndTeamId" parameterType="java.lang.Object" resultType="com.kiss.kissnest.entity.Project">
+        select * from projects where slug = #{slug} and groupId = #{groupId} and teamId = #{teamId};
     </select>
 
     <select id="getProjectByRepositoryId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">

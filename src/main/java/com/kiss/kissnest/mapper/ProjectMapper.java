@@ -1,6 +1,5 @@
 package com.kiss.kissnest.mapper;
 
-import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.output.ProjectOutput;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,9 +23,9 @@ public interface ProjectMapper {
 
     List<Project> getProjects(Map params);
 
-    Project getProjectByNameAndTeamId(Map params);
+    Project getProjectByNameAndGroupIdAndTeamId(@Param("name") String name,@Param("groupId") Integer groupId,@Param("teamId") Integer teamId);
 
-    Project getProjectBySlugAndTeamId(Map params);
+    Project getProjectBySlugAndGroupIdAndTeamId(@Param("slug") String slug,@Param("groupId") Integer groupId,@Param("teamId") Integer teamId);
 
     Integer addRepositoryIdById(Project project);
 
