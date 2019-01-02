@@ -65,23 +65,19 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
-    public Project getProjectByNameAndTeamId(String name, Integer teamId) {
+    public Project getProjectByNameAndGroupIdAndTeamId(String name, Integer groupId, Integer teamId) {
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("teamId", teamId);
-
-        return projectMapper.getProjectByNameAndTeamId(params);
+        return projectMapper.getProjectByNameAndGroupIdAndTeamId(name, groupId, teamId);
     }
 
     @Override
-    public Project getProjectBySlugAndTeamId(String slug, Integer teamId) {
+    public Project getProjectBySlugAndGroupIdAndTeamId(String slug, Integer groupId,Integer teamId) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("slug", slug);
         params.put("teamId", teamId);
 
-        return projectMapper.getProjectBySlugAndTeamId(params);
+        return projectMapper.getProjectBySlugAndGroupIdAndTeamId(slug,groupId,teamId);
     }
 
     @Override

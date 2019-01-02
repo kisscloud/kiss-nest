@@ -22,9 +22,9 @@ public interface ProjectDao {
 
     List<Project> getProjects(Integer teamId, Integer groupId);
 
-    Project getProjectByNameAndTeamId(String name, Integer teamId);
+    Project getProjectByNameAndGroupIdAndTeamId(String name, Integer groupId, Integer teamId);
 
-    Project getProjectBySlugAndTeamId(String slug, Integer teamId);
+    Project getProjectBySlugAndGroupIdAndTeamId(String slug, Integer groupId, Integer teamId);
 
     Integer addRepositoryIdById(Project project);
 

@@ -90,18 +90,21 @@ public class GroupValidator implements Validator {
 
     }
 
-    public void validateId(Integer id, String idName, Errors errors) {
+    public boolean validateId(Integer id, String idName, Errors errors) {
 
         if (id == null) {
             errors.rejectValue(idName, String.valueOf(NestStatusCode.GROUP_ID_IS_EMPTY));
-            return;
+            return false;
         }
 
         Group group = groupDao.getGroupById(id);
 
         if (group == null) {
             errors.rejectValue(idName, String.valueOf(NestStatusCode.GROUP_ID_NOT_EXIST));
+            return false;
         }
+
+        return true;
     }
 
     public void validateStatus(Integer status, Errors errors) {
