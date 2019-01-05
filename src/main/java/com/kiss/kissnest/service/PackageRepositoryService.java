@@ -3,10 +3,9 @@ package com.kiss.kissnest.service;
 import com.kiss.kissnest.dao.PackageRepositoryDao;
 import com.kiss.kissnest.entity.BuildLog;
 import com.kiss.kissnest.entity.PackageRepository;
-import com.kiss.kissnest.util.ResultOutputUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import output.ResultOutput;
+
 
 import java.util.List;
 
@@ -45,23 +44,23 @@ public class PackageRepositoryService {
         return packageRepositoryDao.createPackageRepository(packageRepository);
     }
 
-    public ResultOutput getPackageRepositoryBranches(Integer projectId) {
+    public List<String> getPackageRepositoryBranches(Integer projectId) {
 
         PackageRepository jobRepository = new PackageRepository();
         jobRepository.setProjectId(projectId);
         jobRepository.setType(0);
         List<String> branches = packageRepositoryDao.getPackageRepositoryBranches(jobRepository);
 
-        return ResultOutputUtil.success(branches);
+        return branches;
     }
 
-    public ResultOutput getPackageRepositoryTags(Integer projectId) {
+    public List<String> getPackageRepositoryTags(Integer projectId) {
 
         PackageRepository jobRepository = new PackageRepository();
         jobRepository.setProjectId(projectId);
         jobRepository.setType(1);
         List<String> tags = packageRepositoryDao.getPackageRepositoryTags(jobRepository);
 
-        return ResultOutputUtil.success(tags);
+        return tags;
     }
 }

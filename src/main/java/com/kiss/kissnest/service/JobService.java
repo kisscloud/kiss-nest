@@ -10,15 +10,15 @@ import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import com.kiss.kissnest.util.LangUtil;
 import com.kiss.kissnest.util.SaltStackUtil;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
 import com.offbytwo.jenkins.model.BuildWithDetails;
 import entity.Guest;
+import exception.StatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.BeanUtils;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 import utils.GuestUtil;
 import utils.ThreadLocalUtil;
@@ -61,7 +61,7 @@ public class JobService {
     private ServerDao serverDao;
 
     @Autowired
-    private CodeUtil codeUtil;
+    private LangUtil langUtil;
 
     @Value("${jenkins.buildLogUrl}")
     private String jenkinsBuildLogUrl;
@@ -114,20 +114,20 @@ public class JobService {
 
     public static Map<String, String> buildRemarks = new HashMap<>();
 
-    public ResultOutput createBuildJob(CreateJobInput createJobInput) {
+    public JobOutput createBuildJob(CreateJobInput createJobInput) {
 
         Integer projectId = createJobInput.getProjectId();
         Project project = projectDao.getProjectById(projectId);
 
         if (StringUtils.isEmpty(project.getSlug())) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
+            throw new StatusException(NestStatusCode.PROJECT_SLUG_EMPTY);
         }
 
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         if (StringUtils.isEmpty(member.getApiToken())) {
-            return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
+            throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
@@ -153,29 +153,30 @@ public class JobService {
         JobOutput jobOutput = jobDao.getJobOutputsById(job.getId());
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_BUILD_JOB, job);
-        return ResultOutputUtil.success(jobOutput);
+
+        return jobOutput;
     }
 
-    public ResultOutput createDeployJob(CreateDeployInput createDeployInput) {
+    public JobOutput createDeployJob(CreateDeployInput createDeployInput) {
 
         Integer projectId = createDeployInput.getProjectId();
         Project project = projectDao.getProjectById(projectId);
 
         if (StringUtils.isEmpty(project.getSlug())) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
+            throw new StatusException(NestStatusCode.PROJECT_SLUG_EMPTY);
         }
 
-        Job exist = jobDao.getDeployJobByProjectIdAndEnvId(projectId,createDeployInput.getEnvId());
+        Job exist = jobDao.getDeployJobByProjectIdAndEnvId(projectId, createDeployInput.getEnvId());
 
         if (exist != null) {
-            return ResultOutputUtil.error(NestStatusCode.DEPLOY_JOB_IS_EXIST);
+            throw new StatusException(NestStatusCode.DEPLOY_JOB_IS_EXIST);
         }
 
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         if (StringUtils.isEmpty(member.getApiToken())) {
-            return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
+            throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
         List<Integer> serverIdList = createDeployInput.getServerIds();
@@ -197,11 +198,11 @@ public class JobService {
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_DEPLOY_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_DEPLOY_JOB, job);
 
-        return ResultOutputUtil.success(jobOutput);
+        return jobOutput;
     }
 
     @Transactional
-    public ResultOutput buildJob(BuildJobInput buildJobInput) {
+    public Map<String, Object> buildJob(BuildJobInput buildJobInput) {
 
         Job job = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
         Project project = projectDao.getProjectById(job.getProjectId());
@@ -213,7 +214,7 @@ public class JobService {
         BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, 2);
 
         if (buildLog == null) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_BUILD_LOG_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_BUILD_LOG_FAILED);
         }
 
         String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
@@ -237,14 +238,14 @@ public class JobService {
         result.put("branch", buildJobInput.getBranch());
         result.put("remark", buildJobInput.getRemark());
         result.put("status", 2);
-        result.put("statusText", codeUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
+        result.put("statusText", langUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         result.put("groupId", group.getId());
         result.put("groupName", group.getName());
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
-    public ResultOutput deployJob(DeployJobInput deployJobInput) throws IOException {
+    public DeployLogOutput deployJob(DeployJobInput deployJobInput) throws IOException {
         Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(), 2);
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         Integer type = environment.getType();
@@ -272,7 +273,7 @@ public class JobService {
 
         if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(jarName) || StringUtils.isEmpty(version)) {
 
-            return ResultOutputUtil.success(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
+            throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(deployJobInput.getProjectId());
@@ -357,11 +358,11 @@ public class JobService {
         operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
 
-        return ResultOutputUtil.success(deployLogOutput);
+        return deployLogOutput;
     }
 
 
-    public ResultOutput validateJobExist(Integer projectId, Integer type) {
+    public Map<String, Boolean> validateJobExist(Integer projectId, Integer type) {
 
         Map<String, Boolean> result = new HashMap<>();
         Job job = jobDao.getJobByProjectIdAndType(projectId, type);
@@ -372,10 +373,10 @@ public class JobService {
             result.put("exist", true);
         }
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
-    public ResultOutput getBuildLogsByTeamId(BuildLogInput buildLogsInput) {
+    public GetBuildLogOutput getBuildLogsByTeamId(BuildLogInput buildLogsInput) {
 
         Integer maxSize = Integer.parseInt(buildLogSize);
         Integer size = buildLogsInput.getSize();
@@ -384,7 +385,7 @@ public class JobService {
         List<BuildLogOutput> buildLogOutputList = buildLogDao.getBuildLogOutputsByTeamId(buildLogsInput.getTeamId(), start, pageSize);
 
         buildLogOutputList.forEach(buildLogOutput -> {
-            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
+            buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
             String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
             String branchPath = gitlabUrl + String.format(gitlabBranchPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getBranch());
             buildLogOutput.setCommitPath(commitPath);
@@ -396,19 +397,19 @@ public class JobService {
         buildLogOutputs.setBuildLogOutputs(buildLogOutputList);
         buildLogOutputs.setCount(count);
 
-        return ResultOutputUtil.success(buildLogOutputs);
+        return buildLogOutputs;
     }
 
-    public ResultOutput getDeployLogOutputTextById(Integer id) {
+    public Map<String, Object> getDeployLogOutputTextById(Integer id) {
 
         String output = buildLogDao.getDeployLogOutputTextById(id);
         Map<String, Object> result = new HashMap<>();
         result.put("output", output);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
-    public ResultOutput getBuildRecentLog(Integer id) {
+    public BuildLogOutput getBuildRecentLog(Integer id) {
 
         BuildLogOutput buildLogOutput = buildLogDao.getBuildRecentLog(id);
 
@@ -416,31 +417,31 @@ public class JobService {
             buildLogOutput = new BuildLogOutput();
             buildLogOutput.setId(id);
             buildLogOutput.setStatus(2);
-            buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
-            return ResultOutputUtil.success(buildLogOutput);
+            buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
+            return buildLogOutput;
         }
 
         String commitPath = gitlabUrl + String.format(gitlabCommitPath, buildLogOutput.getCommitPath() == null ? "" : buildLogOutput.getCommitPath(), buildLogOutput.getVersion());
         buildLogOutput.setCommitPath(commitPath);
-        buildLogOutput.setStatusText(codeUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
+        buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLogOutput.getStatus())));
 
-        return ResultOutputUtil.success(buildLogOutput);
+        return buildLogOutput;
     }
 
-    public ResultOutput getJobsByTeamId(Integer teamId, Integer type) {
+    public List<JobOutput> getJobsByTeamId(Integer teamId, Integer type) {
 
         List<JobOutput> jobOutputs = jobDao.getJobOutputsByTeamId(teamId, type);
 
-        return ResultOutputUtil.success(jobOutputs);
+        return jobOutputs;
     }
 
-    public ResultOutput updateBuildJob(UpdateJobInput updateJobInput) {
+    public JobOutput updateBuildJob(UpdateJobInput updateJobInput) {
 
         Job job = BeanCopyUtil.copy(updateJobInput, Job.class);
         Integer count = jobDao.updateBuildJob(job);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.UPDATE_JOB_FAILED);
+            throw new StatusException(NestStatusCode.UPDATE_JOB_FAILED);
         }
 
         Job wholeJob = jobDao.getJobById(job.getId());
@@ -450,7 +451,7 @@ public class JobService {
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
         if (StringUtils.isEmpty(member.getApiToken())) {
-            return ResultOutputUtil.error(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
+            throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
         boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
@@ -459,22 +460,22 @@ public class JobService {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
+        return BeanCopyUtil.copy(job, JobOutput.class);
     }
 
-    public ResultOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
+    public JobOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
 
         Job job = BeanCopyUtil.copy(updateDeployInput, Job.class);
         Integer count = jobDao.updateDeployJob(job);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.UPDATE_DEPLOY_JOB_FAILED);
+            throw new StatusException(NestStatusCode.UPDATE_DEPLOY_JOB_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(job, JobOutput.class));
+        return BeanCopyUtil.copy(job, JobOutput.class);
     }
 
-    public ResultOutput getDeployEnvs(Integer projectId) {
+    public List<EnvironmentOutput> getDeployEnvs(Integer projectId) {
 
         List<Environment> environments = environmentDao.getEnvironmentsByProjectId(projectId);
         List<EnvironmentOutput> environmentOutputs = new LinkedList<>();
@@ -484,10 +485,10 @@ public class JobService {
             environmentOutputs.add(environmentOutput);
         }
 
-        return ResultOutputUtil.success(environmentOutputs);
+        return environmentOutputs;
     }
 
-    public ResultOutput getDeployLogs(DeployLogInput deployLogInput) {
+    public GetDeployLogOutput getDeployLogs(DeployLogInput deployLogInput) {
 
         Integer maxSize = Integer.parseInt(buildLogSize);
         Integer size = deployLogInput.getSize();
@@ -507,30 +508,30 @@ public class JobService {
         getDeployLogOutput.setDeployLogOutputs(deployLogOutputs);
         getDeployLogOutput.setCount(count);
 
-        return ResultOutputUtil.success(getDeployLogOutput);
+        return getDeployLogOutput;
     }
 
-    public ResultOutput getDeployLogOutputText(Integer id) {
+    public Map<String, Object> getDeployLogOutputText(Integer id) {
 
         String output = deployLogDao.getDeployLogOutputTextById(id);
         Map<String, Object> result = new HashMap<>();
         result.put("output", output);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
 
-    public ResultOutput getProjectDeployConf(Integer projectId, Integer envId) {
+    public Map<String, Object> getProjectDeployConf(Integer projectId, Integer envId) {
 
         Project project = projectDao.getProjectById(projectId);
         String slug = project.getSlug();
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         String path = projectRepository.getPathWithNamespace();
         Environment environment = environmentDao.getEnvironmentById(envId);
-        String type = codeUtil.getEnumsMessage("environment.type.conf", String.valueOf(environment.getType()));
+        String type = langUtil.getEnumsMessage("environment.type.conf", String.valueOf(environment.getType()));
 
         if (project == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
         StringBuilder stringBuilder = null;
@@ -540,7 +541,7 @@ public class JobService {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
+            throw new StatusException(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
         String name = path.replaceAll("/", "-");
@@ -550,10 +551,10 @@ public class JobService {
         Map<String, Object> result = new HashMap<>();
         result.put("conf", conf);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
-    public ResultOutput getProjectDeployScript(Integer projectId, Integer envId) {
+    public Map<String, Object> getProjectDeployScript(Integer projectId, Integer envId) {
 
         StringBuilder stringBuilder = null;
 
@@ -562,7 +563,7 @@ public class JobService {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return ResultOutputUtil.error(NestStatusCode.GET_DEPLOY_CONF_FAILED);
+            throw new StatusException(NestStatusCode.GET_DEPLOY_CONF_FAILED);
         }
 
         String script = stringBuilder.toString();
@@ -591,7 +592,7 @@ public class JobService {
 
         result.put("script", script);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     class BuildLogRunnable implements Runnable {

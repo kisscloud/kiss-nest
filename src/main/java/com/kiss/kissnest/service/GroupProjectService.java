@@ -8,11 +8,11 @@ import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.output.BindGroupProjectsOutput;
 import com.kiss.kissnest.output.GroupProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import exception.StatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 
 import java.util.ArrayList;
@@ -28,32 +28,32 @@ public class GroupProjectService {
     private GroupDao groupDao;
 
 
-    public ResultOutput createGroupProject(GroupProject groupProject) {
+    public GroupProjectOutput createGroupProject(GroupProject groupProject) {
 
         Group group = groupDao.getGroupById(groupProject.getGroupId());
 
         if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_NOT_EXIST);
         }
 
         Integer count = groupProjectDao.createGroupProject(groupProject);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_GROUP_PROJECT_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_GROUP_PROJECT_FAILED);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(groupProject,GroupProjectOutput.class));
+        return BeanCopyUtil.copy(groupProject, GroupProjectOutput.class);
     }
 
     @Transactional
-    public ResultOutput bindGroupProjects(BindGroupProjectsInput bindGroupProjectsInput) {
+    public List<BindGroupProjectsOutput> bindGroupProjects(BindGroupProjectsInput bindGroupProjectsInput) {
 
         Integer groupId = bindGroupProjectsInput.getGroupId();
 
         Group group = groupDao.getGroupById(groupId);
 
         if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_NOT_EXIST);
         }
 
         groupProjectDao.deleteGroupProjectByGroupId(groupId);
@@ -72,11 +72,11 @@ public class GroupProjectService {
         Integer count = groupProjectDao.createGroupProjects(groupProjects);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_NOT_EXIST);
         }
 
-        groupDao.addCount(groupId,"projects",count);
+        groupDao.addCount(groupId, "projects", count);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(groupProjects,BindGroupProjectsOutput.class));
+        return BeanCopyUtil.copyList(groupProjects, BindGroupProjectsOutput.class);
     }
 }

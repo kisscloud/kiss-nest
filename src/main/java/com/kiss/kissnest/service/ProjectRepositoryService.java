@@ -12,12 +12,12 @@ import com.kiss.kissnest.input.CreateProjectRepositoryInput;
 import com.kiss.kissnest.output.ProjectRepositoryOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import exception.StatusException;
 import org.gitlab.api.models.GitlabProject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
@@ -46,40 +46,40 @@ public class ProjectRepositoryService {
     @Autowired
     private OperationLogService operationLogService;
 
-    public ResultOutput createProjectRepository(CreateProjectRepositoryInput createProjectRepositoryInput) {
+    public ProjectRepositoryOutput createProjectRepository(CreateProjectRepositoryInput createProjectRepositoryInput) {
 
         Integer projectId = createProjectRepositoryInput.getProjectId();
         Project project = projectDao.getProjectById(projectId);
 
         if (project == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         if (projectRepository != null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_REPOSITORY_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_REPOSITORY_EXIST);
         }
 
         if (StringUtils.isEmpty(project.getSlug())) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_SLUG_EMPTY);
+            throw new StatusException(NestStatusCode.PROJECT_SLUG_EMPTY);
         }
 
         Group group = groupDao.getGroupById(project.getGroupId());
 
         if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_MASTER_GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_MASTER_GROUP_NOT_EXIST);
         }
 
         if (group.getRepositoryId() == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_REPOSITORYID_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_REPOSITORYID_NOT_EXIST);
         }
 
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
         GitlabProject gitlabProject = gitlabApiUtil.createProjectForGroup(project.getSlug(), group.getRepositoryId(), accessToken);
 
         if (gitlabProject == null) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_REPOSITORY_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_PROJECT_REPOSITORY_FAILED);
         }
 
         projectRepository = new ProjectRepository();
@@ -100,19 +100,19 @@ public class ProjectRepositoryService {
 
         projectRepositoryDao.createProjectRepository(projectRepository);
 
-        operationLogService.saveOperationLog(projectRepository.getTeamId(),ThreadLocalUtil.getGuest(),null,projectRepository,"id",OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY);
-        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(),projectRepository.getTeamId(),null,projectRepository.getProjectId(),OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY,projectRepository);
-        return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository,ProjectRepositoryOutput.class));
+        operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, projectRepository, "id", OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), projectRepository.getTeamId(), null, projectRepository.getProjectId(), OperationTargetType.TYPE__CREATE_PROJECT_REPOSITORY, projectRepository);
+        return BeanCopyUtil.copy(projectRepository, ProjectRepositoryOutput.class);
     }
 
-    public ResultOutput getProjectRepositoriesByTeamId(Integer teamId) {
+    public List<ProjectRepositoryOutput> getProjectRepositoriesByTeamId(Integer teamId) {
 
         List<ProjectRepository> projectRepositoryList = projectRepositoryDao.getProjectRepositoriesByTeamId(teamId);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copyList(projectRepositoryList, ProjectRepositoryOutput.class));
+        return BeanCopyUtil.copyList(projectRepositoryList, ProjectRepositoryOutput.class);
     }
 
-    public ResultOutput validateProjectRepositoryExist(Integer projectId) {
+    public Map<String, Object> validateProjectRepositoryExist(Integer projectId) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
         Map<String, Object> result = new HashMap<>();
@@ -123,13 +123,13 @@ public class ProjectRepositoryService {
             result.put("exist", true);
         }
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
-    public ResultOutput getProjectRepositoryByProjectId(Integer projectId) {
+    public ProjectRepositoryOutput getProjectRepositoryByProjectId(Integer projectId) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(projectRepository, ProjectRepositoryOutput.class,BeanCopyUtil.defaultFieldNames));
+        return BeanCopyUtil.copy(projectRepository, ProjectRepositoryOutput.class, BeanCopyUtil.defaultFieldNames);
     }
 }

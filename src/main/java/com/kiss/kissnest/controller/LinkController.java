@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import output.ResultOutput;
+
 import utils.ThreadLocalUtil;
+
+import java.util.List;
 
 @RestController
 @Api(tags = "Link", description = "团队超链接")
@@ -33,7 +35,7 @@ public class LinkController {
 
     @PostMapping("/link")
     @ApiOperation(value = "添加链表")
-    public ResultOutput createLink(@Validated @RequestBody CreateLinkInput createLinkInput) {
+    public Link createLink(@Validated @RequestBody CreateLinkInput createLinkInput) {
 
         Guest guest = ThreadLocalUtil.getGuest();
 
@@ -49,7 +51,7 @@ public class LinkController {
 
     @PutMapping("/link")
     @ApiOperation(value = "更新链接")
-    public ResultOutput updateLink(@Validated @RequestBody UpdateLinkInput updateLinkInput) {
+    public Link updateLink(@Validated @RequestBody UpdateLinkInput updateLinkInput) {
 
         Guest guest = ThreadLocalUtil.getGuest();
 
@@ -65,14 +67,15 @@ public class LinkController {
 
     @GetMapping("/links")
     @ApiOperation(value = "获取链接列表")
-    public ResultOutput getLinks(Integer teamId) {
+    public List<Link> getLinks(Integer teamId) {
         return linkService.getLinks(teamId);
     }
 
     @DeleteMapping("/link")
     @ApiOperation(value = "删除链接")
-    public ResultOutput deleteLink(Integer id) {
-        return linkService.deleteLink(id);
+    public void deleteLink(Integer id) {
+
+        linkService.deleteLink(id);
     }
 
 }

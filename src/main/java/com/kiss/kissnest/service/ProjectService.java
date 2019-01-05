@@ -12,11 +12,11 @@ import com.kiss.kissnest.output.ProjectOutput;
 import com.kiss.kissnest.output.ProjectTypeOutput;
 import com.kiss.kissnest.output.TagOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import com.kiss.kissnest.util.LangUtil;
 import entity.Guest;
+import exception.StatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabBranchCommit;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 import utils.GuestUtil;
 import utils.ThreadLocalUtil;
@@ -64,7 +64,7 @@ public class ProjectService {
     private ProjectRepositoryDao projectRepositoryDao;
 
     @Autowired
-    private CodeUtil codeUtil;
+    private LangUtil langUtil;
 
     @Value("${project.type}")
     private String projectTypes;
@@ -78,7 +78,7 @@ public class ProjectService {
     @Autowired
     private MemberProjectDao memberProjectDao;
 
-    public ResultOutput createProject(CreateProjectInput createProjectInput) {
+    public ProjectOutput createProject(CreateProjectInput createProjectInput) {
 
         Project project = BeanCopyUtil.copy(createProjectInput, Project.class);
         Guest guest = ThreadLocalUtil.getGuest();
@@ -88,7 +88,7 @@ public class ProjectService {
         Integer count = projectDao.createProject(project);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_PROJECT_FAILED);
         }
 
         teamDao.addCount("projects", 1, project.getTeamId());
@@ -110,36 +110,36 @@ public class ProjectService {
         }
 
         ProjectOutput projectOutput = projectDao.getProjectOutputById(project.getId());
-        projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
+        projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
         Integer id = project.getId();
         project = projectDao.getProjectById(id);
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, project, "id", OperationTargetType.TYPE_CREATE_PROJECT);
         operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_CREATE_PROJECT, project);
-        return ResultOutputUtil.success(projectOutput);
+        return projectOutput;
     }
 
     @Transactional
-    public ResultOutput deleteProject(Integer id) {
+    public void deleteProject(Integer id) {
 
         Project project = projectDao.getProjectById(id);
 
         if (project == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
         Integer count = projectDao.deleteProjectById(id);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.DELETE_PROJECT_FAILED);
+            throw new StatusException(NestStatusCode.DELETE_PROJECT_FAILED);
         }
 
         buildLogDao.deleteBuildLogsByProjectId(project.getId());
 
-        List<MemberProject> memberProjects = memberProjectDao.getMemberProjects(project.getTeamId(),id);
+        List<MemberProject> memberProjects = memberProjectDao.getMemberProjects(project.getTeamId(), id);
 
         for (MemberProject memberProject : memberProjects) {
 
-            Integer memberCount = memberDao.deleteCount(memberProject.getMemberId(),1,"projects");
+            Integer memberCount = memberDao.deleteCount(memberProject.getMemberId(), 1, "projects");
 
             if (memberCount == 0) {
                 throw new TransactionalException(NestStatusCode.DELETE_MEMBER_PROJECT_COUNT_FAILED);
@@ -178,10 +178,9 @@ public class ProjectService {
         operationLogService.saveOperationLog(project.getTeamId(), ThreadLocalUtil.getGuest(), project, null, "id", OperationTargetType.TYPE_DELETE_PROJECT);
         operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_DELETE_PROJECT, project);
 
-        return ResultOutputUtil.success();
     }
 
-    public ResultOutput updateProject(UpdateProjectInput updateProjectInput) {
+    public ProjectOutput updateProject(UpdateProjectInput updateProjectInput) {
 
         Project project = BeanCopyUtil.copy(updateProjectInput, Project.class);
         Project oldValue = projectDao.getProjectById(updateProjectInput.getId());
@@ -191,39 +190,39 @@ public class ProjectService {
         Integer count = projectDao.updateProject(project);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.UPDATE_PROJECT_FAILED);
+            throw new StatusException(NestStatusCode.UPDATE_PROJECT_FAILED);
         }
 
         operationLogService.saveOperationLog(project.getTeamId(), guest, oldValue, project, "id", OperationTargetType.TYPE_UPDATE_PROJECT);
         operationLogService.saveDynamic(guest, project.getTeamId(), project.getGroupId(), project.getId(), OperationTargetType.TYPE_UPDATE_PROJECT, project);
 
         ProjectOutput projectOutput = BeanCopyUtil.copy(project, ProjectOutput.class);
-        projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));
+        projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(project.getType())));
 
-        return ResultOutputUtil.success(projectOutput);
+        return projectOutput;
     }
 
-    public ResultOutput getProjectById(Integer id) {
+    public ProjectOutput getProjectById(Integer id) {
 
         Project project = projectDao.getProjectById(id);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(project, ProjectOutput.class));
+        return BeanCopyUtil.copy(project, ProjectOutput.class);
     }
 
-    public ResultOutput getProjects(Integer teamId, Integer groupId) {
+    public List<ProjectOutput> getProjects(Integer teamId, Integer groupId) {
 
         List<ProjectOutput> projectOutputs = projectDao.getProjectOutputs(teamId, groupId);
-        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(codeUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
+        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
 
-        return ResultOutputUtil.success(projectOutputs);
+        return projectOutputs;
     }
 
-    public ResultOutput getProjectBranches(Integer projectId) {
+    public List<String> getProjectBranches(Integer projectId) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         if (projectRepository == null || projectRepository.getRepositoryId() == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
@@ -240,15 +239,15 @@ public class ProjectService {
             }
         }
 
-        return ResultOutputUtil.success(branches);
+        return branches;
     }
 
-    public ResultOutput getProjectTags(Integer projectId) {
+    public List<TagOutput> getProjectTags(Integer projectId) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         if (projectRepository == null || projectRepository.getRepositoryId() == null) {
-            return ResultOutputUtil.error(NestStatusCode.PROJECT_NOT_EXIST);
+            throw new StatusException(NestStatusCode.PROJECT_NOT_EXIST);
         }
 
         String accessToken = memberDao.getAccessTokenByAccountId(ThreadLocalUtil.getGuest().getId());
@@ -274,56 +273,56 @@ public class ProjectService {
         }
 
         log.info("gitlabTags：" + gitlabTags);
-        return ResultOutputUtil.success(branches);
+        return branches;
     }
 
-    public ResultOutput getProjectsWithoutBuildJob(Integer teamId) {
+    public List<ProjectOutput> getProjectsWithoutBuildJob(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithoutBuildJob(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
-        return ResultOutputUtil.success(projectOutputs);
+        return projectOutputs;
     }
 
-    public ResultOutput getProjectsWithBuildJobByTeamId(Integer teamId) {
+    public List<ProjectOutput> getProjectsWithBuildJobByTeamId(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithBuildJobByTeamId(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
-        return ResultOutputUtil.success(projectOutputs);
+        return projectOutputs;
     }
 
-    public ResultOutput getProjectsWithBuildJob(Integer teamId) {
+    public List<ProjectOutput> getProjectsWithBuildJob(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithBuildJob(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
-        return ResultOutputUtil.success(projectOutputs);
+        return projectOutputs;
     }
 
-    public ResultOutput getProjectsWithDeployJob(Integer teamId) {
+    public List<ProjectOutput> getProjectsWithDeployJob(Integer teamId) {
 
         List<Project> projects = projectDao.getProjectsWithDeployJob(teamId);
         List<ProjectOutput> projectOutputs = BeanCopyUtil.copyList(projects, ProjectOutput.class);
 
-        return ResultOutputUtil.success(projectOutputs);
+        return projectOutputs;
     }
 
-    public ResultOutput getProjectTypes() {
+    public List<ProjectTypeOutput> getProjectTypes() {
         String[] types = projectTypes.split(",");
         List<ProjectTypeOutput> typeList = new ArrayList<>();
 
         for (String type : types) {
             ProjectTypeOutput projectTypeOutput = new ProjectTypeOutput();
             projectTypeOutput.setId(Integer.valueOf(type));
-            projectTypeOutput.setName(codeUtil.getEnumsMessage("project.type", type));
+            projectTypeOutput.setName(langUtil.getEnumsMessage("project.type", type));
             typeList.add(projectTypeOutput);
         }
 
-        return ResultOutputUtil.success(typeList);
+        return typeList;
     }
 
-    public ResultOutput addTag(CreateTagInput createTagInput) {
+    public TagOutput addTag(CreateTagInput createTagInput) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createTagInput.getProjectId());
         Integer repositoryId = projectRepository.getRepositoryId();
@@ -331,7 +330,7 @@ public class ProjectService {
         GitlabTag gitlabTag = gitlabApiUtil.addTag(repositoryId, createTagInput.getTagName(), createTagInput.getRef(), createTagInput.getMessage(), createTagInput.getReleaseDescription(), member.getAccessToken());
 
         if (gitlabTag == null) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_PROJECT_TAG_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_PROJECT_TAG_FAILED);
         }
 
         operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, createTagInput, "id", OperationTargetType.TYPE__CREATE_PROJECT_TAG);
@@ -345,14 +344,14 @@ public class ProjectService {
         tagOutput.setMessage(gitlabTag.getMessage());
         tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
 
-        return ResultOutputUtil.success(tagOutput);
+        return tagOutput;
     }
 
-    public ResultOutput getMemberProjectsByProjectId(Integer projectId) {
+    public List<MemberOutput> getMemberProjectsByProjectId(Integer projectId) {
 
         List<Member> members = memberProjectDao.getMemberProjectsByProjectId(projectId);
-        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
+        List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members, MemberOutput.class, BeanCopyUtil.defaultFieldNames);
 
-        return ResultOutputUtil.success(memberOutputs);
+        return memberOutputs;
     }
 }

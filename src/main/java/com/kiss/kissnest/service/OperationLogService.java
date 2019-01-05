@@ -10,12 +10,11 @@ import com.kiss.kissnest.output.DeployLogOutput;
 import com.kiss.kissnest.output.DynamicOutput;
 import com.kiss.kissnest.output.GetDynamicOutput;
 import com.kiss.kissnest.output.OperationLogOutput;
-import com.kiss.kissnest.util.CodeUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import com.kiss.kissnest.util.LangUtil;
 import entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 
 import java.lang.reflect.Field;
@@ -34,7 +33,7 @@ public class OperationLogService {
     private DynamicDao dynamicDao;
 
     @Autowired
-    private CodeUtil codeUtil;
+    private LangUtil langUtil;
 
     public void saveOperationLog(Integer teamId, Guest guest, Object before, Object after, String targetField, Integer targetType) {
 
@@ -164,14 +163,14 @@ public class OperationLogService {
         } else if (targetType == OperationTargetType.TYPE__DEPLOY_JOB) {
             DeployLogOutput deployLogOutput = (DeployLogOutput) object;
             logMap.put("projectName", deployLogOutput.getOperatorName());
-            logMap.put("serverIds",deployLogOutput.getServerIds());
-            logMap.put("envName",deployLogOutput.getEnvName());
+            logMap.put("serverIds", deployLogOutput.getServerIds());
+            logMap.put("envName", deployLogOutput.getEnvName());
             logMap.put("createdAt", new Date().getTime());
         } else if (targetType == OperationTargetType.TYPE__CREATE_PROJECT_TAG) {
             CreateTagInput createTagInput = (CreateTagInput) object;
             logMap.put("tagName", createTagInput.getTagName());
-            logMap.put("ref",createTagInput.getRef());
-            logMap.put("projectId",createTagInput.getProjectId());
+            logMap.put("ref", createTagInput.getRef());
+            logMap.put("projectId", createTagInput.getProjectId());
         }
 
         dynamic.setLog(JSON.toJSONString(logMap));
@@ -180,16 +179,16 @@ public class OperationLogService {
         dynamicDao.createDynamic(dynamic);
     }
 
-    public ResultOutput getOperationLogsByTeamId(Integer teamId) {
+    public List<OperationLogOutput> getOperationLogsByTeamId(Integer teamId) {
 
         List<OperationLog> operationLogs = operationLogDao.getOperationLogsByTeamId(teamId);
         List<OperationLogOutput> operationLogOutputs = BeanCopyUtil.copyList(operationLogs, OperationLogOutput.class, BeanCopyUtil.defaultFieldNames);
-        operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(codeUtil.getEnumsMessage("operation.log", String.valueOf(operationLogOutput.getTargetType()))));
+        operationLogOutputs.forEach(operationLogOutput -> operationLogOutput.setTargetTypeText(langUtil.getEnumsMessage("operation.log", String.valueOf(operationLogOutput.getTargetType()))));
 
-        return ResultOutputUtil.success(operationLogOutputs);
+        return operationLogOutputs;
     }
 
-    public ResultOutput getDynamics(Integer teamId, Integer page, Integer size, Integer groupId, Integer projectId) {
+    public GetDynamicOutput getDynamics(Integer teamId, Integer page, Integer size, Integer groupId, Integer projectId) {
 
         Integer start = page == null ? null : (page - 1) * size;
         Dynamic dynamic = new Dynamic();
@@ -204,6 +203,6 @@ public class OperationLogService {
         getDynamicOutput.setDynamicOutputs(dynamicOutputs);
         getDynamicOutput.setCount(count);
 
-        return ResultOutputUtil.success(getDynamicOutput);
+        return getDynamicOutput;
     }
 }

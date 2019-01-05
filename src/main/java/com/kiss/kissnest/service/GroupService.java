@@ -9,16 +9,15 @@ import com.kiss.kissnest.input.UpdateGroupInput;
 import com.kiss.kissnest.output.GroupOutput;
 import com.kiss.kissnest.output.MemberOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import com.kiss.kissnest.util.CodeUtil;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
+import com.kiss.kissnest.util.LangUtil;
 import entity.Guest;
+import exception.StatusException;
 import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 import utils.ThreadLocalUtil;
 
@@ -43,7 +42,7 @@ public class GroupService {
     private GitlabApiUtil gitlabApiUtil;
 
     @Autowired
-    private CodeUtil codeUtil;
+    private LangUtil langUtil;
 
     @Autowired
     private ProjectDao projectDao;
@@ -55,7 +54,7 @@ public class GroupService {
     private MemberGroupDao memberGroupDao;
 
     @Transactional
-    public ResultOutput createGroup(CreateGroupInput createGroupInput) {
+    public GroupOutput createGroup(CreateGroupInput createGroupInput) {
 
         Group group = BeanCopyUtil.copy(createGroupInput, Group.class);
         Guest guest = ThreadLocalUtil.getGuest();
@@ -67,7 +66,7 @@ public class GroupService {
         Integer count = groupDao.createGroup(group);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.CREATE_GROUP_FAILED);
+            throw new StatusException(NestStatusCode.CREATE_GROUP_FAILED);
         }
 
         teamDao.addCount("groups", 1, group.getTeamId());
@@ -107,30 +106,30 @@ public class GroupService {
         operationLogService.saveOperationLog(group.getTeamId(), guest, null, group, "id", OperationTargetType.TYPE_CREATE_GROUP);
         operationLogService.saveDynamic(guest, group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_CREATE_GROUP, group);
         GroupOutput groupOutput = BeanCopyUtil.copy(group, GroupOutput.class);
-        groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus())));
+        groupOutput.setStatusText(langUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus())));
 
-        return ResultOutputUtil.success(groupOutput);
+        return groupOutput;
     }
 
     @Transactional
-    public ResultOutput deleteGroup(Integer id) {
+    public void deleteGroup(Integer id) {
 
         List<Project> projects = projectDao.getProjectsByGroupId(id);
 
         if (projects != null && projects.size() != 0) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_PROJECT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_PROJECT_EXIST);
         }
 
         Group group = groupDao.getGroupById(id);
 
         if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_NOT_EXIST);
         }
 
         Integer count = groupDao.deleteGroupById(id);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.DELETE_GROUP_FAILED);
+            throw new StatusException(NestStatusCode.DELETE_GROUP_FAILED);
         }
 
         List<MemberGroup> memberGroups = memberGroupDao.getMemberGroups(group.getTeamId(),id);
@@ -159,10 +158,9 @@ public class GroupService {
         operationLogService.saveOperationLog(group.getTeamId(), ThreadLocalUtil.getGuest(), group, null, "id", OperationTargetType.TYPE_DELETE_GROUP);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_DELETE_GROUP, group);
 
-        return ResultOutputUtil.success();
     }
 
-    public ResultOutput updateGroup(UpdateGroupInput updateGroupInput) {
+    public GroupOutput updateGroup(UpdateGroupInput updateGroupInput) {
 
         Group group = BeanCopyUtil.copy(updateGroupInput, Group.class);
         Guest guest = ThreadLocalUtil.getGuest();
@@ -173,42 +171,42 @@ public class GroupService {
         Integer count = groupDao.updateGroupById(group);
 
         if (count == 0) {
-            return ResultOutputUtil.error(NestStatusCode.UPDATE_GROUP_FAILED);
+            throw new StatusException(NestStatusCode.UPDATE_GROUP_FAILED);
         }
 
         operationLogService.saveOperationLog(group.getTeamId(), guest, oldValue, group, "id", OperationTargetType.TYPE_UPDATE_GROUP);
         operationLogService.saveDynamic(guest, group.getTeamId(), group.getId(), null, OperationTargetType.TYPE_UPDATE_GROUP, group);
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(group, GroupOutput.class));
+        return BeanCopyUtil.copy(group, GroupOutput.class);
     }
 
-    public ResultOutput getGroupById(Integer id) {
+    public GroupOutput getGroupById(Integer id) {
 
         Group group = groupDao.getGroupById(id);
 
         if (group == null) {
-            return ResultOutputUtil.error(NestStatusCode.GROUP_NOT_EXIST);
+            throw new StatusException(NestStatusCode.GROUP_NOT_EXIST);
         }
 
-        return ResultOutputUtil.success(BeanCopyUtil.copy(group, GroupOutput.class));
+        return BeanCopyUtil.copy(group, GroupOutput.class);
     }
 
-    public ResultOutput getGroups(Integer teamId) {
+    public List<GroupOutput> getGroups(Integer teamId) {
 
         List<Group> groups = groupDao.getGroups(teamId);
 
         List<GroupOutput> groupOutputs = BeanCopyUtil.copyList(groups, GroupOutput.class, BeanCopyUtil.defaultFieldNames);
 
-        groupOutputs.forEach(groupOutput -> groupOutput.setStatusText(codeUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus()))));
+        groupOutputs.forEach(groupOutput -> groupOutput.setStatusText(langUtil.getEnumsMessage("group.status", String.valueOf(groupOutput.getStatus()))));
 
-        return ResultOutputUtil.success(groupOutputs);
+        return groupOutputs;
     }
 
-    public ResultOutput getMemberGroupsByGroupId(Integer groupId) {
+    public List<MemberOutput> getMemberGroupsByGroupId(Integer groupId) {
 
         List<Member> members = memberGroupDao.getMemberGroupsByGroupId(groupId);
         List<MemberOutput> memberOutputs = BeanCopyUtil.copyList(members,MemberOutput.class,BeanCopyUtil.defaultFieldNames);
 
-        return ResultOutputUtil.success(memberOutputs);
+        return memberOutputs;
     }
 }

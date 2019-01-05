@@ -1,7 +1,8 @@
 package com.kiss.kissnest.controller;
 
+import com.kiss.kissnest.entity.Link;
+import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.service.*;
-import com.kiss.kissnest.util.ResultOutputUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import output.ResultOutput;
+
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,168 +45,168 @@ public class PageController {
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/groups")
-    public ResultOutput GetPageGroupsParams(Integer teamId) {
+    public Map<String, Object> GetPageGroupsParams(Integer teamId) {
 
-        ResultOutput groups = groupService.getGroups(teamId);
+        List<GroupOutput> groups = groupService.getGroups(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("groups", groups.getData());
-        result.put("status", groups.getData());
+        result.put("groups", groups);
+        result.put("status", groups);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取项目组页面参数")
     @GetMapping("/projects")
-    public ResultOutput GetPageProjectsParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
+    public Map<String, Object> GetPageProjectsParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
-        ResultOutput projects = projectService.getProjects(teamId, groupId);
-        ResultOutput groups = groupService.getGroups(teamId);
-        ResultOutput types = projectService.getProjectTypes();
+        List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
+        List<GroupOutput> groups = groupService.getGroups(teamId);
+        List<ProjectTypeOutput> types = projectService.getProjectTypes();
 
         Map<String, Object> result = new HashMap<>();
-        result.put("projects", projects.getData());
-        result.put("groups", groups.getData());
-        result.put("types", types.getData());
+        result.put("projects", projects);
+        result.put("groups", groups);
+        result.put("types", types);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
 
     @ApiOperation(value = "获取构建记录页面参数")
     @GetMapping("/build/logs")
-    public ResultOutput GetPageBuildLogsParams(Integer teamId) {
+    public Map<String, Object> GetPageBuildLogsParams(Integer teamId) {
 
-        ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
-        ResultOutput buildProjects = projectService.getProjectsWithBuildJob(teamId);
+        List<ProjectOutput> projects = projectService.getProjectsWithoutBuildJob(teamId);
+        List<ProjectOutput> buildProjects = projectService.getProjectsWithBuildJob(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("projects", projects.getData());
-        result.put("build", buildProjects.getData());
+        result.put("projects", projects);
+        result.put("build", buildProjects);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取构建任务页面参数")
     @GetMapping("/build/jobs")
-    public ResultOutput GetPageBuildJobsParams(Integer teamId) {
+    public Map<String, Object> GetPageBuildJobsParams(Integer teamId) {
 
-        ResultOutput jobs = buildService.getJobsByTeamId(teamId, 1);
-        ResultOutput projects = projectService.getProjectsWithoutBuildJob(teamId);
+        List<JobOutput> jobs = buildService.getJobsByTeamId(teamId, 1);
+        List<ProjectOutput> projects = projectService.getProjectsWithoutBuildJob(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("jobs", jobs.getData());
-        result.put("projects", projects.getData());
+        result.put("jobs", jobs);
+        result.put("projects", projects);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
 
     @ApiOperation(value = "获取仓库页面参数")
     @GetMapping("/repositories")
-    public ResultOutput GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
+    public Map<String, Object> GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
-        ResultOutput projects = projectService.getProjects(teamId, groupId);
-        ResultOutput repositories = projectRepositoryService.getProjectRepositoriesByTeamId(teamId);
+        List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
+        List<ProjectRepositoryOutput> repositories = projectRepositoryService.getProjectRepositoriesByTeamId(teamId);
         Map<String, Object> result = new HashMap<>();
-        result.put("projects", projects.getData());
-        result.put("repositories", repositories.getData());
+        result.put("projects", projects);
+        result.put("repositories", repositories);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取部署记录页面参数")
     @GetMapping("/deploy/logs")
-    public ResultOutput GetPageDeployLogsParams(Integer teamId) {
+    public Map<String, Object> GetPageDeployLogsParams(Integer teamId) {
 
-        ResultOutput projects = projectService.getProjects(teamId, null);
+        List<ProjectOutput> projects = projectService.getProjects(teamId, null);
 
         Map<String, Object> result = new HashMap<>();
 
-        result.put("projects", projects.getData());
+        result.put("projects", projects);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取部署任务页面参数")
     @GetMapping("/deploy/jobs")
-    public ResultOutput GetPageDeployJobsParams(Integer teamId) {
+    public Map<String, Object> GetPageDeployJobsParams(Integer teamId) {
 
-        ResultOutput jobs = buildService.getJobsByTeamId(teamId, 2);
-        ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
-        ResultOutput projects = projectService.getProjectsWithBuildJobByTeamId(teamId);
+        List<JobOutput> jobs = buildService.getJobsByTeamId(teamId, 2);
+        List<EnvironmentOutput> envs = serverService.getEnvironmentsByTeamId(teamId);
+        List<ProjectOutput> projects = projectService.getProjectsWithBuildJobByTeamId(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("jobs", jobs.getData());
-        result.put("envs", envs.getData());
-        result.put("projects", projects.getData());
+        result.put("jobs", jobs);
+        result.put("envs", envs);
+        result.put("projects", projects);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取设置页面参数")
     @GetMapping("/setting")
-    public ResultOutput GetPageSettingParams(@RequestParam("teamId") Integer teamId) {
+    public Map<String, Object> GetPageSettingParams(@RequestParam("teamId") Integer teamId) {
 
-        ResultOutput links = linkService.getLinks(teamId);
+        List<Link> links = linkService.getLinks(teamId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("links", links.getData());
+        result.put("links", links);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
 
     @ApiOperation(value = "获取服务器页面参数")
     @GetMapping("/servers")
-    public ResultOutput GetPageServersParams(@RequestParam("teamId") Integer teamId) {
+    public Map<String, Object> GetPageServersParams(@RequestParam("teamId") Integer teamId) {
 
-        ResultOutput envs = serverService.getEnvironmentsByTeamId(teamId);
-        ResultOutput servers = serverService.getServerOutputByTeamId(teamId, 0, null, null);
+        List<EnvironmentOutput> envs = serverService.getEnvironmentsByTeamId(teamId);
+        GetServerOutput servers = serverService.getServerOutputByTeamId(teamId, 0, null, null);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("envs", envs.getData());
-        result.put("servers", servers.getData());
+        result.put("envs", envs);
+        result.put("servers", servers);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取成员页面参数")
     @GetMapping("/members")
-    public ResultOutput GetPageMembersParams(@RequestParam("teamId") Integer teamId, Integer groupId, Integer projectId) {
+    public Map<String, Object> GetPageMembersParams(@RequestParam("teamId") Integer teamId, Integer groupId, Integer projectId) {
 
-        ResultOutput teamRoles = memberService.getMemberRoles(1);
-        ResultOutput groupRoles = memberService.getMemberRoles(2);
-        ResultOutput projectRoles = memberService.getMemberRoles(3);
-        ResultOutput members = memberService.getMemberTeamsByTeamId(teamId);
-        ResultOutput group = groupService.getMemberGroupsByGroupId(groupId);
-        ResultOutput project = projectService.getMemberProjectsByProjectId(projectId);
+        List<MemberRoleOutput> teamRoles = memberService.getMemberRoles(1);
+        List<MemberRoleOutput> groupRoles = memberService.getMemberRoles(2);
+        List<MemberRoleOutput> projectRoles = memberService.getMemberRoles(3);
+        List<MemberOutput> members = memberService.getMemberTeamsByTeamId(teamId);
+        List<MemberOutput> group = groupService.getMemberGroupsByGroupId(groupId);
+        List<MemberOutput> project = projectService.getMemberProjectsByProjectId(projectId);
 
         Map<String, Object> result = new HashMap<>();
 
-        result.put("members", members.getData());
-        result.put("teamRoles", teamRoles.getData());
-        result.put("groupRoles", groupRoles.getData());
-        result.put("projectRoles", projectRoles.getData());
-        result.put("group", group.getData());
-        result.put("project", project.getData());
+        result.put("members", members);
+        result.put("teamRoles", teamRoles);
+        result.put("groupRoles", groupRoles);
+        result.put("projectRoles", projectRoles);
+        result.put("group", group);
+        result.put("project", project);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 
     @ApiOperation(value = "获取项目版本页面参数")
     @GetMapping("/tags")
-    public ResultOutput GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
+    public Map<String, Object> GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
 
-        ResultOutput project = projectService.getProjectById(projectId);
-        ResultOutput branches = projectService.getProjectBranches(projectId);
-        ResultOutput tags = projectService.getProjectTags(projectId);
+        ProjectOutput project = projectService.getProjectById(projectId);
+        List<String> branches = projectService.getProjectBranches(projectId);
+        List<TagOutput> tags = projectService.getProjectTags(projectId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("project", project.getData());
-        result.put("branches", branches.getData());
-        result.put("tags", tags.getData());
+        result.put("project", project);
+        result.put("branches", branches);
+        result.put("tags", tags);
 
-        return ResultOutputUtil.success(result);
+        return result;
     }
 }

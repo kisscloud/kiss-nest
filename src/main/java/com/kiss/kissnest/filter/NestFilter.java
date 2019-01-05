@@ -1,13 +1,12 @@
 package com.kiss.kissnest.filter;
 
-import com.kiss.kissnest.util.CodeUtil;
-import entity.Guest;
+import com.kiss.kissnest.util.LangUtil;
 import filter.GuestFilter;
 import filter.InnerFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import utils.GuestUtil;
+
 import utils.ThreadLocalUtil;
 
 import javax.servlet.*;
@@ -20,13 +19,13 @@ import java.io.IOException;
 @WebFilter(filterName = "nestFilter", urlPatterns = "/*")
 public class NestFilter implements Filter {
 
-    private CodeUtil codeUtil;
+    private LangUtil langUtil;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
         WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-        codeUtil = context.getBean(CodeUtil.class);
+        langUtil = context.getBean(LangUtil.class);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class NestFilter implements Filter {
 
         chain.doFilter(httpServletRequest, responseWrapper);
         InnerFilterChain suffixFilterChain = new InnerFilterChain();
-        suffixFilterChain.addFilter(new ResponseFilter(responseWrapper, codeUtil));
+        suffixFilterChain.addFilter(new ResponseFilter(responseWrapper, langUtil));
         suffixFilterChain.doFilter(httpServletRequest, httpServletResponse, suffixFilterChain);
         ThreadLocalUtil.remove();
     }

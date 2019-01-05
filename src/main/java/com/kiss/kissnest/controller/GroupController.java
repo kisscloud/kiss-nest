@@ -3,6 +3,8 @@ package com.kiss.kissnest.controller;
 import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.input.CreateGroupInput;
 import com.kiss.kissnest.input.UpdateGroupInput;
+import com.kiss.kissnest.output.BindGroupProjectsOutput;
+import com.kiss.kissnest.output.GroupOutput;
 import com.kiss.kissnest.service.GroupProjectService;
 import com.kiss.kissnest.service.GroupService;
 import com.kiss.kissnest.validator.GroupValidator;
@@ -12,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import output.ResultOutput;
+
+import java.util.List;
+
 
 @RestController
 @Api(tags = "Group", description = "组织相关接口")
@@ -35,44 +39,42 @@ public class GroupController {
 
     @PostMapping("/group")
     @ApiOperation(value = "添加组织")
-    public ResultOutput createGroup(@Validated @RequestBody CreateGroupInput createGroupInput) {
+    public GroupOutput createGroup(@Validated @RequestBody CreateGroupInput createGroupInput) {
 
-        ResultOutput createOutput = groupService.createGroup(createGroupInput);
-
-        return createOutput;
+        return groupService.createGroup(createGroupInput);
     }
 
     @PostMapping("/group/projects")
     @ApiOperation(value = "组织绑定项目")
-    public ResultOutput bindGroupProjects(@Validated @RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
+    public List<BindGroupProjectsOutput> bindGroupProjects(@Validated @RequestBody BindGroupProjectsInput bindGroupProjectsInput) {
 
         return groupProjectService.bindGroupProjects(bindGroupProjectsInput);
     }
 
     @DeleteMapping("/group")
     @ApiOperation(value = "删除组织")
-    public ResultOutput deleteGroup(@RequestParam("id") Integer id) {
+    public void deleteGroup(@RequestParam("id") Integer id) {
 
-        return groupService.deleteGroup(id);
+        groupService.deleteGroup(id);
     }
 
     @PutMapping("/group")
     @ApiOperation(value = "更新组织")
-    public ResultOutput updateGroup(@Validated @RequestBody UpdateGroupInput updateGroupInput) {
+    public GroupOutput updateGroup(@Validated @RequestBody UpdateGroupInput updateGroupInput) {
 
         return groupService.updateGroup(updateGroupInput);
     }
 
     @GetMapping("/group")
     @ApiOperation(value = "获取组织")
-    public ResultOutput getGroup(@RequestParam("groupId") Integer groupId) {
+    public GroupOutput getGroup(@RequestParam("groupId") Integer groupId) {
 
         return groupService.getGroupById(groupId);
     }
 
     @GetMapping("/groups")
     @ApiOperation(value = "获取组织列表")
-    public ResultOutput getGroups(@RequestParam("teamId") Integer teamId) {
+    public List<GroupOutput> getGroups(@RequestParam("teamId") Integer teamId) {
 
         return groupService.getGroups(teamId);
     }

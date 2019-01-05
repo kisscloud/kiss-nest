@@ -1,9 +1,11 @@
 package com.kiss.kissnest.controller;
 
+import com.kiss.account.output.ClientAccountOutput;
 import com.kiss.kissnest.input.*;
-import com.kiss.kissnest.output.BindGroupProjectsOutput;
+import com.kiss.kissnest.output.MemberOutput;
+import com.kiss.kissnest.output.MemberRoleOutput;
+import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.service.MemberService;
-import com.kiss.kissnest.util.ResultOutputUtil;
 import com.kiss.kissnest.validator.MemberValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,9 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import output.ResultOutput;
 
 import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @Api(tags = "Member", description = "成员相关接口")
@@ -33,88 +36,86 @@ public class MemberController {
 
     @PostMapping("/member/access")
     @ApiOperation(value = "获取成员gitlab的凭证")
-    public ResultOutput getMemberAccess(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
-
-        return memberService.getMemberAccess(createMemberAccessInput);
+    public void getMemberAccess(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
+        memberService.getMemberAccess(createMemberAccessInput);
     }
 
     @PostMapping("/member/apiToken")
     @ApiOperation(value = "获取成员jenkins的凭证")
-    public ResultOutput getMemberApiToken(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
-
-        return memberService.getMemberApiToken(createMemberAccessInput);
+    public void getMemberApiToken(@Validated @RequestBody CreateMemberAccessInput createMemberAccessInput) {
+        memberService.getMemberApiToken(createMemberAccessInput);
     }
 
     @GetMapping("/member/validate")
     @ApiOperation(value = "判断成员是否拥有凭证")
-    public ResultOutput validateMember () {
+    public Map<String, Object> validateMember() {
 
-       return memberService.validateMember();
+        return memberService.validateMember();
     }
 
     @GetMapping("/member")
-    public ResultOutput getMember() {
+    public MemberOutput getMember() {
 
         return memberService.getMember();
     }
 
     @GetMapping("/member/team/default")
-    public ResultOutput getDefaultTeamId(@RequestParam("accountId") Integer accountId) {
+    public Map<String, Object> getDefaultTeamId(@RequestParam("accountId") Integer accountId) {
 
         return memberService.getMemberDefaultTeamId(accountId);
     }
 
     @GetMapping("/member/teams")
-    public ResultOutput getMemberTeamsByAccountId(@RequestParam("accountId") Integer accountId) {
+    public List<TeamOutput> getMemberTeamsByAccountId(@RequestParam("accountId") Integer accountId) {
 
         return memberService.getMemberTeamsByAccountId(accountId);
     }
 
     @PostMapping("/member/team/search")
-    public ResultOutput getMembersByClientId(@RequestBody MemberClientInput memberClientInput) {
+    public List<ClientAccountOutput> getMembersByClientId(@RequestBody MemberClientInput memberClientInput) {
 
         return memberService.getMembersByClientId(memberClientInput);
     }
 
     @PostMapping("/member/group/search")
-    public ResultOutput getGroupMembers(@Validated @RequestBody GroupMemberSearchInput groupMemberSearchInput) {
+    public List<MemberOutput> getGroupMembers(@Validated @RequestBody GroupMemberSearchInput groupMemberSearchInput) {
 
         return memberService.getGroupValidMembers(groupMemberSearchInput);
     }
 
     @PostMapping("/member/project/search")
-    public ResultOutput getMembersByClientId(@RequestBody ProjectMemberSearchInput projectMemberSearchInput) {
+    public List<MemberOutput> getMembersByClientId(@RequestBody ProjectMemberSearchInput projectMemberSearchInput) {
 
         return memberService.getProjectValidMembers(projectMemberSearchInput);
     }
 
     @PostMapping("/member/team")
-    public ResultOutput createMemberTeam(@RequestBody CreateMemberTeamInput createMemberTeamInput) {
+    public List<MemberOutput> createMemberTeam(@RequestBody CreateMemberTeamInput createMemberTeamInput) {
 
         return memberService.createMemberTeam(createMemberTeamInput);
     }
 
     @PostMapping("/member/group")
-    public ResultOutput bindMemberGroup(@Validated @RequestBody BindMemberGroupInput bindMemberGroupInput) {
+    public void bindMemberGroup(@Validated @RequestBody BindMemberGroupInput bindMemberGroupInput) {
 
-        return memberService.createMemberGroup(bindMemberGroupInput);
+        memberService.createMemberGroup(bindMemberGroupInput);
     }
 
     @PostMapping("/member/project")
-    public ResultOutput bindMemberGroup(@Validated @RequestBody BindMemberProjectInput bindMemberProjectInput) {
+    public void bindMemberGroup(@Validated @RequestBody BindMemberProjectInput bindMemberProjectInput) {
 
-        return memberService.createMemberProject(bindMemberProjectInput);
+        memberService.createMemberProject(bindMemberProjectInput);
     }
 
     @GetMapping("/member/roles")
-    public ResultOutput getMemberRoles(@RequestParam("type") Integer type) {
+    public List<MemberRoleOutput> getMemberRoles(@RequestParam("type") Integer type) {
 
         return memberService.getMemberRoles(type);
     }
 
     @GetMapping("/members")
-    public ResultOutput getMembers(@RequestParam("teamId") Integer teamId,Integer groupId,Integer projectId) {
+    public List<MemberOutput> getMembers(@RequestParam("teamId") Integer teamId, Integer groupId, Integer projectId) {
 
-        return memberService.getMembers(teamId,groupId,projectId);
+        return memberService.getMembers(teamId, groupId, projectId);
     }
 }

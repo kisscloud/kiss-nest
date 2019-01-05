@@ -1,8 +1,8 @@
 package com.kiss.kissnest.status;
 
-import status.CodeEnums;
+import enums.StatusCodeEnums;
 
-public class NestStatusCode extends CodeEnums {
+public class NestStatusCode extends StatusCodeEnums {
 
 
     public static final Integer TEAM_GROUPS_EXIST = 1001;

@@ -1,6 +1,7 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.account.input.ClientAuthorizationInput;
+import com.kiss.account.output.AuthOutput;
 import com.kiss.kissnest.feign.ClientServiceFeign;
 import com.kiss.kissnest.input.LoginInput;
 import io.swagger.annotations.Api;
@@ -10,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import output.ResultOutput;
+
 
 @RestController
 @Api(tags = "Auth", description = "授权相关接口")
@@ -30,7 +31,7 @@ public class AuthController {
 
     @PostMapping("/code/login")
     @ApiOperation(value = "登录")
-    public ResultOutput ClientAuthorization(@RequestBody LoginInput loginInput) {
+    public AuthOutput ClientAuthorization(@RequestBody LoginInput loginInput) {
 
         ClientAuthorizationInput clientAuthorizationInput = new ClientAuthorizationInput();
         clientAuthorizationInput.setCode(loginInput.getAuthorizationCode());

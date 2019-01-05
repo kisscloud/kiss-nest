@@ -11,13 +11,12 @@ import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Track;
 import com.kiss.kissnest.output.TrackOutput;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import com.kiss.kissnest.util.ResultOutputUtil;
 import entity.Guest;
 import org.apache.commons.lang3.StringUtils;
 import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import output.ResultOutput;
+
 import utils.BeanCopyUtil;
 
 import java.util.ArrayList;
@@ -54,16 +53,16 @@ public class TrackService {
 
         if ("push".equals(eventName)) {
             track.setType(1);
-            push(hookJson,track);
-            projectRepositoryDao.addCount("commit",1);
+            push(hookJson, track);
+            projectRepositoryDao.addCount("commit", 1);
         } else if ("tag_push".equals(eventName)) {
             track.setType(2);
-            push(hookJson,track);
-            projectRepositoryDao.addCount("commit",1);
+            push(hookJson, track);
+            projectRepositoryDao.addCount("commit", 1);
         } else if ("merge_request".equals(eventName)) {
             track.setType(3);
-            merge(hookJson,track);
-            projectRepositoryDao.addCount("mergeRequest",1);
+            merge(hookJson, track);
+            projectRepositoryDao.addCount("mergeRequest", 1);
         }
 
         Project project = projectDao.getProjectByRepositoryId(track.getProjectId());
@@ -72,9 +71,9 @@ public class TrackService {
             track.setTeamId(project.getTeamId());
         }
 
-        updateBranch(project.getTeamId(),project.getId());
+        updateBranch(project.getTeamId(), project.getId());
         trackDao.createTrack(track);
-        operationLogService.saveDynamic(new Guest(),track.getTeamId(),null,null,OperationTargetType.TYPE__PUSH_CODES,track);
+        operationLogService.saveDynamic(new Guest(), track.getTeamId(), null, null, OperationTargetType.TYPE__PUSH_CODES, track);
     }
 
     public void push(JSONObject hookJson, Track track) {
@@ -129,7 +128,7 @@ public class TrackService {
         track.setHash(commitJson == null ? null : commitJson.getString("id"));
     }
 
-    public ResultOutput getTracksByTeamId(Integer teamId) {
+    public List<TrackOutput> getTracksByTeamId(Integer teamId) {
 
         List<Track> tracks = trackDao.getTracksByTeamId(teamId);
         List<TrackOutput> trackOutputs = new ArrayList<>();
@@ -140,10 +139,10 @@ public class TrackService {
             }
         }
 
-        return ResultOutputUtil.success(trackOutputs);
+        return trackOutputs;
     }
 
-    public void updateBranch(Integer teamId,Integer projectId) {
+    public void updateBranch(Integer teamId, Integer projectId) {
 
         String accessToken = projectDao.getProjectOperatorAccessToken(projectId);
 
@@ -152,9 +151,9 @@ public class TrackService {
         }
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
-        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(projectRepository.getRepositoryId(),accessToken);
+        List<GitlabBranch> gitlabBranches = gitlabApiUtil.getBranches(projectRepository.getRepositoryId(), accessToken);
         Integer count = gitlabBranches.size();
 
-        projectRepositoryDao.updateProjectRepositoryBranch(teamId,projectId,count);
+        projectRepositoryDao.updateProjectRepositoryBranch(teamId, projectId, count);
     }
 }
