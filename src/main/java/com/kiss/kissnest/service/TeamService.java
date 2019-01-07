@@ -12,15 +12,15 @@ import com.kiss.kissnest.input.UpdateTeamInput;
 import com.kiss.kissnest.output.TeamOutput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import kiss.foundation.entity.Guest;
-import kiss.foundation.exception.StatusException;
+import com.kiss.foundation.entity.Guest;
+import com.kiss.foundation.exception.StatusException;
 import org.gitlab.api.models.GitlabGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kiss.foundation.utils.BeanCopyUtil;
-import kiss.foundation.utils.ThreadLocalUtil;
+import com.kiss.foundation.utils.BeanCopyUtil;
+import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 package com.kiss.kissnest.status;
-import kiss.foundation.status.BaseStatusCode;
+import com.kiss.foundation.status.BaseStatusCode;
 
 public class NestStatusCode extends BaseStatusCode {
 
