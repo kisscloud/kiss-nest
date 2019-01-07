@@ -2,8 +2,8 @@ package com.kiss.kissnest.filter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.util.LangUtil;
-import filter.InnerFilter;
-import filter.InnerFilterChain;
+import kiss.foundation.filter.InnerFilter;
+import kiss.foundation.filter.InnerFilterChain;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

@@ -11,13 +11,14 @@ import com.kiss.kissnest.entity.ProjectRepository;
 import com.kiss.kissnest.entity.Track;
 import com.kiss.kissnest.output.TrackOutput;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import entity.Guest;
+import kiss.foundation.entity.Guest;
+import kiss.foundation.utils.BeanCopyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.gitlab.api.models.GitlabBranch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import utils.BeanCopyUtil;
+
 
 import java.util.ArrayList;
 import java.util.List;

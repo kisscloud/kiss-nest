@@ -15,8 +15,11 @@ import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.LangUtil;
-import entity.Guest;
-import exception.StatusException;
+import kiss.foundation.entity.Guest;
+import kiss.foundation.exception.StatusException;
+import kiss.foundation.utils.BeanCopyUtil;
+import kiss.foundation.utils.GuestUtil;
+import kiss.foundation.utils.ThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabBranchCommit;
@@ -27,10 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import utils.BeanCopyUtil;
-import utils.GuestUtil;
-import utils.ThreadLocalUtil;
 
 import java.util.ArrayList;
 import java.util.List;

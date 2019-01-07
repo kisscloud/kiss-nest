@@ -2,9 +2,9 @@ package com.kiss.kissnest.config;
 
 import com.alibaba.fastjson.JSON;
 import com.kiss.kissnest.util.LangUtil;
-import enums.StatusCodeEnums;
-import exception.StatusException;
 import feign.FeignException;
+import kiss.foundation.exception.StatusException;
+import kiss.foundation.status.BaseStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -70,9 +70,9 @@ public class ExceptionAdvice {
 
             response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
 
-            return new StatusException(StatusCodeEnums.VALIDATE_ERROR, formFields);
+            return new StatusException(BaseStatusCode.VALIDATE_ERROR, formFields);
         }
 
-        return new StatusException(StatusCodeEnums.SERVICE_ERROR, e.getMessage());
+        return new StatusException(BaseStatusCode.SERVICE_ERROR, e.getMessage());
     }
 }

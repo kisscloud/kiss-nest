@@ -3,11 +3,11 @@ package com.kiss.kissnest.service;
 import com.kiss.kissnest.dao.LinkDao;
 import com.kiss.kissnest.entity.Link;
 import com.kiss.kissnest.enums.OperationTargetType;
+import kiss.foundation.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import utils.ThreadLocalUtil;
 
 import java.util.List;
 

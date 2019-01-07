@@ -11,11 +11,10 @@ import com.kiss.kissnest.output.DynamicOutput;
 import com.kiss.kissnest.output.GetDynamicOutput;
 import com.kiss.kissnest.output.OperationLogOutput;
 import com.kiss.kissnest.util.LangUtil;
-import entity.Guest;
+import kiss.foundation.entity.Guest;
+import kiss.foundation.utils.BeanCopyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import utils.BeanCopyUtil;
 
 import java.lang.reflect.Field;
 import java.util.Date;
