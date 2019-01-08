@@ -72,7 +72,7 @@ public class ExceptionAdvice {
 
             return new StatusException(BaseStatusCode.VALIDATE_ERROR, formFields);
         }
-
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new StatusException(BaseStatusCode.SERVICE_ERROR, e.getMessage());
     }
 }
