@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.EnvironmentMapper">
+    <insert id="createEnvironment" parameterType="com.kiss.kissnest.entity.Environment" useGeneratedKeys="true" keyProperty="id">
+        insert into environments (teamId,name,type,saltHost,saltVersion,saltUser,saltPassword,operatorId,operatorName)
+        value
+        (#{teamId},#{name},#{type},#{saltHost},#{saltVersion},#{saltUser},#{saltPassword},#{operatorId},#{operatorName})
+    </insert>
+    
+    <select id="getEnvironmentsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where teamId = #{teamId};
+    </select>
+    
+    <select id="getEnvironmentById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where id = #{id};
+    </select>
+    
+    <select id="getEnvironmentByTeamIdAndName" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where teamId = #{teamId} and name = #{name};
+    </select>
+
+    <select id="getEnvironmentsByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Environment">
+        select * from environments where id in (select distinct envId from jobs where projectId= #{projectId});
+    </select>
+    
+    <update id="updateEnvironment" parameterType="com.kiss.kissnest.entity.Environment">
+        update environments
+        set name = #{name},
+        saltHost = #{saltHost},
+        saltVersion = #{saltVersion},
+        saltUser = #{saltUser},
+        saltPassword = #{saltPassword},
+        type = #{type}
+        where id = #{id} and teamId = #{teamId}
+    </update>
+    
+    <update id="addEnvironmentServerCount" parameterType="java.lang.Integer">
+        update environments
+        set serverCount = serverCount + 1
+        where  id = #{id}
+    </update>
+
+    <delete id="deleteEnvironmentById" parameterType="java.lang.Integer">
+        delete from environments where id = #{id}
+    </delete>
+</mapper>

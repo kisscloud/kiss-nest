@@ -6,7 +6,6 @@ import com.kiss.kissnest.enums.RepositoryType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.status.NestStatusCode;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -17,7 +16,7 @@ import org.gitlab.api.TokenType;
 import org.gitlab.api.models.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import utils.ThreadLocalUtil;
+import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -166,9 +165,7 @@ public class GitlabApiUtil {
     public List<GitlabTag> getTags(Integer projectId, String accessToken) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
-            List<GitlabTag> gitlabTags = gitlabAPI.getTags(projectId);
-
-            return gitlabTags;
+           return gitlabAPI.getTags(projectId);
         } catch (Exception e) {
             log.info("获取tag失败了");
             e.printStackTrace();

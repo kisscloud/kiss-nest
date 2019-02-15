@@ -8,12 +8,11 @@ import com.kiss.kissnest.input.BindGroupProjectsInput;
 import com.kiss.kissnest.output.BindGroupProjectsOutput;
 import com.kiss.kissnest.output.GroupProjectOutput;
 import com.kiss.kissnest.status.NestStatusCode;
-import exception.StatusException;
+import com.kiss.foundation.exception.StatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import utils.BeanCopyUtil;
+import com.kiss.foundation.utils.BeanCopyUtil;
 
 import java.util.ArrayList;
 import java.util.List;

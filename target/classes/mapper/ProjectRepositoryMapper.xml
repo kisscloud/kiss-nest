@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.ProjectRepositoryMapper">
+
+    <insert id="createProjectRepository" parameterType="com.kiss.kissnest.entity.ProjectRepository" keyProperty="id" useGeneratedKeys="true">
+        insert into projectrepository (teamId,name,projectId,projectName,repositoryId,sshUrl,httpUrl,pathWithNamespace,branchCount,commitCount,memberCount,mergeRequestCount,operatorId,operatorName)
+        value
+        (#{teamId},#{name},#{projectId},#{projectName},#{repositoryId},#{sshUrl},#{httpUrl},#{pathWithNamespace},#{branchCount},#{commitCount},#{memberCount},#{mergeRequestCount},#{operatorId},#{operatorName})
+    </insert>
+    
+    <select id="getProjectRepositoryByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
+        select * from projectrepository where projectId = #{projectId};
+    </select>
+
+    <select id="getProjectRepositoriesByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.ProjectRepository">
+        select * from projectrepository where teamId = #{teamId};
+    </select>
+
+    <select id="addCount" parameterType="java.util.Map">
+        update projectrepository
+        <if test="type == 'commit'">
+            commitCount = commitCount + #{increment}
+        </if>
+        <if test="type == 'mergeRequest'">
+            mergeRequestCount = mergeRequestCount + #{increment}
+        </if>
+    </select>
+    
+    <update id="updateProjectRepositoryBranch" parameterType="java.util.Map">
+        update projectrepository
+        set branchCount = #{branchCount}
+        where projectId = #{projectId} and teamId = #{teamId}
+    </update>
+
+    <delete id="deleteProjectRepositoryById" parameterType="java.lang.Integer">
+        delete from projectrepository where id = #{id}
+    </delete>
+</mapper>

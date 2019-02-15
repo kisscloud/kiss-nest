@@ -1,0 +1,82 @@
+server:
+  port: 8920
+  maxSize: 20
+
+spring:
+  application:
+    name: kiss-nest
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: iTw7umxj2EDQ0Cnl
+    jdbc-url: jdbc:mysql://rm-uf6g7z0j19ra2cajp1o.mysql.rds.aliyuncs.com/kiss-nest?characterEncoding=utf-8&useSSL=false
+  messages:
+    basename: i18n/codes
+    baseFolder: i18n
+    use-code-as-default-message: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    com.kiss.kissnest.mapper: debug
+
+jenkins:
+  url: https://build.jincse.com
+  buildUrl: https://build.jincse.com/job/%s/build
+  buildWithParameterUrl: https://build.jincse.com/job/%s/buildWithParameters
+  generateTokenUrl: https://build.jincse.com/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
+  buildLogUrl: https://build.jincse.com/job/%s/%s
+  buildOutputPath: /logText/progressiveHtml
+  crumbPath: /crumbIssuer/api/json
+  queuePath: /api/json
+  bin:
+    ip: 47.100.184.133
+
+kiss:
+  nest:
+    clientId: 114094390a3c40a780dd9aa6f30f9a6c
+    clientSecret: d4d23c97eb1d46c8a4cd9d0c8dbbf59d
+    clientExpired: 1296000
+    webHook:
+      url: http://localhost:8920/kiss/nest/note
+
+gitlab:
+  server:
+#    url: https://git.jincse.com
+    url: http://47.100.184.133:6012
+    token:
+      path: /oauth/token
+    commitPath: /%s/commit/%s
+    user: https://git.jincse.com/api/v4/users?username=%s
+    branchPath: /%s/tree/%s
+
+build:
+  log:
+    maxSize: 20
+
+feign:
+  httpclient:
+    connection-timeout: 60000
+ribbon:
+  ConnectTimeout: 60000
+  ReadTimeout: 60000
+
+project:
+  type: 0,1,2,3,4
+  roles: 1,2,3,4
+
+member:
+  roles: 1,2,3,4,5
+
+group:
+  roles: 1,2,3,4
+
+package:
+  nginx:
+    url: https://packages.jincse.com/files/
+  config:
+    url: git@git.jincse.com

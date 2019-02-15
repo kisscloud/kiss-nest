@@ -1,12 +1,11 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.entity.Link;
-import com.kiss.kissnest.input.CreateJobInput;
 import com.kiss.kissnest.input.CreateLinkInput;
 import com.kiss.kissnest.input.UpdateLinkInput;
 import com.kiss.kissnest.service.LinkService;
 import com.kiss.kissnest.validator.LinkValidator;
-import entity.Guest;
+import com.kiss.foundation.entity.Guest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import utils.ThreadLocalUtil;
+import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.util.List;
 

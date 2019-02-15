@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.LinkMapper">
+
+    <insert id="createLink" parameterType="com.kiss.kissnest.entity.Link" keyProperty="id" useGeneratedKeys="true">
+        insert into links (teamId,title,url,operatorId,operatorName)
+        value
+        (#{teamId},#{title},#{url},#{operatorId},#{operatorName})
+    </insert>
+
+    <delete id="deleteLink" parameterType="java.lang.Integer">
+        delete from links where id = #{linkId}
+    </delete>
+
+    <update id="updateLink" parameterType="com.kiss.kissnest.entity.Link">
+        update links
+        set
+        id = #{id}
+        <if test="title != null">
+            ,title = #{title}
+        </if>
+        <if test="url != null">
+            ,url = #{url}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getLinks" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Link">
+        select * from links where teamId = #{teamId};
+    </select>
+    
+    <select id="getLinkById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Link">
+        select * from links where id = #{id};
+    </select>
+</mapper>

@@ -56,18 +56,18 @@ public class PageController {
         return result;
     }
 
-    @ApiOperation(value = "获取项目组页面参数")
+    @ApiOperation(value = "获取项目页面参数")
     @GetMapping("/projects")
     public Map<String, Object> GetPageProjectsParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
 
         List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
         List<GroupOutput> groups = groupService.getGroups(teamId);
-        List<ProjectTypeOutput> types = projectService.getProjectTypes();
+        List<ProjectTypeOutput> projectTypes = projectService.getProjectTypes();
 
         Map<String, Object> result = new HashMap<>();
         result.put("projects", projects);
         result.put("groups", groups);
-        result.put("types", types);
+        result.put("projectTypes", projectTypes);
 
         return result;
     }
@@ -102,47 +102,47 @@ public class PageController {
     }
 
 
-    @ApiOperation(value = "获取仓库页面参数")
-    @GetMapping("/repositories")
-    public Map<String, Object> GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
+//    @ApiOperation(value = "获取仓库页面参数")
+//    @GetMapping("/repositories")
+//    public Map<String, Object> GetPageRepositoriesParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
+//
+//        List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
+//        List<ProjectRepositoryOutput> repositories = projectRepositoryService.getProjectRepositoriesByTeamId(teamId);
+//        Map<String, Object> result = new HashMap<>();
+//        result.put("projects", projects);
+//        result.put("repositories", repositories);
+//
+//        return result;
+//    }
 
-        List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
-        List<ProjectRepositoryOutput> repositories = projectRepositoryService.getProjectRepositoriesByTeamId(teamId);
-        Map<String, Object> result = new HashMap<>();
-        result.put("projects", projects);
-        result.put("repositories", repositories);
+//    @ApiOperation(value = "获取部署记录页面参数")
+//    @GetMapping("/deploy/logs")
+//    public Map<String, Object> GetPageDeployLogsParams(Integer teamId) {
+//
+//        List<ProjectOutput> projects = projectService.getProjects(teamId, null);
+//
+//        Map<String, Object> result = new HashMap<>();
+//
+//        result.put("projects", projects);
+//
+//        return result;
+//    }
 
-        return result;
-    }
-
-    @ApiOperation(value = "获取部署记录页面参数")
-    @GetMapping("/deploy/logs")
-    public Map<String, Object> GetPageDeployLogsParams(Integer teamId) {
-
-        List<ProjectOutput> projects = projectService.getProjects(teamId, null);
-
-        Map<String, Object> result = new HashMap<>();
-
-        result.put("projects", projects);
-
-        return result;
-    }
-
-    @ApiOperation(value = "获取部署任务页面参数")
-    @GetMapping("/deploy/jobs")
-    public Map<String, Object> GetPageDeployJobsParams(Integer teamId) {
-
-        List<JobOutput> jobs = buildService.getJobsByTeamId(teamId, 2);
-        List<EnvironmentOutput> envs = serverService.getEnvironmentsByTeamId(teamId);
-        List<ProjectOutput> projects = projectService.getProjectsWithBuildJobByTeamId(teamId);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("jobs", jobs);
-        result.put("envs", envs);
-        result.put("projects", projects);
-
-        return result;
-    }
+//    @ApiOperation(value = "获取部署任务页面参数")
+//    @GetMapping("/deploy/jobs")
+//    public Map<String, Object> GetPageDeployJobsParams(Integer teamId) {
+//
+//        List<JobOutput> jobs = buildService.getJobsByTeamId(teamId, 2);
+//        List<EnvironmentOutput> envs = serverService.getEnvironmentsByTeamId(teamId);
+//        List<ProjectOutput> projects = projectService.getProjectsWithBuildJobByTeamId(teamId);
+//
+//        Map<String, Object> result = new HashMap<>();
+//        result.put("jobs", jobs);
+//        result.put("envs", envs);
+//        result.put("projects", projects);
+//
+//        return result;
+//    }
 
     @ApiOperation(value = "获取设置页面参数")
     @GetMapping("/setting")
@@ -194,19 +194,19 @@ public class PageController {
         return result;
     }
 
-    @ApiOperation(value = "获取项目版本页面参数")
-    @GetMapping("/tags")
-    public Map<String, Object> GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
-
-        ProjectOutput project = projectService.getProjectById(projectId);
-        List<String> branches = projectService.getProjectBranches(projectId);
-        List<TagOutput> tags = projectService.getProjectTags(projectId);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("project", project);
-        result.put("branches", branches);
-        result.put("tags", tags);
-
-        return result;
-    }
+//    @ApiOperation(value = "获取项目版本页面参数")
+//    @GetMapping("/tags")
+//    public Map<String, Object> GetPageTagsParams(@RequestParam("projectId") Integer projectId) {
+//
+//        ProjectOutput project = projectService.getProjectById(projectId);
+//        List<String> branches = projectService.getProjectBranches(projectId);
+//        List<TagOutput> tags = projectService.getProjectTags(projectId);
+//
+//        Map<String, Object> result = new HashMap<>();
+//        result.put("project", project);
+//        result.put("branches", branches);
+//        result.put("tags", tags);
+//
+//        return result;
+//    }
 }

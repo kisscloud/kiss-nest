@@ -1,6 +1,5 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.CreateProjectRepositoryInput;
 import com.kiss.kissnest.input.CreateTagInput;
@@ -17,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import utils.BeanCopyUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -69,40 +66,45 @@ public class ProjectController {
         return projectService.getProjects(teamId, groupId);
     }
 
-    @PostMapping("/project/repository")
-    @ApiOperation(value = "创建项目仓库")
-    public ProjectRepositoryOutput createProjectRepository(@Validated @RequestBody CreateProjectRepositoryInput createProjectRepositoryInput) {
-
-        return projectRepositoryService.createProjectRepository(createProjectRepositoryInput);
-    }
+//    @PostMapping("/project/repository")
+//    @ApiOperation(value = "创建项目仓库")
+//    public ProjectRepositoryOutput createProjectRepository(@Validated @RequestBody CreateProjectRepositoryInput createProjectRepositoryInput) {
+//
+//        return projectRepositoryService.createProjectRepository(createProjectRepositoryInput);
+//    }
 
     @GetMapping("/project/repository")
-    @ApiOperation(value = "查询项目仓库详情")
-    public ProjectRepositoryOutput  getProjectRepository(@RequestParam("projectId") Integer projectId) {
+    @ApiOperation(value = "获取项目仓库")
+    public ProjectRepositoryOutput getProjectRepository(@RequestParam("projectId") Integer projectId) {
 
-        return projectRepositoryService.getProjectRepositoryByProjectId(projectId);
+        if (projectRepositoryService.validateProjectRepositoryExist(projectId)) {
+
+            return projectRepositoryService.getProjectRepositoryByProjectId(projectId);
+        }
+
+        return projectRepositoryService.createProjectRepository(projectId);
     }
 
     @GetMapping("/project/branches")
     @ApiOperation(value = "查询项目的所有分支")
-    public List<String>  getProjectBranches(@RequestParam("projectId") Integer projectId) {
+    public List<String> getProjectBranches(@RequestParam("projectId") Integer projectId) {
 
         return projectService.getProjectBranches(projectId);
     }
 
     @GetMapping("/project/tags")
     @ApiOperation(value = "查询项目的所有版本")
-    public List<TagOutput>  getProjectTags(@RequestParam("projectId") Integer projectId) {
+    public List<TagOutput> getProjectTags(@RequestParam("projectId") Integer projectId) {
 
         return projectService.getProjectTags(projectId);
     }
 
-    @GetMapping("/project/repository/validate")
-    @ApiOperation(value = "校验项目仓库是否存在")
-    public Map<String, Object> validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
-
-        return projectRepositoryService.validateProjectRepositoryExist(projectId);
-    }
+//    @GetMapping("/project/repository/validate")
+//    @ApiOperation(value = "校验项目仓库是否存在")
+//    public Map<String, Object> validateProjectRepositoryExist(@RequestParam("projectId") Integer projectId) {
+//
+//        return projectRepositoryService.validateProjectRepositoryExist(projectId);
+//    }
 
     @PostMapping("/project/tag")
     @ApiOperation(value = "创建项目版本")

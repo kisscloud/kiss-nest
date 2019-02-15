@@ -45,9 +45,8 @@ public class ProjectRepositoryService {
     @Autowired
     private OperationLogService operationLogService;
 
-    public ProjectRepositoryOutput createProjectRepository(CreateProjectRepositoryInput createProjectRepositoryInput) {
+    public ProjectRepositoryOutput createProjectRepository(Integer projectId) {
 
-        Integer projectId = createProjectRepositoryInput.getProjectId();
         Project project = projectDao.getProjectById(projectId);
 
         if (project == null) {
@@ -111,18 +110,15 @@ public class ProjectRepositoryService {
         return BeanCopyUtil.copyList(projectRepositoryList, ProjectRepositoryOutput.class);
     }
 
-    public Map<String, Object> validateProjectRepositoryExist(Integer projectId) {
+    public Boolean validateProjectRepositoryExist(Integer projectId) {
 
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
-        Map<String, Object> result = new HashMap<>();
 
         if (projectRepository == null) {
-            result.put("exist", false);
-        } else {
-            result.put("exist", true);
+            return false;
         }
 
-        return result;
+        return true;
     }
 
     public ProjectRepositoryOutput getProjectRepositoryByProjectId(Integer projectId) {

@@ -10,13 +10,13 @@ import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.feign.AccountServiceFeign;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.status.NestStatusCode;
-import entity.Guest;
+import com.kiss.foundation.entity.Guest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import utils.ThreadLocalUtil;
+import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.util.List;
 

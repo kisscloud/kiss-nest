@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.JobMapper">
+
+    <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job" keyProperty="id" useGeneratedKeys="true">
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor,conf,status,number)
+        value
+        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{useSupervisor}, #{conf},#{status},#{number})
+    </insert>
+
+    <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where projectId = #{projectId};
+    </select>
+
+    <select id="getJobByProjectIdAndType" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where projectId = #{projectId} and type = #{type} limit 0,1;
+    </select>
+    
+    <update id="updateJobStatus" parameterType="java.util.Map">
+        update jobs
+        set
+        status = #{newStatus}
+        where projectId = #{projectId} and type = #{type} and status = #{status}
+    </update>
+
+    <update id="updateJobStatusAndNumber" parameterType="java.util.Map">
+        update jobs
+        set
+        status = #{newStatus},
+        number = #{number}
+        where projectId = #{projectId} and type = #{type} and status = #{status}
+    </update>
+    
+    <select id="getJobsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where teamId = #{teamId} and type = #{type};
+    </select>
+
+    <update id="updateBuildJob" parameterType="com.kiss.kissnest.entity.Job">
+        update jobs set
+        teamId = #{teamId},
+        projectId = #{projectId},
+        script = #{script},
+        type = #{type}
+        where id = #{id}
+    </update>
+
+    <select id="getJobById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where id = #{id};
+    </select>
+
+    <delete id="deleteJobById" parameterType="java.lang.Integer">
+        delete from jobs where id = #{id}
+    </delete>
+    
+    <select id="getJobsByServerIds" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where serverIds like #{serverId};
+    </select>
+
+    <update id="updateDeployJob" parameterType="com.kiss.kissnest.entity.Job">
+        update jobs set
+        useSupervisor = #{useSupervisor},
+        conf = #{conf},
+        type = #{type},
+        envId = #{envId},
+        where id = #{id}
+    </update>
+
+    <select id="getJobOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.JobOutput">
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,
+        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
+        pr.name as projectName,en.name as envName,pr.groupId,gr.name as groupName from jobs jo
+        left join projects pr
+        on jo.projectId = pr.id
+        left join groups gr
+        on pr.groupId = gr.id
+        left join environments en
+        on jo.envId = en.id
+        where jo.teamId = #{teamId} and jo.type = #{type};
+    </select>
+
+    <select id="getJobOutputsById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.JobOutput">
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,
+        UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
+        pr.name as projectName,en.name as envName from jobs jo
+        left join projects pr
+        on jo.projectId = pr.id
+        left join environments en
+        on jo.envId = en.id
+        where jo.id = #{id};
+    </select>
+
+    <select id="getDeployJobByProjectIdAndEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where projectId = #{projectId} and envId = #{envId} and type = 2 limit 0,1
+    </select>
+</mapper>

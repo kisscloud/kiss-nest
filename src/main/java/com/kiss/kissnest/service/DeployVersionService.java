@@ -2,10 +2,10 @@ package com.kiss.kissnest.service;
 
 import com.kiss.kissnest.dao.DeployVersionDao;
 import com.kiss.kissnest.entity.DeployVersion;
-import entity.Guest;
+import com.kiss.foundation.entity.Guest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utils.ThreadLocalUtil;
+import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.util.List;
 

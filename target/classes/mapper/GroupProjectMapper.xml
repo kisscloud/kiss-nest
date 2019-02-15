@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 定义一个映射配置文件的根节点 -->
+<!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
+<!-- namespace 默认使用当前操作实体类的全路径 -->
+<mapper namespace="com.kiss.kissnest.mapper.GroupProjectMapper">
+
+    <insert id="createGroupProject" parameterType="com.kiss.kissnest.entity.GroupProject">
+        insert into groupsprojects (groupId,projectId,operatorId,operatorName)
+        value
+        (#{groupId},#{projectId},#{operatorId},#{operatorName})
+    </insert>
+
+    <insert id="createGroupProjects" parameterType="com.kiss.kissnest.entity.GroupProject">
+        insert into groupsprojects (groupId,projectId,operatorId,operatorName)
+        value
+        <foreach collection="list" separator="," item="projects">
+            (#{projects.groupId},#{projects.projectId},#{projects.operatorId},#{projects.operatorName})
+        </foreach>
+    </insert>
+    
+    <delete id="deleteGroupProjectById" parameterType="java.lang.Integer">
+        delete from groupsprojects where id = #{id}
+    </delete>
+    
+    <delete id="deleteGroupProjectByGroupId" parameterType="java.lang.Integer">
+        delete from groupsprojects where groupId = #{groupId}
+    </delete>
+    
+    <update id="updateGroupProjectById" parameterType="com.kiss.kissnest.entity.GroupProject">
+        update groupsprojects
+        set 
+        id = #{id}
+        <if test="groupId != null">
+            ,groupId = #{groupId}
+        </if>
+        <if test="projectId != null">
+            ,projectId = #{projectId}
+        </if>
+        <if test="operatorId != null">
+            ,operatorId = #{operatorId}
+        </if>
+        <if test="operatorName != null">
+            ,operatorName = #{operatorName}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getGroupProjectById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.GroupProject">
+        select * from groupsprojects where id = #{id};
+    </select>
+    
+    <select id="getGroupsProjects" resultType="com.kiss.kissnest.entity.GroupProject">
+        select * from groupsprojects;
+    </select>
+    
+    <select id="getGroupProjectsByGroupId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.GroupProject">
+        select * from groupsprojects where groupId = #{groupId};
+    </select>
+</mapper>

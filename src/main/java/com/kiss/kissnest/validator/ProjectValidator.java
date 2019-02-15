@@ -14,7 +14,6 @@ import com.kiss.kissnest.input.CreateTagInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
-import lombok.Data;
 import org.gitlab.api.models.GitlabBranch;
 import org.gitlab.api.models.GitlabTag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import utils.GuestUtil;
+import com.kiss.foundation.utils.GuestUtil;
 
 import java.util.List;
 
