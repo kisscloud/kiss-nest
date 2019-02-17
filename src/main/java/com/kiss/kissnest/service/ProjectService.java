@@ -6,11 +6,9 @@ import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.CreateProjectInput;
 import com.kiss.kissnest.input.CreateTagInput;
+import com.kiss.kissnest.input.QueryProjectInput;
 import com.kiss.kissnest.input.UpdateProjectInput;
-import com.kiss.kissnest.output.MemberOutput;
-import com.kiss.kissnest.output.ProjectOutput;
-import com.kiss.kissnest.output.ProjectTypeOutput;
-import com.kiss.kissnest.output.TagOutput;
+import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import com.kiss.kissnest.util.JenkinsUtil;
@@ -208,10 +206,16 @@ public class ProjectService {
         return BeanCopyUtil.copy(project, ProjectOutput.class);
     }
 
-    public List<ProjectOutput> getProjects(Integer teamId, Integer groupId) {
+    public ProjectOutputs getProjects(QueryProjectInput queryProjectInput) {
 
-        List<ProjectOutput> projectOutputs = projectDao.getProjectOutputs(teamId, groupId);
-        projectOutputs.forEach((projectOutput -> projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
+        Integer start = (queryProjectInput.getPage() == 0 ? 1 : queryProjectInput.getPage() - 1) * queryProjectInput.getSize();
+        queryProjectInput.setPage(start);
+
+        List<ProjectOutput> projectOutputList = projectDao.getProjectOutputs(queryProjectInput);
+        projectOutputList.forEach((projectOutput -> projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
+        Integer count = projectDao.getProjectOutputsCount(queryProjectInput);
+
+        ProjectOutputs projectOutputs = new ProjectOutputs(projectOutputList,count);
 
         return projectOutputs;
     }

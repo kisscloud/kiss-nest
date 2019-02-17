@@ -3,15 +3,10 @@ package com.kiss.kissnest.validator;
 import com.kiss.kissnest.dao.MemberDao;
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.dao.ProjectRepositoryDao;
-import com.kiss.kissnest.dao.TeamDao;
 import com.kiss.kissnest.entity.Member;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.entity.ProjectRepository;
-import com.kiss.kissnest.entity.Team;
-import com.kiss.kissnest.input.CreateProjectInput;
-import com.kiss.kissnest.input.CreateProjectRepositoryInput;
-import com.kiss.kissnest.input.CreateTagInput;
-import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
 import org.gitlab.api.models.GitlabBranch;
@@ -52,7 +47,8 @@ public class ProjectValidator implements Validator {
         return clazz.equals(CreateProjectInput.class) ||
                 clazz.equals(UpdateProjectInput.class) ||
                 clazz.equals(CreateProjectRepositoryInput.class) ||
-                clazz.equals(CreateTagInput.class);
+                clazz.equals(CreateTagInput.class) ||
+                clazz.equals(QueryProjectInput.class);
     }
 
     @Override
@@ -98,6 +94,8 @@ public class ProjectValidator implements Validator {
                 validateBranch(createTagInput.getRef(), repositoryId, member.getAccessToken(), errors);
                 validateTag(createTagInput.getTagName(), repositoryId, member.getAccessToken(), errors);
             }
+        } else if (QueryProjectInput.class.isInstance(target)) {
+
         }
     }
 

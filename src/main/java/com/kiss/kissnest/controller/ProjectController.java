@@ -1,10 +1,8 @@
 package com.kiss.kissnest.controller;
 
-import com.kiss.kissnest.input.CreateProjectInput;
-import com.kiss.kissnest.input.CreateProjectRepositoryInput;
-import com.kiss.kissnest.input.CreateTagInput;
-import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.ProjectOutput;
+import com.kiss.kissnest.output.ProjectOutputs;
 import com.kiss.kissnest.output.ProjectRepositoryOutput;
 import com.kiss.kissnest.output.TagOutput;
 import com.kiss.kissnest.service.ProjectRepositoryService;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Api(tags = "Project", description = "项目相关接口")
@@ -59,11 +56,11 @@ public class ProjectController {
         return projectService.updateProject(updateProjectInput);
     }
 
-    @GetMapping("/projects")
+    @PostMapping("/projects")
     @ApiOperation(value = "获取项目")
-    public List<ProjectOutput> getProjects(@RequestParam("teamId") Integer teamId, Integer groupId) {
+    public ProjectOutputs getProjects(@Validated @RequestBody QueryProjectInput queryProjectInput) {
 
-        return projectService.getProjects(teamId, groupId);
+        return projectService.getProjects(queryProjectInput);
     }
 
 //    @PostMapping("/project/repository")

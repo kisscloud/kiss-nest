@@ -2,6 +2,7 @@ package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.ProjectDao;
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.input.QueryProjectInput;
 import com.kiss.kissnest.mapper.ProjectMapper;
 import com.kiss.kissnest.output.ProjectOutput;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,9 +134,9 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
     @Override
-    public List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId) {
+    public List<ProjectOutput> getProjectOutputs(QueryProjectInput queryProjectInput) {
 
-        return projectMapper.getProjectOutputs(teamId, groupId);
+        return projectMapper.getProjectOutputs(queryProjectInput);
     }
 
     @Override
@@ -154,5 +155,11 @@ public class ProjectDaoImpl implements ProjectDao {
     public Integer updateLastDeploy(Integer id, String lastDeploy) {
 
         return projectMapper.updateLastDeploy(id, lastDeploy);
+    }
+
+    @Override
+    public Integer getProjectOutputsCount(QueryProjectInput queryProjectInput) {
+
+        return projectMapper.getProjectOutputsCount(queryProjectInput);
     }
 }
