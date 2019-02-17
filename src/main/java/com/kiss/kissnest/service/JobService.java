@@ -132,7 +132,7 @@ public class JobService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
-        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), createJobInput.getRelativeTargetDir(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -311,6 +311,7 @@ public class JobService {
 
         Integer success = 0;
         Integer total = 0;
+
         if (!StringUtils.isEmpty(response)) {
             JSONObject returnJson = JSONObject.parseObject(response);
             JSONArray returnArray = returnJson.getJSONArray("return");
@@ -590,6 +591,15 @@ public class JobService {
         Map<String, Object> result = new HashMap<>();
 
         result.put("script", script);
+
+        return result;
+    }
+
+    public Map<String, Integer> getPendingJobCount() {
+
+        Integer buildLogCount = buildLogDao.getPendingBuildLogCount();
+        Map<String,Integer> result = new HashMap<>();
+        result.put("buildingJobs",buildLogCount);
 
         return result;
     }

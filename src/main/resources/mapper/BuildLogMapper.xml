@@ -126,4 +126,8 @@
     <select id="getDeployLogOutputTextById" parameterType="java.lang.Integer" resultType="java.lang.String">
         select output from buildlogs where id = #{id};
     </select>
+
+    <select id="getBuildLogCountByStatus" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(*) from buildlogs where status = #{status};
+    </select>
 </mapper>

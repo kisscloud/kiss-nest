@@ -10,4 +10,6 @@ public class CreateJobInput {
     private String script;
 
     private Integer type;
+
+    private String relativeTargetDir;
 }

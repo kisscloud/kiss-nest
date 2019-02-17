@@ -56,6 +56,7 @@ public class JobValidator implements Validator {
             validateProjectId(createJobInput.getProjectId(), errors);
             validateScript(createJobInput.getScript(), errors);
             validateType(createJobInput.getType(), errors);
+            validateRelativeTargetDir(createJobInput.getRelativeTargetDir(), errors);
         } else if (BuildJobInput.class.isInstance(target)) {
             BuildJobInput buildJobInput = (BuildJobInput) target;
             validateProjectId(buildJobInput.getProjectId(), errors);
@@ -215,6 +216,13 @@ public class JobValidator implements Validator {
 
         if (StringUtils.isEmpty(conf)) {
             errors.rejectValue("conf", String.valueOf(NestStatusCode.DEPLOY_JOB_CONF_IS_EMPTY), "部署任务的配置为空");
+        }
+    }
+
+    public void validateRelativeTargetDir(String relativeTargetDir, Errors errors) {
+
+        if (StringUtils.isEmpty(relativeTargetDir)) {
+            errors.rejectValue("relativeTargetDir", String.valueOf(NestStatusCode.RELATIVETARGETDIR_IS_EMPTY));
         }
     }
 }
