@@ -11,5 +11,5 @@ public class CreateJobInput {
 
     private Integer type;
 
-    private String relativeTargetDir;
+    private String workspace;
 }

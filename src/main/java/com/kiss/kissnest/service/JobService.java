@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
+import com.kiss.kissnest.enums.BuildJobStatusEnums;
+import com.kiss.kissnest.enums.BuildJobTypeEnums;
 import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
@@ -132,7 +134,7 @@ public class JobService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
-        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), createJobInput.getRelativeTargetDir(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), createJobInput.getWorkspace(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -146,9 +148,8 @@ public class JobService {
         job.setType(createJobInput.getType());
         job.setStatus(0);
         job.setNumber(0);
-
+        job.setWorkspace(createJobInput.getWorkspace());
         jobDao.createJob(job);
-
         JobOutput jobOutput = jobDao.getJobOutputsById(job.getId());
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_BUILD_JOB, job);
@@ -236,7 +237,7 @@ public class JobService {
         result.put("projectId", buildJobInput.getProjectId());
         result.put("branch", buildJobInput.getBranch());
         result.put("remark", buildJobInput.getRemark());
-        result.put("status", 2);
+        result.put("status", BuildJobStatusEnums.PENDING.value());
         result.put("statusText", langUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         result.put("groupId", group.getId());
@@ -358,6 +359,7 @@ public class JobService {
         operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
 
+        updateProjectLastDeploy(job.getProjectId(), deployJobInput.getBranch(), deployJobInput.getTag(), version);
         return deployLogOutput;
     }
 
@@ -598,8 +600,8 @@ public class JobService {
     public Map<String, Integer> getPendingJobCount() {
 
         Integer buildLogCount = buildLogDao.getPendingBuildLogCount();
-        Map<String,Integer> result = new HashMap<>();
-        result.put("buildingJobs",buildLogCount);
+        Map<String, Integer> result = new HashMap<>();
+        result.put("buildingJobs", buildLogCount);
 
         return result;
     }
@@ -741,8 +743,9 @@ public class JobService {
         buildLog.setQueueId(Long.valueOf(urlStr[urlStr.length - 1]));
         buildLog.setDuration(duration);
 
+        String version = "";
         if (output.indexOf("versionStart") != -1) {
-            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
+            version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
             buildLog.setVersion(version);
         }
 
@@ -765,5 +768,31 @@ public class JobService {
         buildLogDao.updateBuildLog(buildLog);
         buildLog.setProjectId(projectId);
         packageRepositoryService.createPackageRepository(buildLog);
+
+        if (BuildJobTypeEnums.BRANCH.equals(versionType)) {
+            updateProjectLastBuild(projectId, version);
+        } else if (BuildJobTypeEnums.TAG.equals(version)) {
+            updateProjectLastBuild(projectId, branch);
+        }
+    }
+
+    public void updateProjectLastBuild(Integer projectId, String lastBuild) {
+
+        projectDao.updateLastBuild(projectId, lastBuild);
+    }
+
+    public void updateProjectLastDeploy(Integer projectId, String branch, String tag, String version) {
+
+        String lastDeploy = "";
+
+        if (!StringUtils.isEmpty(branch)) {
+            lastDeploy = version;
+        } else if (!StringUtils.isEmpty(tag)) {
+            lastDeploy = tag;
+        }
+
+        if (!StringUtils.isEmpty(lastDeploy)) {
+            projectDao.updateLastDeploy(projectId, lastDeploy);
+        }
     }
 }

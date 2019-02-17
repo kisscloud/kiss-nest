@@ -1,12 +1,9 @@
 package com.kiss.kissnest.dao;
 
-import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.output.ProjectOutput;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ProjectDao {
 
@@ -47,4 +44,8 @@ public interface ProjectDao {
     List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId);
 
     ProjectOutput getProjectOutputById(Integer id);
+
+    Integer updateLastBuild(Integer id, String lastBuild);
+
+    Integer updateLastDeploy(Integer id, String lastDeploy);
 }

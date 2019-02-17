@@ -6,16 +6,17 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.ProjectMapper">
 
-    <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project" keyProperty="id" useGeneratedKeys="true">
+    <insert id="createProject" parameterType="com.kiss.kissnest.entity.Project" keyProperty="id"
+            useGeneratedKeys="true">
         insert into projects (name,teamId,groupId,slug,membersCount,operatorId,operatorName,type)
         value
         (#{name},#{teamId},#{groupId},#{slug},#{membersCount},#{operatorId},#{operatorName},#{type})
     </insert>
-    
+
     <delete id="deleteProjectById" parameterType="java.lang.Integer">
         delete from projects where id = #{id}
     </delete>
-    
+
     <update id="updateProject" parameterType="com.kiss.kissnest.entity.Project">
         update projects
         set
@@ -43,10 +44,10 @@
         </if>
         where id = #{id}
     </update>
-    
+
     <update id="addCount" parameterType="java.util.Map">
         update projects
-        set 
+        set
         <if test="type == 'members'">
             membersCount = membersCount + #{increments}
         </if>
@@ -72,60 +73,67 @@
         </if>
     </select>
 
-    <select id="getProjectByNameAndGroupIdAndTeamId" parameterType="java.lang.Object" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectByNameAndGroupIdAndTeamId" parameterType="java.lang.Object"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects where name = #{name} and groupId = #{groupId} and teamId = #{teamId};
     </select>
-    
-    <select id="getProjectBySlugAndGroupIdAndTeamId" parameterType="java.lang.Object" resultType="com.kiss.kissnest.entity.Project">
+
+    <select id="getProjectBySlugAndGroupIdAndTeamId" parameterType="java.lang.Object"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects where slug = #{slug} and groupId = #{groupId} and teamId = #{teamId};
     </select>
 
-    <select id="getProjectByRepositoryId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectByRepositoryId" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects where repositoryId = #{repositoryId};
     </select>
-    
+
     <update id="addRepositoryIdById" parameterType="com.kiss.kissnest.entity.Project">
         update projects
         set
         repositoryId = #{repositoryId}
         where id = #{id};
     </update>
-    
-    <select id="getProjectsWithoutBuildJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+
+    <select id="getProjectsWithoutBuildJob" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects 
         where id not in
         (select projectId from jobs where teamId = #{teamId} and type =1)
         and teamId = #{teamId}
     </select>
 
-    <select id="getProjectsWithBuildJobByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectsWithBuildJobByTeamId" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects
         where id in
         (select distinct projectId from jobs where teamId = #{teamId} and type =1)
         and teamId = #{teamId}
     </select>
 
-    <select id="getProjectsWithBuildJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectsWithBuildJob" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects
         where id in
         (select projectId from jobs where teamId = #{teamId} and type =1)
         and teamId = #{teamId}
     </select>
 
-    <select id="getProjectsWithDeployJob" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
+    <select id="getProjectsWithDeployJob" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Project">
         select * from projects
         where id in
         (select projectId from jobs where teamId = #{teamId} and type =2)
         and teamId = #{teamId}
     </select>
-    
+
     <select id="getProjectOperatorAccessToken" parameterType="java.lang.String" resultType="java.lang.String">
         select me.accessToken from projects pr
         left join members me
         on pr.operatorId = me.accountId
         where pr.id = #{projectId}
     </select>
-    
+
     <select id="getProjectNameByServerId" parameterType="java.lang.String" resultType="java.lang.String">
         select concat('[',rs.name,']') as name from
         (
@@ -139,13 +147,16 @@
         group by re.tmp
         ) rs;
     </select>
-    
+
     <select id="getProjectsByGroupId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Project">
         select * from projects where groupId = #{groupId};
     </select>
 
-    <select id="getProjectOutputs" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.ProjectOutput">
-        select pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.slug,gr.name as groupName,
+    <select id="getProjectOutputs" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.output.ProjectOutput">
+        select
+        pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.slug,gr.name
+        as groupName,
         UNIX_TIMESTAMP(pr.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(pr.updatedAt) * 1000 as updatedAt
         from projects pr
         left join groups gr
@@ -157,7 +168,8 @@
         </if>
     </select>
 
-    <select id="getProjectOutputById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.ProjectOutput">
+    <select id="getProjectOutputById" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.output.ProjectOutput">
         select pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.slug,gr.name as groupName,
         UNIX_TIMESTAMP(pr.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(pr.updatedAt) * 1000 as updatedAt
         from projects pr
@@ -167,4 +179,17 @@
         pr.id = #{id}
     </select>
 
+    <update id="updateLastBuild" parameterType="java.lang.Object">
+        update projects
+        set
+        lastBuild = #{lastBuild}
+        where id = #{id}
+    </update>
+
+    <update id="updateLastDeploy" parameterType="java.lang.Object">
+        update projects
+        set
+        lastDeploy = #{lastDeploy}
+        where id = #{id}
+    </update>
 </mapper>
