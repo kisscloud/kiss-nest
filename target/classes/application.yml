@@ -25,11 +25,11 @@ logging:
     com.kiss.kissnest.mapper: debug
 
 jenkins:
-  url: https://build.jincse.com
-  buildUrl: https://build.jincse.com/job/%s/build
-  buildWithParameterUrl: https://build.jincse.com/job/%s/buildWithParameters
-  generateTokenUrl: https://build.jincse.com/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
-  buildLogUrl: https://build.jincse.com/job/%s/%s
+  url: http://47.100.184.133:8003
+  buildUrl: http://47.100.184.133:8003/job/%s/build
+  buildWithParameterUrl: http://47.100.184.133:8003/job/%s/buildWithParameters
+  generateTokenUrl: http://47.100.184.133:8003/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
+  buildLogUrl: http://47.100.184.133:8003/job/%s/%s
   buildOutputPath: /logText/progressiveHtml
   crumbPath: /crumbIssuer/api/json
   queuePath: /api/json
