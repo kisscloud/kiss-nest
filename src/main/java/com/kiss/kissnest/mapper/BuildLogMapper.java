@@ -32,4 +32,6 @@ public interface BuildLogMapper {
     Integer getBuildLogCountByTeamId(Integer teamId);
 
     String getDeployLogOutputTextById(Integer id);
+
+    Integer getBuildLogCountByStatus(Integer status);
 }

@@ -2,6 +2,7 @@ package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.BuildLogDao;
 import com.kiss.kissnest.entity.BuildLog;
+import com.kiss.kissnest.enums.BuildJobStatusEnums;
 import com.kiss.kissnest.mapper.BuildLogMapper;
 import com.kiss.kissnest.output.BuildLogOutput;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class BuildLogDaoImpl implements BuildLogDao {
     @Override
     public List<BuildLogOutput> getBuildLogOutputsByTeamId(Integer teamId, Integer start, Integer size) {
 
-        return buildLogMapper.getBuildLogOutputsByTeamId(teamId,start,size);
+        return buildLogMapper.getBuildLogOutputsByTeamId(teamId, start, size);
     }
 
     @Override
@@ -85,5 +86,11 @@ public class BuildLogDaoImpl implements BuildLogDao {
     public String getDeployLogOutputTextById(Integer id) {
 
         return buildLogMapper.getDeployLogOutputTextById(id);
+    }
+
+    @Override
+    public Integer getPendingBuildLogCount() {
+
+        return buildLogMapper.getBuildLogCountByStatus(BuildJobStatusEnums.PENDING.value());
     }
 }

@@ -28,4 +28,6 @@ public interface BuildLogDao {
     Integer getBuildLogCountByTeamId(Integer teamId);
 
     String getDeployLogOutputTextById(Integer id);
+
+    Integer getPendingBuildLogCount();
 }

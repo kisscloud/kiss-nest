@@ -145,4 +145,10 @@ public class JobController {
 
         return jobService.getProjectDeployScript(projectId, envId);
     }
+
+    @GetMapping("/job/pending/count")
+    public Map<String,Integer> getPendingJobCount() {
+
+        return jobService.getPendingJobCount();
+    }
 }
