@@ -23,9 +23,9 @@ public interface ProjectMapper {
 
     List<Project> getProjects(Map params);
 
-    Project getProjectByNameAndGroupIdAndTeamId(@Param("name") String name,@Param("groupId") Integer groupId,@Param("teamId") Integer teamId);
+    Project getProjectByNameAndGroupIdAndTeamId(@Param("name") String name, @Param("groupId") Integer groupId, @Param("teamId") Integer teamId);
 
-    Project getProjectBySlugAndGroupIdAndTeamId(@Param("slug") String slug,@Param("groupId") Integer groupId,@Param("teamId") Integer teamId);
+    Project getProjectBySlugAndGroupIdAndTeamId(@Param("slug") String slug, @Param("groupId") Integer groupId, @Param("teamId") Integer teamId);
 
     Integer addRepositoryIdById(Project project);
 
@@ -45,7 +45,11 @@ public interface ProjectMapper {
 
     List<Project> getProjectsByGroupId(Integer groupId);
 
-    List<ProjectOutput> getProjectOutputs(@Param("teamId") Integer teamId,@Param("groupId") Integer groupId);
+    List<ProjectOutput> getProjectOutputs(@Param("teamId") Integer teamId, @Param("groupId") Integer groupId);
 
     ProjectOutput getProjectOutputById(Integer id);
+
+    Integer updateLastBuild(@Param("id") Integer id, @Param("lastBuild") String lastBuild);
+
+    Integer updateLastDeploy(@Param("id") Integer id, @Param("lastDeploy") String lastDeploy);
 }

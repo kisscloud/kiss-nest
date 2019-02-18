@@ -1,11 +1,9 @@
 package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.ProjectDao;
-import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Project;
 import com.kiss.kissnest.mapper.ProjectMapper;
 import com.kiss.kissnest.output.ProjectOutput;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -144,5 +142,17 @@ public class ProjectDaoImpl implements ProjectDao {
     public ProjectOutput getProjectOutputById(Integer id) {
 
         return projectMapper.getProjectOutputById(id);
+    }
+
+    @Override
+    public Integer updateLastBuild(Integer id, String lastBuild) {
+
+        return projectMapper.updateLastBuild(id, lastBuild);
+    }
+
+    @Override
+    public Integer updateLastDeploy(Integer id, String lastDeploy) {
+
+        return projectMapper.updateLastDeploy(id, lastDeploy);
     }
 }

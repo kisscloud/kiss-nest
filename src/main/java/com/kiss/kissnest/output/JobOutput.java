@@ -33,6 +33,8 @@ public class JobOutput {
 
     private String conf;
 
+    private String workspace;
+
     private Long createdAt;
 
     private Long updatedAt;

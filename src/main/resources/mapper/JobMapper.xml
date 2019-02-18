@@ -83,7 +83,7 @@
     </select>
 
     <select id="getJobOutputsById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.JobOutput">
-        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,
+        select jo.id,jo.teamId,jo.projectId,jo.jobName,jo.script,jo.type,jo.envId,jo.serverIds,jo.useSupervisor, jo.conf,jo.status,jo.number,jo.workspace,
         UNIX_TIMESTAMP(jo.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(jo.updatedAt) * 1000 as updatedAt,
         pr.name as projectName,en.name as envName from jobs jo
         left join projects pr

@@ -56,7 +56,7 @@ public class JobValidator implements Validator {
             validateProjectId(createJobInput.getProjectId(), errors);
             validateScript(createJobInput.getScript(), errors);
             validateType(createJobInput.getType(), errors);
-            validateRelativeTargetDir(createJobInput.getRelativeTargetDir(), errors);
+            validateRelativeTargetDir(createJobInput.getWorkspace(), errors);
         } else if (BuildJobInput.class.isInstance(target)) {
             BuildJobInput buildJobInput = (BuildJobInput) target;
             validateProjectId(buildJobInput.getProjectId(), errors);

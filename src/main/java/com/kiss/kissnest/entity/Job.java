@@ -31,6 +31,8 @@ public class Job {
 
     private Integer number;
 
+    private String workspace;
+
     private Date createdAt;
 
     private Date updatedAt;
