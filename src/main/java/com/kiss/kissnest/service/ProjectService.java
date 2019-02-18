@@ -215,9 +215,7 @@ public class ProjectService {
         projectOutputList.forEach((projectOutput -> projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
         Integer count = projectDao.getProjectOutputsCount(queryProjectInput);
 
-        ProjectOutputs projectOutputs = new ProjectOutputs(projectOutputList,count);
-
-        return projectOutputs;
+        return new ProjectOutputs(projectOutputList, count);
     }
 
     public List<String> getProjectBranches(Integer projectId) {

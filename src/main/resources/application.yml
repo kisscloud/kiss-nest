@@ -33,6 +33,7 @@ jenkins:
   buildOutputPath: /logText/progressiveHtml
   crumbPath: /crumbIssuer/api/json
   queuePath: /api/json
+  configurePath: /job/%s/configure
   bin:
     ip: 47.100.184.133
 
