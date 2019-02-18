@@ -7,19 +7,15 @@
 <mapper namespace="com.kiss.kissnest.mapper.JobMapper">
 
     <insert id="createJob" parameterType="com.kiss.kissnest.entity.Job" keyProperty="id" useGeneratedKeys="true">
-        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor,conf,status,number)
+        insert into jobs (teamId,projectId,jobName,script,type,envId,serverIds,useSupervisor,conf,status,number,workspace,jobUrl)
         value
-        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{useSupervisor}, #{conf},#{status},#{number})
+        (#{teamId},#{projectId},#{jobName},#{script},#{type},#{envId},#{serverIds},#{useSupervisor}, #{conf},#{status},#{number},#{workspace},#{jobUrl})
     </insert>
 
     <select id="getJobByProjectId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where projectId = #{projectId};
     </select>
 
-    <select id="getJobByProjectIdAndType" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
-        select * from jobs where projectId = #{projectId} and type = #{type} limit 0,1;
-    </select>
-    
     <update id="updateJobStatus" parameterType="java.util.Map">
         update jobs
         set
@@ -34,7 +30,7 @@
         number = #{number}
         where projectId = #{projectId} and type = #{type} and status = #{status}
     </update>
-    
+
     <select id="getJobsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where teamId = #{teamId} and type = #{type};
     </select>
@@ -44,7 +40,8 @@
         teamId = #{teamId},
         projectId = #{projectId},
         script = #{script},
-        type = #{type}
+        type = #{type},
+        workspace = #{workspace}
         where id = #{id}
     </update>
 
@@ -55,7 +52,7 @@
     <delete id="deleteJobById" parameterType="java.lang.Integer">
         delete from jobs where id = #{id}
     </delete>
-    
+
     <select id="getJobsByServerIds" parameterType="java.lang.String" resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where serverIds like #{serverId};
     </select>
@@ -93,7 +90,12 @@
         where jo.id = #{id};
     </select>
 
-    <select id="getDeployJobByProjectIdAndEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+    <select id="getDeployJobByProjectIdAndEnvId" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.entity.Job">
         select * from jobs where projectId = #{projectId} and envId = #{envId} and type = 2 limit 0,1
+    </select>
+
+    <select id="getJobByProjectIdAndType" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
+        select * from jobs where projectId = #{projectId} and type = #{type}
     </select>
 </mapper>

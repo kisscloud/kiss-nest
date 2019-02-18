@@ -2,6 +2,7 @@ package com.kiss.kissnest.dao.impl;
 
 import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.entity.Job;
+import com.kiss.kissnest.enums.JobTypeEnums;
 import com.kiss.kissnest.mapper.JobMapper;
 import com.kiss.kissnest.output.JobOutput;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +33,17 @@ public class JobDaoImpl implements JobDao {
     @Override
     public Job getJobByProjectIdAndType(Integer projectId, Integer type) {
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("projectId", projectId);
-        params.put("type", type);
-
-        return jobMapper.getJobByProjectIdAndType(params);
+        return jobMapper.getJobByProjectIdAndType(projectId,type);
     }
 
     @Override
-    public Integer updateJobStatus(Integer projectId, Integer type, Integer status,Integer newStatus) {
+    public Integer updateJobStatus(Integer projectId, Integer type, Integer status, Integer newStatus) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("projectId", projectId);
         params.put("type", type);
         params.put("status", status);
-        params.put("newStatus",newStatus);
+        params.put("newStatus", newStatus);
 
         return jobMapper.updateJobStatus(params);
     }
@@ -58,8 +55,8 @@ public class JobDaoImpl implements JobDao {
         params.put("projectId", projectId);
         params.put("type", type);
         params.put("status", status);
-        params.put("newStatus",newStatus);
-        params.put("number",number);
+        params.put("newStatus", newStatus);
+        params.put("number", number);
 
         return jobMapper.updateJobStatusAndNumber(params);
     }
@@ -67,9 +64,9 @@ public class JobDaoImpl implements JobDao {
     @Override
     public List<Job> getJobsByTeamId(Integer teamId, Integer type) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("type",type);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("type", type);
 
         return jobMapper.getJobsByTeamId(params);
     }
@@ -109,9 +106,9 @@ public class JobDaoImpl implements JobDao {
     @Override
     public List<JobOutput> getJobOutputsByTeamId(Integer teamId, Integer type) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("type",type);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("type", type);
 
         return jobMapper.getJobOutputsByTeamId(params);
     }
@@ -125,6 +122,18 @@ public class JobDaoImpl implements JobDao {
     @Override
     public Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId) {
 
-        return jobMapper.getDeployJobByProjectIdAndEnvId(projectId,envId);
+        return jobMapper.getDeployJobByProjectIdAndEnvId(projectId, envId);
+    }
+
+    @Override
+    public Job getBuildJobByProjectId(Integer projectId) {
+
+        return jobMapper.getJobByProjectIdAndType(projectId, JobTypeEnums.BUILD.value());
+    }
+
+    @Override
+    public Job getDeployJobByProjectId(Integer projectId) {
+
+        return jobMapper.getJobByProjectIdAndType(projectId, JobTypeEnums.DEPLOY.value());
     }
 }

@@ -33,6 +33,8 @@ public class Job {
 
     private String workspace;
 
+    private String jobUrl;
+
     private Date createdAt;
 
     private Date updatedAt;

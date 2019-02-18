@@ -88,6 +88,12 @@ public class JobService {
     @Value("${package.config.url}")
     private String configUrl;
 
+    @Value("${jenkins.configurePath}")
+    private String jenkinsConfigurePath;
+
+    @Value("${jenkins.url}")
+    private String jenkinsUrl;
+
     @Autowired
     private DeployLogDao deployLogDao;
 
@@ -149,6 +155,7 @@ public class JobService {
         job.setStatus(0);
         job.setNumber(0);
         job.setWorkspace(createJobInput.getWorkspace());
+        job.setJobUrl(String.format(jenkinsUrl + jenkinsConfigurePath, jobName));
         jobDao.createJob(job);
         JobOutput jobOutput = jobDao.getJobOutputsById(job.getId());
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
@@ -456,7 +463,7 @@ public class JobService {
             throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), updateJobInput.getWorkspace(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
@@ -604,6 +611,16 @@ public class JobService {
         result.put("buildingJobs", buildLogCount);
 
         return result;
+    }
+
+    public Job getBuildJobByProjectId(Integer projectId) {
+
+        return jobDao.getBuildJobByProjectId(projectId);
+    }
+
+    public Job getDeployJobByProjectId(Integer projectId) {
+
+        return jobDao.getDeployJobByProjectId(projectId);
     }
 
     class BuildLogRunnable implements Runnable {

@@ -13,11 +13,11 @@ public interface JobDao {
 
     Job getJobByProjectIdAndType(Integer projectId, Integer type);
 
-    Integer updateJobStatus(Integer projectId, Integer type, Integer status,Integer newStatus);
+    Integer updateJobStatus(Integer projectId, Integer type, Integer status, Integer newStatus);
 
-    Integer updateJobStatusAndNumber(Integer projectId, Integer type, Integer status,Integer newStatus,Integer number);
+    Integer updateJobStatusAndNumber(Integer projectId, Integer type, Integer status, Integer newStatus, Integer number);
 
-    List<Job> getJobsByTeamId(Integer teamId,Integer type);
+    List<Job> getJobsByTeamId(Integer teamId, Integer type);
 
     Integer updateBuildJob(Job job);
 
@@ -29,9 +29,13 @@ public interface JobDao {
 
     Integer updateDeployJob(Job job);
 
-    List<JobOutput> getJobOutputsByTeamId(Integer teamId,Integer type);
+    List<JobOutput> getJobOutputsByTeamId(Integer teamId, Integer type);
 
     JobOutput getJobOutputsById(Integer id);
 
-    Job getDeployJobByProjectIdAndEnvId(Integer projectId,Integer envId);
+    Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId);
+
+    Job getBuildJobByProjectId(Integer projectId);
+
+    Job getDeployJobByProjectId(Integer projectId);
 }
