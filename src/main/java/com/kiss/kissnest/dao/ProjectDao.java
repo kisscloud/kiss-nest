@@ -1,6 +1,7 @@
 package com.kiss.kissnest.dao;
 
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.input.QueryProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 
 import java.util.List;
@@ -41,11 +42,13 @@ public interface ProjectDao {
 
     List<Project> getProjectsByGroupId(Integer groupId);
 
-    List<ProjectOutput> getProjectOutputs(Integer teamId, Integer groupId);
+    List<ProjectOutput> getProjectOutputs(QueryProjectInput queryProjectInput);
 
     ProjectOutput getProjectOutputById(Integer id);
 
     Integer updateLastBuild(Integer id, String lastBuild);
 
     Integer updateLastDeploy(Integer id, String lastDeploy);
+
+    Integer getProjectOutputsCount(QueryProjectInput queryProjectInput);
 }

@@ -1,6 +1,7 @@
 package com.kiss.kissnest.mapper;
 
 import com.kiss.kissnest.entity.Project;
+import com.kiss.kissnest.input.QueryProjectInput;
 import com.kiss.kissnest.output.ProjectOutput;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -45,11 +46,13 @@ public interface ProjectMapper {
 
     List<Project> getProjectsByGroupId(Integer groupId);
 
-    List<ProjectOutput> getProjectOutputs(@Param("teamId") Integer teamId, @Param("groupId") Integer groupId);
+    List<ProjectOutput> getProjectOutputs(QueryProjectInput queryProjectInput);
 
     ProjectOutput getProjectOutputById(Integer id);
 
     Integer updateLastBuild(@Param("id") Integer id, @Param("lastBuild") String lastBuild);
 
     Integer updateLastDeploy(@Param("id") Integer id, @Param("lastDeploy") String lastDeploy);
+
+    Integer getProjectOutputsCount(QueryProjectInput queryProjectInput);
 }

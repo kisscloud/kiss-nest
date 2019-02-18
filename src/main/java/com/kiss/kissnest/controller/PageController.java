@@ -1,15 +1,14 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.kissnest.entity.Link;
+import com.kiss.kissnest.input.QueryProjectInput;
 import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.HashMap;
@@ -57,11 +56,11 @@ public class PageController {
     }
 
     @ApiOperation(value = "获取项目页面参数")
-    @GetMapping("/projects")
-    public Map<String, Object> GetPageProjectsParams(@RequestParam("teamId") Integer teamId, Integer groupId) {
+    @PostMapping("/projects")
+    public Map<String, Object> GetPageProjectsParams(@Validated @RequestBody QueryProjectInput queryProjectInput) {
 
-        List<ProjectOutput> projects = projectService.getProjects(teamId, groupId);
-        List<GroupOutput> groups = groupService.getGroups(teamId);
+        ProjectOutputs projects = projectService.getProjects(queryProjectInput);
+        List<GroupOutput> groups = groupService.getGroups(queryProjectInput.getTeamId());
         List<ProjectTypeOutput> projectTypes = projectService.getProjectTypes();
 
         Map<String, Object> result = new HashMap<>();

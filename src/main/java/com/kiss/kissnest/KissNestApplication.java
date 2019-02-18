@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableAutoConfiguration
 @EnableFeignClients
 public class KissNestApplication {
 
