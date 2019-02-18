@@ -159,6 +159,10 @@ public class JobController {
 
         Job job = jobService.getBuildJobByProjectId(projectId);
 
+        if (job == null) {
+            return null;
+        }
+
         return BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames);
     }
 
@@ -166,6 +170,10 @@ public class JobController {
     public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId) {
 
         Job job = jobService.getDeployJobByProjectId(projectId);
+
+        if (job == null) {
+            return null;
+        }
 
         return BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames);
     }
