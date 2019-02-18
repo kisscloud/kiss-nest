@@ -47,7 +47,7 @@ kiss:
 
 gitlab:
   server:
-#    url: https://git.jincse.com
+    #    url: https://git.jincse.com
     url: http://47.100.184.133:6012
     token:
       path: /oauth/token

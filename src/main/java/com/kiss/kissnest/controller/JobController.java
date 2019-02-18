@@ -1,5 +1,7 @@
 package com.kiss.kissnest.controller;
 
+import com.kiss.foundation.utils.BeanCopyUtil;
+import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.service.JobService;
@@ -147,8 +149,32 @@ public class JobController {
     }
 
     @GetMapping("/job/pending/count")
-    public Map<String,Integer> getPendingJobCount() {
+    public Map<String, Integer> getPendingJobCount() {
 
         return jobService.getPendingJobCount();
+    }
+
+    @GetMapping("/job/build")
+    public JobOutput getBuildJobByProjectId(@RequestParam("projectId") Integer projectId) {
+
+        Job job = jobService.getBuildJobByProjectId(projectId);
+
+        if (job == null) {
+            return null;
+        }
+
+        return BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames);
+    }
+
+    @GetMapping("/job/deploy")
+    public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId) {
+
+        Job job = jobService.getDeployJobByProjectId(projectId);
+
+        if (job == null) {
+            return null;
+        }
+
+        return BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames);
     }
 }

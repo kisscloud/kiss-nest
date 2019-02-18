@@ -18,4 +18,6 @@ public class UpdateJobInput {
     private String conf;
 
     private Integer type;
+
+    private String workspace;
 }
