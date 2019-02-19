@@ -29,7 +29,6 @@
         </branches>
         <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
         <submoduleCfg class="list"/>
-        <extensions/>
         <extensions>
             <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
                 <relativeTargetDir>%s</relativeTargetDir>

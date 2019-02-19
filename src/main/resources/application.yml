@@ -14,6 +14,16 @@ spring:
     basename: i18n/codes
     baseFolder: i18n
     use-code-as-default-message: true
+  rabbitmq:
+    host: 106.14.169.166
+    port: 5672
+    username: root
+    password: 12345678
+    virtual-host: /java
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
 
 eureka:
   client:
@@ -25,7 +35,7 @@ logging:
     com.kiss.kissnest.mapper: debug
 
 jenkins:
-  url: http://47.100.184.133:8003
+  url: http://47.75.39.53:8003
   buildUrl: http://47.100.184.133:8003/job/%s/build
   buildWithParameterUrl: http://47.100.184.133:8003/job/%s/buildWithParameters
   generateTokenUrl: http://47.100.184.133:8003/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken

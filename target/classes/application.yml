@@ -25,7 +25,7 @@ logging:
     com.kiss.kissnest.mapper: debug
 
 jenkins:
-  url: http://47.100.184.133:8003
+  url: http://47.75.39.53:8003
   buildUrl: http://47.100.184.133:8003/job/%s/build
   buildWithParameterUrl: http://47.100.184.133:8003/job/%s/buildWithParameters
   generateTokenUrl: http://47.100.184.133:8003/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
@@ -33,6 +33,7 @@ jenkins:
   buildOutputPath: /logText/progressiveHtml
   crumbPath: /crumbIssuer/api/json
   queuePath: /api/json
+  configurePath: /job/%s/configure
   bin:
     ip: 47.100.184.133
 
@@ -46,7 +47,7 @@ kiss:
 
 gitlab:
   server:
-#    url: https://git.jincse.com
+    #    url: https://git.jincse.com
     url: http://47.100.184.133:6012
     token:
       path: /oauth/token
