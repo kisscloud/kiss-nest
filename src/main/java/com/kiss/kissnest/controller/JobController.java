@@ -167,9 +167,9 @@ public class JobController {
     }
 
     @GetMapping("/job/deploy")
-    public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId) {
+    public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId,@RequestParam("envId") Integer envId) {
 
-        Job job = jobService.getDeployJobByProjectId(projectId);
+        Job job = jobService.getDeployJobByProjectId(projectId,envId);
 
         if (job == null) {
             return null;

@@ -36,6 +36,4 @@ public interface JobDao {
     Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId);
 
     Job getBuildJobByProjectId(Integer projectId);
-
-    Job getDeployJobByProjectId(Integer projectId);
 }

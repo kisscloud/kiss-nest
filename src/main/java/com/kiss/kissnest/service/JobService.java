@@ -252,8 +252,8 @@ public class JobService {
         return result;
     }
 
-    public DeployLogOutput deployJob(DeployJobInput deployJobInput) throws IOException {
-        Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(), 2);
+    public DeployLogOutput deployJob(DeployJobInput deployJobInput) {
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(deployJobInput.getProjectId(), deployJobInput.getEnvId());
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         Integer type = environment.getType();
         String tarName;
@@ -618,9 +618,9 @@ public class JobService {
         return jobDao.getBuildJobByProjectId(projectId);
     }
 
-    public Job getDeployJobByProjectId(Integer projectId) {
+    public Job getDeployJobByProjectId(Integer projectId, Integer envId) {
 
-        return jobDao.getDeployJobByProjectId(projectId);
+        return jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
     }
 
     class BuildLogRunnable implements Runnable {
