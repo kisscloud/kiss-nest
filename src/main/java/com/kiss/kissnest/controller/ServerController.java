@@ -38,13 +38,12 @@ public class ServerController {
     @PostMapping("/server/environment")
     @ApiOperation(value = "创建服务器环境")
     public EnvironmentOutput createEnvironment(@Validated @RequestBody CreateEnvironmentInput environmentInput) {
-
         return serverService.createEnvironment(environmentInput);
     }
 
 
     @PutMapping("/server/environment")
-    public EnvironmentOutput  updateEnvironment(@Validated @RequestBody UpdateEnvironmentInput updateEnvironmentInput) {
+    public EnvironmentOutput updateEnvironment(@Validated @RequestBody UpdateEnvironmentInput updateEnvironmentInput) {
 
         return serverService.updateEnvironment(updateEnvironmentInput);
     }
@@ -52,7 +51,7 @@ public class ServerController {
     @DeleteMapping("/server/environment")
     public void deleteEnvironment(@RequestParam("id") Integer id) {
 
-         serverService.deleteEnvironmentById(id);
+        serverService.deleteEnvironmentById(id);
     }
 
     @GetMapping("/server/environments")
@@ -64,25 +63,33 @@ public class ServerController {
 
     @PostMapping("/server")
     @ApiOperation(value = "创建服务器")
-    public ServerOutput createServer(@Validated @RequestBody CreateServerInput createServerInput){
+    public ServerOutput createServer(@Validated @RequestBody CreateServerInput createServerInput) {
 
         return serverService.createServer(createServerInput);
     }
 
     @PutMapping("/server")
-    public ServerOutput  updateServer(@Validated @RequestBody UpdateServerInput updateServerInput) {
+    @ApiOperation(value = "更新服务器信息")
+    public ServerOutput updateServer(@Validated @RequestBody UpdateServerInput updateServerInput) {
 
         return serverService.updateServer(updateServerInput);
     }
 
     @GetMapping("/servers")
+    @ApiOperation(value = "获取服务器列表")
     public GetServerOutput getServers(@RequestParam("teamId") Integer teamId, @RequestParam("page") Integer page, @RequestParam("size") Integer size, Integer envId) {
+        return serverService.getServerOutputByTeamId(teamId, page, size, envId);
+    }
 
-        return serverService.getServerOutputByTeamId(teamId,page,size,envId);
+    @GetMapping("/monitor/servers")
+    @ApiOperation(value = "获取服务器列表")
+    public List<ServerOutput> getMonitorServers(@RequestParam("teamId") Integer teamId) {
+        return serverService.getMonitorServers(teamId);
     }
 
     @DeleteMapping("/server")
+    @ApiOperation(value = "删除服务器")
     public void deleteServers(@RequestParam("id") Integer id) {
-         serverService.deleteServerById(id);
+        serverService.deleteServerById(id);
     }
 }

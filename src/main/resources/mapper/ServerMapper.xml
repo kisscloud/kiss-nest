@@ -80,7 +80,7 @@
     </select>
     
     <select id="getServerOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.ServerOutput">
-        select se.*,en.name as envName from servers se
+        select se.*,en.name as envName, en.path as envPath  from servers se
         left join environments en
         on se.envId = en.id
         where se.teamId = #{teamId}
@@ -91,6 +91,13 @@
             limit #{start},#{size}
         </if>
     </select>
+
+    <select id="getMonitorServers" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
+        select se.id, se.innerIp, en.path as envPath  from servers se
+        left join environments en
+        on se.envId = en.id
+        where se.teamId = #{teamId}
+    </select>
     
     <select id="getServerOutputCount" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(*) from servers where teamId = #{teamId}
@@ -100,7 +107,7 @@
     </select>
     
     <select id="getServersByEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Server">
-        select * from servers where envId = #{envId};
+        select servers.*, envs.path as envPath from servers left join environments where envId = #{envId};
     </select>
     
     <select id="getServerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">

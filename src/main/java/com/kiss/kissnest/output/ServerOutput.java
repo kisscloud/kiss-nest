@@ -1,5 +1,6 @@
 package com.kiss.kissnest.output;
 
+import com.kiss.kissnest.input.MonitorServerInput;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,6 +15,8 @@ public class ServerOutput {
     private Integer envId;
 
     private String envName;
+
+    private String envPath;
 
     private Integer projectId;
 
@@ -36,6 +39,8 @@ public class ServerOutput {
     private String operatorName;
 
     private Date lastDeployedAt;
+
+    private MonitorServerInput monitorServerInput;
 
     private Long createdAt;
 

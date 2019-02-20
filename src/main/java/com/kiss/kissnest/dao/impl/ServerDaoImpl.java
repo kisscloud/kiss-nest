@@ -104,6 +104,11 @@ public class ServerDaoImpl implements ServerDao {
     }
 
     @Override
+    public List<Server> getMonitorServers(Integer teamId) {
+        return serverMapper.getMonitorServers(teamId);
+    }
+
+    @Override
     public String getServerIpsByIds(String ids) {
 
         return serverMapper.getServerIpsByIds(ids);

@@ -13,6 +13,8 @@ public class Environment {
 
     private String name;
 
+    private String path;
+
     private Integer type;
 
     private Integer serverCount;

@@ -1,5 +1,7 @@
 package com.kiss.kissnest.service;
 
+import com.alibaba.fastjson.JSON;
+import com.kiss.foundation.utils.CryptUtil;
 import com.kiss.kissnest.dao.EnvironmentDao;
 import com.kiss.kissnest.dao.JobDao;
 import com.kiss.kissnest.dao.ProjectDao;
@@ -8,10 +10,7 @@ import com.kiss.kissnest.entity.Environment;
 import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.entity.Server;
-import com.kiss.kissnest.input.CreateEnvironmentInput;
-import com.kiss.kissnest.input.CreateServerInput;
-import com.kiss.kissnest.input.UpdateEnvironmentInput;
-import com.kiss.kissnest.input.UpdateServerInput;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.EnvironmentOutput;
 import com.kiss.kissnest.output.GetServerOutput;
 import com.kiss.kissnest.output.ServerOutput;
@@ -23,6 +22,7 @@ import com.kiss.foundation.utils.BeanCopyUtil;
 import com.kiss.foundation.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -49,6 +49,9 @@ public class ServerService {
 
     @Autowired
     private LangUtil langUtil;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Value("${server.maxSize}")
     private String serverSize;
@@ -170,6 +173,12 @@ public class ServerService {
             String projectName = projectDao.getProjectNameByServerId("%" + serverOutput.getId() + "%");
             serverOutput.setProjectName(projectName);
             serverOutput.setStatusText(langUtil.getEnumsMessage("server.status", String.valueOf(serverOutput.getStatus())));
+
+            String cacheKey = CryptUtil.md5(serverOutput.getEnvPath() + serverOutput.getInnerIp());
+            String serverMonitorData = redisTemplate.opsForValue().get(cacheKey);
+            if (serverMonitorData != null) {
+                serverOutput.setMonitorServerInput(JSON.parseObject(serverMonitorData, MonitorServerInput.class));
+            }
         });
 
         GetServerOutput getServerOutput = new GetServerOutput();
@@ -177,6 +186,21 @@ public class ServerService {
         getServerOutput.setServerOutputs(serverOutputs);
 
         return getServerOutput;
+    }
+
+    public List<ServerOutput> getMonitorServers(Integer teamId) {
+        List<Server> servers = serverDao.getMonitorServers(teamId);
+        List<ServerOutput> serverOutputs = BeanCopyUtil.copyList(servers, ServerOutput.class, BeanCopyUtil.defaultFieldNames);
+
+        for (ServerOutput serverOutput : serverOutputs) {
+            String cacheKey = CryptUtil.md5(serverOutput.getEnvPath() + serverOutput.getInnerIp());
+            String serverMonitorData = redisTemplate.opsForValue().get(cacheKey);
+            if (serverMonitorData != null) {
+                serverOutput.setMonitorServerInput(JSON.parseObject(serverMonitorData, MonitorServerInput.class));
+            }
+        }
+
+        return serverOutputs;
     }
 
     public void deleteEnvironmentById(Integer id) {

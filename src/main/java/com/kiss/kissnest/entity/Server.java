@@ -15,6 +15,8 @@ public class Server {
 
     private Integer envId;
 
+    private String envPath;
+
     private String innerIp;
 
     private String outerIp;

@@ -9,6 +9,8 @@ public class CreateEnvironmentInput {
 
     private String name;
 
+    private String path;
+
     private String saltHost;
 
     private String saltVersion;
