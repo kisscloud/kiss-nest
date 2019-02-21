@@ -186,10 +186,13 @@ public class JobService {
             throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
+        String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
+
         List<Integer> serverIdList = createDeployInput.getServerIds();
         Job job = new Job();
         job.setTeamId(project.getTeamId());
-        job.setJobName(project.getSlug());
+        job.setJobName(jobName);
         job.setProjectId(projectId);
         job.setUseSupervisor(createDeployInput.getUseSupervisor());
         job.setConf(createDeployInput.getConf());
