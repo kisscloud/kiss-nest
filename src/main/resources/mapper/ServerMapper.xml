@@ -110,10 +110,14 @@
         select servers.*, envs.path as envPath from servers left join environments where envId = #{envId};
     </select>
     
-    <select id="getServerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="getServerIpsByIds" parameterType="java.util.List" resultType="java.lang.String">
         select group_concat(se.innerIp) as innerIps from
         (
-        select concat("node-",replace(innerIp,'.','-')) as innerIp,teamId from servers where id in (#{ids})
+          select concat("node-",replace(innerIp,'.','-')) as innerIp,teamId from servers
+           where id in
+           <foreach item="item" collection="list" open="(" separator="," close=")">
+               #{item}
+           </foreach>
         ) se
         group by se.teamId
     </select>

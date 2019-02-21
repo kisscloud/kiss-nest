@@ -34,5 +34,5 @@ public interface ServerMapper {
 
     List<Server> getMonitorServers(Integer teamId);
 
-    String getServerIpsByIds(String ids);
+    String getServerIpsByIds(List<Integer> ids);
 }

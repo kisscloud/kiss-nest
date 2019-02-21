@@ -25,19 +25,20 @@ import com.kiss.foundation.utils.BeanCopyUtil;
 import com.kiss.foundation.utils.GuestUtil;
 import com.kiss.foundation.utils.ThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Future;
 
 @Service
 @Slf4j
@@ -257,43 +258,118 @@ public class JobService {
     }
 
 
-    public Boolean checkProgram(Integer projectId, Integer envId) {
+    public HashMap checkProgram(Integer projectId, Integer envId) {
 
         Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
-        String serverIds = job.getServerIds();
-        serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
+        List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
+
         String targetIps = serverDao.getServerIpsByIds(serverIds);
 
-        String option = String.format("supervisorctl status %s", job.getJobName());
+        String command = String.format("supervisorctl status %s", job.getJobName());
 
-        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, command);
 
-        if(response.contains("no such process")){
+        JSONObject returnJson = JSONObject.parseObject(response);
+        JSONArray states = returnJson.getJSONArray("return");
+        HashMap<String, String> result = new HashMap<>();
 
+        for (int i = 0; i < states.size(); i++) {
+            JSONObject state = states.getJSONObject(i);
+            for (String key : state.keySet()) {
+
+                if (state.getString(key).contains("no such process")) {
+                    result.put(key, "NONE");
+                } else if (state.getString(key).contains("STOPPED")) {
+                    result.put(key, "STOPPED");
+                } else if (state.getString(key).contains("RUNNING")) {
+                    result.put(key, "RUNNING");
+                }
+            }
         }
-        if(response.contains("RUNNING")){
 
-        }
-
-        if(response.contains("STOPPED")){
-
-        }
-        log.info("部署日志:{}", response);
-
-        return false;
+        return result;
     }
 
-    public DeployLogOutput startProgram() {
-        return new DeployLogOutput();
+    public HashMap startProgram(Integer projectId, Integer envId) {
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
+        Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
+        List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
+        String targetIps = serverDao.getServerIpsByIds(serverIds);
+
+        String command = String.format("supervisorctl start %s", job.getJobName());
+
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, command);
+        JSONObject returnJson = JSONObject.parseObject(response);
+        JSONArray states = returnJson.getJSONArray("return");
+        HashMap<String, String> result = new HashMap<>();
+
+        for (int i = 0; i < states.size(); i++) {
+            JSONObject state = states.getJSONObject(i);
+            for (String key : state.keySet()) {
+
+                if (state.getString(key).contains("no such process")) {
+                    result.put(key, "NONE");
+                } else if (state.getString(key).contains("STOPPED")) {
+                    result.put(key, "STOPPED");
+                }
+            }
+        }
+        return result;
     }
 
-    public DeployLogOutput restartProgram() {
-        return new DeployLogOutput();
+    public HashMap restartProgram(Integer projectId, Integer envId) {
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
+        Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
+        List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
+        String targetIps = serverDao.getServerIpsByIds(serverIds);
+
+        String command = String.format("supervisorctl restart %s", job.getJobName());
+
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, command);
+        JSONObject returnJson = JSONObject.parseObject(response);
+        JSONArray states = returnJson.getJSONArray("return");
+        HashMap<String, String> result = new HashMap<>();
+
+        for (int i = 0; i < states.size(); i++) {
+            JSONObject state = states.getJSONObject(i);
+            for (String key : state.keySet()) {
+
+                if (state.getString(key).contains("no such process")) {
+                    result.put(key, "NONE");
+                } else if (state.getString(key).contains("STOPPED")) {
+                    result.put(key, "STOPPED");
+                }
+            }
+        }
+        return result;
     }
 
-    public DeployLogOutput stopProgram() {
-        return new DeployLogOutput();
+    public HashMap stopProgram(Integer projectId, Integer envId) {
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
+        Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
+        List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
+        String targetIps = serverDao.getServerIpsByIds(serverIds);
+
+        String command = String.format("supervisorctl stop %s", job.getJobName());
+
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, command);
+        JSONObject returnJson = JSONObject.parseObject(response);
+        JSONArray states = returnJson.getJSONArray("return");
+        HashMap<String, String> result = new HashMap<>();
+
+        for (int i = 0; i < states.size(); i++) {
+            JSONObject state = states.getJSONObject(i);
+            for (String key : state.keySet()) {
+
+                if (state.getString(key).contains("no such process")) {
+                    result.put(key, "NONE");
+                } else if (state.getString(key).contains("STOPPED")) {
+                    result.put(key, "STOPPED");
+                }
+            }
+        }
+        return result;
     }
 
     public DeployLogOutput deployJob(DeployJobInput deployJobInput) {
@@ -304,8 +380,9 @@ public class JobService {
         String tarName;
         String jarName;
         String version;
+
+        //测试环境
         if (type == 1) {
-            //测试环境
             PackageRepository packageRepository = new PackageRepository();
             packageRepository.setProjectId(deployJobInput.getProjectId());
             packageRepository.setBranch(deployJobInput.getBranch());
@@ -324,7 +401,6 @@ public class JobService {
         }
 
         if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(jarName) || StringUtils.isEmpty(version)) {
-
             throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
         }
 
@@ -332,13 +408,13 @@ public class JobService {
         String path = projectRepository.getPathWithNamespace();
 
         String script = job.getScript();
-//        String shell = String.format(script,path);
+
         script = script.replace("__TAR__PACKAGE__", packageUrl + path + "/" + tarName);
         String slug = path.replace("/", "-");
         path = path.substring(0, path.lastIndexOf("/") + 1);
         script = script.replace("__CONFIG__", configUrl + ":" + path + "config.git");
 
-        String option = "mkdir -p /opt/option/" + path + " && cd /opt/option/" + path + " && echo '" + script + "' > " + deployJobInput.getProjectId() + ".sh && chmod +x " + deployJobInput.getProjectId() + ".sh"
+        String command = "mkdir -p /opt/scripts/" + path + " && cd /opt/scripts/" + path + " && echo '" + script + "' > " + deployJobInput.getProjectId() + ".sh && chmod +x " + deployJobInput.getProjectId() + ".sh"
                 + " && ./" + deployJobInput.getProjectId() + ".sh";
 
         String conf = "";
@@ -347,72 +423,112 @@ public class JobService {
             conf = job.getConf();
             conf = conf.replace("__BIN__", jarName);
             conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
-            option = option + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf && supervisorctl reread && supervisorctl restart " + slug + " && supervisorctl update && echo $? ";
+            command = command + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf ";
         } else {
-            option = option + " && echo $? ";
+            command = command + " && echo $? ";
         }
 
-        String serverIds = job.getServerIds();
-        serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
+        List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
         String targetIps = serverDao.getServerIpsByIds(serverIds);
+        String[] deployNodes = targetIps.split(",");
 
-        log.info("操作{},目标{},conf{}", option, targetIps, conf);
+        log.info("操作{},目标{},conf{}", command, targetIps, conf);
 
-        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
+        HashMap programStates = checkProgram(deployJobInput.getProjectId(), deployJobInput.getEnvId());
+        String runCommand;
+        List<Future<String>> tasks = new ArrayList<>();
 
-        log.info("部署日志:{}", response);
+        for (String deployNode : deployNodes) {
+            String nodeStatus = (String) programStates.get(deployNode);
+            if (nodeStatus.equals("NONE")) {
+                runCommand = command + "&& supervisorctl reread && supervisorctl update " + slug;
+            } else if (nodeStatus == null || nodeStatus.equals("STOPPED")) {
+                runCommand = command + "&& supervisorctl reread && supervisorctl start " + slug;
+            } else {
+                runCommand = command + "&& supervisorctl reread && supervisorctl restart " + slug;
+            }
+            runCommand = runCommand + " && echo $? ";
+            tasks.add(execDeployCommand(environment, deployNode, runCommand));
+        }
 
-        Integer success = 0;
-        Integer total = 0;
-
-        if (!StringUtils.isEmpty(response)) {
-            JSONObject returnJson = JSONObject.parseObject(response);
-            JSONArray returnArray = returnJson.getJSONArray("return");
-            JSONObject node = returnArray.getJSONObject(0);
-            String[] target = targetIps.split(",");
-
-            for (int i = 0; i < target.length; i++) {
-                String message = node.getString(target[i]);
-                System.out.println(message);
-                System.out.println(message.lastIndexOf("\n"));
-                String status = message.substring(message.lastIndexOf("\n") + 1);
-                log.info("status:{}", status);
-
-                if (status.equals("0")) {
-                    success++;
+        while (true) {
+            Integer count = 0;
+            for (Future<String> task : tasks) {
+                if (task.isDone()) {
+                    count++;
                 }
-
-                total++;
+            }
+            if (count.equals(tasks.size())) {
+                break;
             }
         }
 
-        DeployLog deployLog = new DeployLog();
-        deployLog.setTeamId(job.getTeamId());
-        deployLog.setJobId(job.getId());
-        deployLog.setEnvId(environment.getId());
-        deployLog.setBranch(deployJobInput.getBranch());
-        deployLog.setTag(deployJobInput.getTag());
-        deployLog.setVersion(version);
-        deployLog.setProjectId(job.getProjectId());
-        deployLog.setRemark(deployJobInput.getRemark());
-        deployLog.setStatus(1);
-        deployLog.setStatusText(success + "/" + total);
-        deployLog.setOutput(response);
-        deployLog.setOperatorId(GuestUtil.getGuestId());
-        deployLog.setOperatorName(GuestUtil.getName());
-        deployLogDao.createDeployLog(deployLog);
-        DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
-        String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
-        String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
-        deployLogOutput.setCommitPath(commitPath);
-        deployLogOutput.setBranchPath(branchPath);
-        deployLogOutput.setServerIds("[" + targetIps + "]");
+        log.info("结束了");
+//        log.info("部署日志:{}", response);
+//
+//        Integer success = 0;
+//        Integer total = 0;
+//
+//        if (!StringUtils.isEmpty(response)) {
+//            JSONObject returnJson = JSONObject.parseObject(response);
+//            JSONArray returnArray = returnJson.getJSONArray("return");
+//            JSONObject node = returnArray.getJSONObject(0);
+//            String[] target = targetIps.split(",");
+//
+//            for (int i = 0; i < target.length; i++) {
+//                String message = node.getString(target[i]);
+//                System.out.println(message);
+//                System.out.println(message.lastIndexOf("\n"));
+//                String status = message.substring(message.lastIndexOf("\n") + 1);
+//                log.info("status:{}", status);
+//
+//                if (status.equals("0")) {
+//                    success++;
+//                }
+//
+//                total++;
+//            }
+//        }
+//
+//        DeployLog deployLog = new DeployLog();
+//        deployLog.setTeamId(job.getTeamId());
+//        deployLog.setJobId(job.getId());
+//        deployLog.setEnvId(environment.getId());
+//        deployLog.setBranch(deployJobInput.getBranch());
+//        deployLog.setTag(deployJobInput.getTag());
+//        deployLog.setVersion(version);
+//        deployLog.setProjectId(job.getProjectId());
+//        deployLog.setRemark(deployJobInput.getRemark());
+//        deployLog.setStatus(1);
+//        deployLog.setStatusText(success + "/" + total);
+//        deployLog.setOutput(response);
+//        deployLog.setOperatorId(GuestUtil.getGuestId());
+//        deployLog.setOperatorName(GuestUtil.getName());
+//        deployLogDao.createDeployLog(deployLog);
+//
+//        DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
+//
+//        String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
+//        String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
+//
+//        deployLogOutput.setCommitPath(commitPath);
+//        deployLogOutput.setBranchPath(branchPath);
+//        deployLogOutput.setServerIds("[" + targetIps + "]");
+//
+//        operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
+//        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
+//
+//        updateProjectLastDeploy(job.getProjectId(), deployJobInput.getBranch(), deployJobInput.getTag(), version);
+        return new DeployLogOutput();
+    }
 
-        operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
-        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
+    @Async
+    public Future<String> execDeployCommand(Environment environment, String deployNode, String runCommand) {
 
-        updateProjectLastDeploy(job.getProjectId(), deployJobInput.getBranch(), deployJobInput.getTag(), version);
-        return deployLogOutput;
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", deployNode, runCommand);
+        log.info("部署日志:{}", response);
+
+        return new AsyncResult<>("done");
     }
 
 
