@@ -442,7 +442,19 @@ public class JobService {
         List<Future<String>> tasks = new ArrayList<>();
 
         DeployLog deployLog = new DeployLog();
+        deployLog.setTeamId(job.getTeamId());
+        deployLog.setJobId(job.getId());
+        deployLog.setEnvId(environment.getId());
+        deployLog.setBranch(deployJobInput.getBranch());
+        deployLog.setTag(deployJobInput.getTag());
+        deployLog.setVersion(version);
+        deployLog.setProjectId(job.getProjectId());
+        deployLog.setRemark(deployJobInput.getRemark());
+        deployLog.setStatus(1);
+        deployLog.setOperatorId(GuestUtil.getGuestId());
+        deployLog.setOperatorName(GuestUtil.getName());
         deployLog.setTotalTasks(tasks.size());
+        deployLogDao.createDeployLog(deployLog);
 
         for (String deployNode : deployNodes) {
             String nodeStatus = (String) programStates.get(deployNode);
@@ -512,19 +524,19 @@ public class JobService {
 //        deployLog.setOperatorName(GuestUtil.getName());
 //        deployLogDao.createDeployLog(deployLog);
 //
-//        DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
+        DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
 //
-//        String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
-//        String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
-//
-//        deployLogOutput.setCommitPath(commitPath);
-//        deployLogOutput.setBranchPath(branchPath);
-//        deployLogOutput.setServerIds("[" + targetIps + "]");
-//
-//        operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
-//        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
-//
-//        updateProjectLastDeploy(job.getProjectId(), deployJobInput.getBranch(), deployJobInput.getTag(), version);
+        String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
+        String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
+
+        deployLogOutput.setCommitPath(commitPath);
+        deployLogOutput.setBranchPath(branchPath);
+        deployLogOutput.setServerIds("[" + targetIps + "]");
+
+        operationLogService.saveOperationLog(job.getTeamId(), ThreadLocalUtil.getGuest(), null, deployLog, "id", OperationTargetType.TYPE__DEPLOY_JOB);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__DEPLOY_JOB, deployLogOutput);
+
+        updateProjectLastDeploy(job.getProjectId(), deployJobInput.getBranch(), deployJobInput.getTag(), version);
         return new DeployLogOutput();
     }
 
@@ -534,15 +546,26 @@ public class JobService {
 
         String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", deployNode, runCommand);
         log.info("部署日志:{}", response);
-
         DeployNodeLog deployNodeLog = new DeployNodeLog();
         deployNodeLog.setDeployLogId(deployLog.getId());
         deployNodeLog.setOutput(response);
-
         deployNodeLogDao.createDeployNodeLog(deployNodeLog);
 
-        deployLogDao.incrementDeployLogSuccessTasks(deployLog.getId());
+        if (!StringUtils.isEmpty(response)) {
+            JSONObject returnJson = JSONObject.parseObject(response);
+            JSONArray returnArray = returnJson.getJSONArray("return");
+            JSONObject node = returnArray.getJSONObject(0);
 
+            String message = node.getString(deployNode);
+            System.out.println(message);
+            System.out.println(message.lastIndexOf("\n"));
+            String status = message.substring(message.lastIndexOf("\n") + 1);
+            log.info("status:{}", status);
+
+            if (status.equals("0")) {
+                deployLogDao.incrementDeployLogSuccessTasks(deployLog.getId());
+            }
+        }
 
         return new AsyncResult<>("done");
     }
