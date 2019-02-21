@@ -29,6 +29,10 @@ public class DeployLogOutput {
 
     private String remark;
 
+    private Integer successTasks;
+
+    private Integer totalTasks;
+    
     private Integer status;
 
     private String statusText;

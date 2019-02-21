@@ -20,4 +20,6 @@ public interface DeployLogDao {
     Integer getDeployLogsCount(Integer teamId);
 
     String getDeployLogOutputTextById(Integer id);
+
+    Integer incrementDeployLogSuccessTasks(Integer id);
 }

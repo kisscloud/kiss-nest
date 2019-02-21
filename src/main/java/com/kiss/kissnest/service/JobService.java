@@ -114,6 +114,9 @@ public class JobService {
     private PackageRepositoryDao packageRepositoryDao;
 
     @Autowired
+    private DeployNodeLogDao deployNodeLogDao;
+
+    @Autowired
     private SaltStackUtil saltStackUtil;
 
     @Autowired
@@ -438,6 +441,9 @@ public class JobService {
         String runCommand;
         List<Future<String>> tasks = new ArrayList<>();
 
+        DeployLog deployLog = new DeployLog();
+        deployLog.setTotalTasks(tasks.size());
+
         for (String deployNode : deployNodes) {
             String nodeStatus = (String) programStates.get(deployNode);
             if (nodeStatus.equals("NONE")) {
@@ -448,7 +454,7 @@ public class JobService {
                 runCommand = command + "&& supervisorctl reread && supervisorctl restart " + slug;
             }
             runCommand = runCommand + " && echo $? ";
-            tasks.add(execDeployCommand(environment, deployNode, runCommand));
+            tasks.add(execDeployCommand(deployLog, environment, deployNode, runCommand));
         }
 
         while (true) {
@@ -490,7 +496,7 @@ public class JobService {
 //            }
 //        }
 //
-//        DeployLog deployLog = new DeployLog();
+
 //        deployLog.setTeamId(job.getTeamId());
 //        deployLog.setJobId(job.getId());
 //        deployLog.setEnvId(environment.getId());
@@ -523,10 +529,20 @@ public class JobService {
     }
 
     @Async
-    public Future<String> execDeployCommand(Environment environment, String deployNode, String runCommand) {
+    public Future<String> execDeployCommand(DeployLog deployLog, Environment environment, String deployNode, String runCommand) {
+
 
         String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", deployNode, runCommand);
         log.info("部署日志:{}", response);
+
+        DeployNodeLog deployNodeLog = new DeployNodeLog();
+        deployNodeLog.setDeployLogId(deployLog.getId());
+        deployNodeLog.setOutput(response);
+
+        deployNodeLogDao.createDeployNodeLog(deployNodeLog);
+
+        deployLogDao.incrementDeployLogSuccessTasks(deployLog.getId());
+
 
         return new AsyncResult<>("done");
     }

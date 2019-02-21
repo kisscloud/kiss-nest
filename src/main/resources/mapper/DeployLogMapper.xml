@@ -6,10 +6,17 @@
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.DeployLogMapper">
     <insert id="createDeployLog" parameterType="com.kiss.kissnest.entity.DeployLog" keyProperty="id" useGeneratedKeys="true">
-        insert into deploylogs (teamId,jobId,envId,branch,tag,version,projectId,remark,status,statusText,output,operatorId,operatorName)
+        insert into deploylogs (teamId,jobId,envId,branch,tag,version,projectId,remark,totalTasks,status,statusText,output,operatorId,operatorName)
         value
-        (#{teamId},#{jobId},#{envId},#{branch},#{tag},#{version},#{projectId},#{remark},#{status},#{statusText},#{output},#{operatorId},#{operatorName})
+        (#{teamId},#{jobId},#{envId},#{branch},#{tag},#{version},#{projectId},#{remark},#{totalTasks},#{status},#{statusText},#{output},#{operatorId},#{operatorName})
     </insert>
+
+    <update id="incrementDeployLogSuccessTasks" parameterType="java.lang.Integer">
+        update deploylogs
+        set
+        successTasks = successTasks + 1
+        where id = #{id}
+    </update>
 
     <select id="getDeployLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.DeployLog">
         select * from deploylogs where id = #{id};

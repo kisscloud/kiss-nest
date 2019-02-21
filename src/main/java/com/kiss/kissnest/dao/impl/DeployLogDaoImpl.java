@@ -42,7 +42,7 @@ public class DeployLogDaoImpl implements DeployLogDao {
     @Override
     public List<DeployLogOutput> getDeployLogsOutputByTeamId(Integer teamId, Integer start, Integer size) {
 
-        return deployLogMapper.getDeployLogsOutputByTeamId(teamId,start,size);
+        return deployLogMapper.getDeployLogsOutputByTeamId(teamId, start, size);
     }
 
     @Override
@@ -55,5 +55,10 @@ public class DeployLogDaoImpl implements DeployLogDao {
     public String getDeployLogOutputTextById(Integer id) {
 
         return deployLogMapper.getDeployLogOutputTextById(id);
+    }
+
+    @Override
+    public Integer incrementDeployLogSuccessTasks(Integer id) {
+        return deployLogMapper.incrementDeployLogSuccessTasks(id);
     }
 }

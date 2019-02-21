@@ -25,6 +25,10 @@ public class DeployLog {
 
     private String remark;
 
+    private Integer successTasks;
+
+    private Integer totalTasks;
+
     private Integer status;
 
     private String statusText;
