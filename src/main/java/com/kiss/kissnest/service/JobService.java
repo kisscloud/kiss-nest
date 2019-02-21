@@ -211,7 +211,8 @@ public class JobService {
     @Transactional
     public Map<String, Object> buildJob(BuildJobInput buildJobInput) {
 
-        Job job = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
+        List<Job> jobs = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
+        Job job = jobs.size() > 0 ? jobs.get(0) : null;
         Project project = projectDao.getProjectById(job.getProjectId());
         String jobName = job.getJobName();
 
@@ -252,8 +253,49 @@ public class JobService {
         return result;
     }
 
-    public DeployLogOutput deployJob(DeployJobInput deployJobInput) throws IOException {
-        Job job = jobDao.getJobByProjectIdAndType(deployJobInput.getProjectId(), 2);
+
+    public Boolean checkProgram(Integer projectId, Integer envId) {
+
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
+        Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
+        String serverIds = job.getServerIds();
+        serverIds = StringUtils.isEmpty(serverIds) ? "" : serverIds.substring(1, serverIds.length() - 1);
+        String targetIps = serverDao.getServerIpsByIds(serverIds);
+
+        String option = String.format("supervisorctl status %s", job.getJobName());
+
+        String response = saltStackUtil.callLocalSync(environment.getSaltHost(), environment.getSaltUser(), environment.getSaltPassword(), environment.getSaltVersion(), "cmd.run", targetIps, option);
+
+        if(response.contains("no such process")){
+
+        }
+        if(response.contains("RUNNING")){
+
+        }
+
+        if(response.contains("STOPPED")){
+
+        }
+        log.info("部署日志:{}", response);
+
+        return false;
+    }
+
+    public DeployLogOutput startProgram() {
+        return new DeployLogOutput();
+    }
+
+    public DeployLogOutput restartProgram() {
+        return new DeployLogOutput();
+    }
+
+    public DeployLogOutput stopProgram() {
+        return new DeployLogOutput();
+    }
+
+    public DeployLogOutput deployJob(DeployJobInput deployJobInput) {
+
+        Job job = jobDao.getDeployJobByProjectIdAndEnvId(deployJobInput.getProjectId(), deployJobInput.getEnvId());
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         Integer type = environment.getType();
         String tarName;
@@ -374,9 +416,9 @@ public class JobService {
     public Map<String, Boolean> validateJobExist(Integer projectId, Integer type) {
 
         Map<String, Boolean> result = new HashMap<>();
-        Job job = jobDao.getJobByProjectIdAndType(projectId, type);
+        List<Job> jobs = jobDao.getJobByProjectIdAndType(projectId, type);
 
-        if (job == null) {
+        if (jobs.size() == 0) {
             result.put("exist", false);
         } else {
             result.put("exist", true);
@@ -475,6 +517,7 @@ public class JobService {
     public JobOutput updateDeployJob(UpdateDeployInput updateDeployInput) {
 
         Job job = BeanCopyUtil.copy(updateDeployInput, Job.class);
+        job.setServerIds(updateDeployInput.getServerIds() == null ? null : JSON.toJSONString(updateDeployInput.getServerIds()));
         Integer count = jobDao.updateDeployJob(job);
 
         if (count == 0) {
@@ -618,9 +661,9 @@ public class JobService {
         return jobDao.getBuildJobByProjectId(projectId);
     }
 
-    public Job getDeployJobByProjectId(Integer projectId) {
+    public Job getDeployJobByProjectId(Integer projectId, Integer envId) {
 
-        return jobDao.getDeployJobByProjectId(projectId);
+        return jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
     }
 
     class BuildLogRunnable implements Runnable {

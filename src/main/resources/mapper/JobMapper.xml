@@ -63,6 +63,7 @@
         conf = #{conf},
         type = #{type},
         envId = #{envId},
+        serverIds = #{serverIds}
         where id = #{id}
     </update>
 
@@ -90,12 +91,11 @@
         where jo.id = #{id};
     </select>
 
-    <select id="getDeployJobByProjectIdAndEnvId" parameterType="java.lang.Integer"
-            resultType="com.kiss.kissnest.entity.Job">
-        select * from jobs where projectId = #{projectId} and envId = #{envId} and type = 2 limit 0,1
-    </select>
-
     <select id="getJobByProjectIdAndType" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Job">
-        select * from jobs where projectId = #{projectId} and type = #{type}
+        select * from jobs where projectId = #{projectId}
+        <if test="envId != null">
+            and envId = #{envId}
+        </if>
+        and type = #{type}
     </select>
 </mapper>

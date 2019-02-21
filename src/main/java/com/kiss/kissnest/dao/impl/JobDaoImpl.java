@@ -31,9 +31,9 @@ public class JobDaoImpl implements JobDao {
     }
 
     @Override
-    public Job getJobByProjectIdAndType(Integer projectId, Integer type) {
+    public List<Job> getJobByProjectIdAndType(Integer projectId, Integer type) {
 
-        return jobMapper.getJobByProjectIdAndType(projectId,type);
+        return jobMapper.getJobByProjectIdAndType(projectId, null, type);
     }
 
     @Override
@@ -121,19 +121,13 @@ public class JobDaoImpl implements JobDao {
 
     @Override
     public Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId) {
-
-        return jobMapper.getDeployJobByProjectIdAndEnvId(projectId, envId);
+        List<Job> jobs = jobMapper.getJobByProjectIdAndType(projectId, envId, JobTypeEnums.DEPLOY.value());
+        return jobs.size() > 0 ? jobs.get(0) : null;
     }
 
     @Override
     public Job getBuildJobByProjectId(Integer projectId) {
-
-        return jobMapper.getJobByProjectIdAndType(projectId, JobTypeEnums.BUILD.value());
-    }
-
-    @Override
-    public Job getDeployJobByProjectId(Integer projectId) {
-
-        return jobMapper.getJobByProjectIdAndType(projectId, JobTypeEnums.DEPLOY.value());
+        List<Job> jobs = jobMapper.getJobByProjectIdAndType(projectId, null, JobTypeEnums.BUILD.value());
+        return jobs.size() > 0 ? jobs.get(0) : null;
     }
 }

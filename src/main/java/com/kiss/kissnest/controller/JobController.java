@@ -167,14 +167,20 @@ public class JobController {
     }
 
     @GetMapping("/job/deploy")
-    public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId) {
+    public JobOutput getDeployJobByProjectId(@RequestParam("projectId") Integer projectId, @RequestParam("envId") Integer envId) {
 
-        Job job = jobService.getDeployJobByProjectId(projectId);
+        Job job = jobService.getDeployJobByProjectId(projectId, envId);
 
         if (job == null) {
             return null;
         }
 
         return BeanCopyUtil.copy(job, JobOutput.class, BeanCopyUtil.defaultFieldNames);
+    }
+
+    @GetMapping("/job/check/program")
+    public Boolean getCheckProgram(@RequestParam("projectId") Integer projectId, @RequestParam("envId") Integer envId) {
+
+        return jobService.checkProgram(projectId, envId);
     }
 }

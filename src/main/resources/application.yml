@@ -62,7 +62,7 @@ gitlab:
     token:
       path: /oauth/token
     commitPath: /%s/commit/%s
-    user: https://git.jincse.com/api/v4/users?username=%s
+    user: http://47.100.184.133:6012/api/v4/users?username=%s
     branchPath: /%s/tree/%s
 
 build:
@@ -72,6 +72,7 @@ build:
 feign:
   httpclient:
     connection-timeout: 60000
+
 ribbon:
   ConnectTimeout: 60000
   ReadTimeout: 60000

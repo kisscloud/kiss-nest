@@ -11,7 +11,7 @@ public interface JobDao {
 
     List<Job> getJobByProjectId(Integer projectId);
 
-    Job getJobByProjectIdAndType(Integer projectId, Integer type);
+    List<Job> getJobByProjectIdAndType(Integer projectId, Integer type);
 
     Integer updateJobStatus(Integer projectId, Integer type, Integer status, Integer newStatus);
 
@@ -36,6 +36,4 @@ public interface JobDao {
     Job getDeployJobByProjectIdAndEnvId(Integer projectId, Integer envId);
 
     Job getBuildJobByProjectId(Integer projectId);
-
-    Job getDeployJobByProjectId(Integer projectId);
 }

@@ -35,7 +35,7 @@ public interface JobMapper {
 
     JobOutput getJobOutputsById(Integer id);
 
-    Job getDeployJobByProjectIdAndEnvId(@Param("projectId") Integer projectId, @Param("envId") Integer envId);
+//    Job getDeployJobByProjectIdAndEnvId(@Param("projectId") Integer projectId, @Param("envId") Integer envId);
 
-    Job getJobByProjectIdAndType(@Param("projectId") Integer projectId, @Param("type") Integer type);
+    List<Job> getJobByProjectIdAndType(@Param("projectId") Integer projectId, @Param("envId") Integer envId, @Param("type") Integer type);
 }
