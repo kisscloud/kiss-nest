@@ -158,7 +158,7 @@ public class JenkinsUtil {
             Map<String, String> params = new HashMap<>();
             String url = String.format(buildUrl, jobName);
             if (branch != null) {
-                params.put("branch", "master");
+                params.put("branch", branch);
                 url = String.format(buildWithParameterUrl, jobName);
             }
 
