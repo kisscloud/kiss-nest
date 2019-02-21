@@ -36,10 +36,10 @@ logging:
 
 jenkins:
   url: http://47.75.39.53:8003
-  buildUrl: http://47.100.184.133:8003/job/%s/build
-  buildWithParameterUrl: http://47.100.184.133:8003/job/%s/buildWithParameters
-  generateTokenUrl: http://47.100.184.133:8003/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
-  buildLogUrl: http://47.100.184.133:8003/job/%s/%s
+  buildUrl: http://47.75.39.53:8003/job/%s/build
+  buildWithParameterUrl: http://47.75.39.53:8003/job/%s/buildWithParameters
+  generateTokenUrl: http://47.75.39.53:8003/user/%s/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken
+  buildLogUrl: http://47.75.39.53:8003/job/%s/%s
   buildOutputPath: /logText/progressiveHtml
   crumbPath: /crumbIssuer/api/json
   queuePath: /api/json
