@@ -52,7 +52,7 @@ if [ $? -eq 0 ]; then&#x000A;
 else&#x000A;
   echo &quot;#Error: source codes ${branch} branch does not exist！&quot;; exit ;&#x000A;
 fi&#x000A;
-git pull&#x000A;
+git pull origin ${branch}&#x000A;
 log=`git log|grep 'commit'|head -1`&#x000A;
 version=`echo ${log##*commit}`&#x000A;
 slug=%s&#x000A;
