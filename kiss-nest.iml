@@ -247,5 +247,7 @@
     <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.29.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-websocket:2.0.6.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-websocket:5.0.10.RELEASE" level="project" />
   </component>
 </module>
