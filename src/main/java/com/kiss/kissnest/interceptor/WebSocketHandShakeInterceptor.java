@@ -8,7 +8,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.Session;
 import java.util.Map;
 
 @Component
@@ -19,6 +18,7 @@ public class WebSocketHandShakeInterceptor implements HandshakeInterceptor {
 
         HttpServletRequest servletRequest = ((ServletServerHttpRequest) serverHttpRequest).getServletRequest();
         String teamId = servletRequest.getParameter("teamId");
+        String token = servletRequest.getParameter("token");
         map.put("teamId", teamId);
         return true;
     }

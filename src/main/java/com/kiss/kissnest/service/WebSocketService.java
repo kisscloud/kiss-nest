@@ -4,10 +4,7 @@ package com.kiss.kissnest.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -15,6 +12,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 
@@ -25,32 +24,21 @@ public class WebSocketService implements WebSocketHandler {
 
     private Integer teamId;
 
-    private Session session;
 
-    private static CopyOnWriteArraySet<WebSocketService> webSocketSet = new CopyOnWriteArraySet<>();
+    private static final List<WebSocketSession> sessionMap = new ArrayList<>();
 
-    @OnOpen
-    public void onOpen(Session session) {
-        URI uri = session.getRequestURI();
-        this.session = session;
-        webSocketSet.add(this);
-        log.info("新连接加入");
-    }
 
-    @OnClose
-    public void onClose() {
-        webSocketSet.remove(this);
-        log.info("连接断开");
-    }
-
-    @OnMessage
-    public void onMessage(String message, Session session) throws IOException {
-        log.info("收到消息：{}", message);
-        this.session.getBasicRemote().sendText("{ ping: ts }");
-    }
-
-    public void broadcastTeamMessage() {
-
+    public void broadcastTeamMessage(TextMessage message) {
+        for (WebSocketSession session : sessionMap) {
+            System.out.println("session=" + session);
+            if (session.isOpen() && session.getAttributes().get("teamId").equals(1)) {
+                // 发送消息
+                try {
+                    session.sendMessage(message);
+                } catch (Exception e) {
+                }
+            }
+        }
     }
 
     @Override
@@ -60,7 +48,9 @@ public class WebSocketService implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
+        teamId = (Integer) webSocketSession.getAttributes().get("teamId");
         System.out.println("前端发送的消息=" + webSocketMessage.toString());
+        sessionMap.add(webSocketSession);
     }
 
     @Override
@@ -68,7 +58,7 @@ public class WebSocketService implements WebSocketHandler {
         if (webSocketSession.isOpen()) {
             webSocketSession.close();
         }
-        webSocketSet.remove(webSocketSession);
+        sessionMap.remove(webSocketSession);
     }
 
     @Override
