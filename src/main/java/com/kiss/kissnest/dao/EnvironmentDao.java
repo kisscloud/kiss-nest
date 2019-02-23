@@ -22,4 +22,6 @@ public interface EnvironmentDao {
     Integer deleteEnvironmentById(Integer id);
 
     List<Environment> getEnvironmentsByProjectId(Integer projectId);
+
+    Environment getEnvironmentByPath(String path);
 }

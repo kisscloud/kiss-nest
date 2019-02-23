@@ -50,21 +50,21 @@ public class ServerDaoImpl implements ServerDao {
     @Override
     public Server getServerByNameAndTeamId(Integer teamId, String name) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("name",name);
-        params.put("teamId",teamId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("teamId", teamId);
 
         return serverMapper.getServerByNameAndTeamId(params);
     }
 
     @Override
-    public List<Server> getServersByTeamId(Integer teamId, Integer start, Integer size,Integer envId) {
+    public List<Server> getServersByTeamId(Integer teamId, Integer start, Integer size, Integer envId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("start",start);
-        params.put("size",size);
-        params.put("envId",envId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("start", start);
+        params.put("size", size);
+        params.put("envId", envId);
 
         return serverMapper.getServersByTeamId(params);
     }
@@ -78,11 +78,11 @@ public class ServerDaoImpl implements ServerDao {
     @Override
     public List<ServerOutput> getServerOutputsByTeamId(Integer teamId, Integer start, Integer size, Integer envId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("start",start);
-        params.put("size",size);
-        params.put("envId",envId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("start", start);
+        params.put("size", size);
+        params.put("envId", envId);
 
         return serverMapper.getServerOutputsByTeamId(params);
     }
@@ -90,9 +90,9 @@ public class ServerDaoImpl implements ServerDao {
     @Override
     public Integer getServerOutputCount(Integer teamId, Integer envId) {
 
-        Map<String,Object> params = new HashMap<>();
-        params.put("teamId",teamId);
-        params.put("envId",envId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teamId", teamId);
+        params.put("envId", envId);
 
         return serverMapper.getServerOutputCount(params);
     }
@@ -113,5 +113,11 @@ public class ServerDaoImpl implements ServerDao {
     public String getServerIpsByIds(List<Integer> ids) {
 
         return serverMapper.getServerIpsByIds(ids);
+    }
+
+    @Override
+    public Server getServerByEnvIdAndInnerIp(Integer envId, String innerIp) {
+
+        return serverMapper.getServerByEnvIdAndInnerIp(envId, innerIp);
     }
 }

@@ -88,7 +88,7 @@ public class JenkinsUtil {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
             StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(), sshUrl, workspace, jobName, path, jenkinBinIp, formatShell);
+            String script = String.format(builder.toString(), sshUrl, workspace, workspace, jobName, path, jenkinBinIp, formatShell);
 
             if (builder == null) {
                 return false;
@@ -114,7 +114,7 @@ public class JenkinsUtil {
             server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
             StringBuilder builder = readFileFromClassPath("/config.xml");
             String formatShell = StringEscapeUtils.escapeHtml(shell);
-            String script = String.format(builder.toString(), sshUrl, workspace, jobName, path, jenkinBinIp, formatShell);
+            String script = String.format(builder.toString(), sshUrl, workspace, workspace, jobName, path, jenkinBinIp, formatShell);
 
             if (builder == null) {
                 return false;

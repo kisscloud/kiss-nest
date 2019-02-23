@@ -46,6 +46,7 @@
             <command>
 &#x000A;
 #!/bin/bash&#x000A;
+cd %s&#x000A;
 (git branch -a | grep ${branch}) || (git tag -l | grep ${branch})&#x000A;
 if [ $? -eq 0 ]; then&#x000A;
   git checkout  $branch &amp;&amp; echo &quot;#Sucess: source codes had checkout to ${branch} branch&quot; || { echo &quot;#Error: source codes failed to checkout to ${branch} branch&quot;; exit ; }&#x000A;
@@ -76,5 +77,8 @@ echo "tarNameStart="$newName.tar.gz"=tarNameEnd"&#x000A;
         </hudson.tasks.Shell>
     </builders>
     <publishers/>
-    <buildWrappers/>
+    <buildWrappers>
+        <org.jenkinsci.plugins.golang.GolangBuildWrapper plugin="golang@1.2">
+        </org.jenkinsci.plugins.golang.GolangBuildWrapper>
+    </buildWrappers>
 </project>

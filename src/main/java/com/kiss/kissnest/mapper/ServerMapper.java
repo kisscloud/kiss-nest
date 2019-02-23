@@ -3,6 +3,7 @@ package com.kiss.kissnest.mapper;
 import com.kiss.kissnest.entity.Server;
 import com.kiss.kissnest.output.ServerOutput;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -35,4 +36,6 @@ public interface ServerMapper {
     List<Server> getMonitorServers(Integer teamId);
 
     String getServerIpsByIds(List<Integer> ids);
+
+    Server getServerByEnvIdAndInnerIp(@Param("envId") Integer envId, @Param("innerIp") String innerIp);
 }

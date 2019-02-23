@@ -67,4 +67,10 @@ public class EnvironmentDaoImpl implements EnvironmentDao {
 
         return environmentMapper.getEnvironmentsByProjectId(projectId);
     }
+
+    @Override
+    public Environment getEnvironmentByPath(String path) {
+
+        return environmentMapper.getEnvironmentByPath(path);
+    }
 }

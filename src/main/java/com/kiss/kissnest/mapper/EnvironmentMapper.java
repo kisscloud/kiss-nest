@@ -24,4 +24,6 @@ public interface EnvironmentMapper {
     Integer deleteEnvironmentById(Integer id);
 
     List<Environment> getEnvironmentsByProjectId(Integer projectId);
+
+    Environment getEnvironmentByPath(String path);
 }

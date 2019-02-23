@@ -18,19 +18,22 @@ public interface ServerDao {
 
     List<Server> getServers();
 
-    Server getServerByNameAndTeamId(Integer teamId,String name);
+    Server getServerByNameAndTeamId(Integer teamId, String name);
 
-    List<Server> getServersByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
+    List<Server> getServersByTeamId(Integer teamId, Integer start, Integer size, Integer envId);
 
     List<String> getServerInnerIpsByIds(String ids);
 
-    List<ServerOutput> getServerOutputsByTeamId(Integer teamId,Integer start,Integer size,Integer envId);
+    List<ServerOutput> getServerOutputsByTeamId(Integer teamId, Integer start, Integer size, Integer envId);
 
-    Integer getServerOutputCount(Integer teamId,Integer envId);
+    Integer getServerOutputCount(Integer teamId, Integer envId);
 
     List<Server> getServersByEnvId(Integer envId);
 
     List<Server> getMonitorServers(Integer teamId);
 
     String getServerIpsByIds(List<Integer> ids);
+
+    Server getServerByEnvIdAndInnerIp(Integer envId, String innerIp);
+
 }

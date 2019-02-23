@@ -60,11 +60,11 @@
     <select id="getServers" resultType="com.kiss.kissnest.entity.Server">
         select * from servers;
     </select>
-    
+
     <select id="getServerByNameAndTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
         select * from servers where teamId = #{teamId} and name = #{name} limit 0,1;
     </select>
-    
+
     <select id="getServersByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.entity.Server">
         select * from servers where teamId = #{teamId}
         <if test="envId != null">
@@ -74,13 +74,14 @@
             limit #{start},#{size}
         </if>
     </select>
-    
+
     <select id="getServerInnerIpsByIds" parameterType="java.lang.String" resultType="java.lang.String">
         select innerIp from servers where id in (#{ids});
     </select>
-    
-    <select id="getServerOutputsByTeamId" parameterType="java.util.Map" resultType="com.kiss.kissnest.output.ServerOutput">
-        select se.*,en.name as envName, en.path as envPath  from servers se
+
+    <select id="getServerOutputsByTeamId" parameterType="java.util.Map"
+            resultType="com.kiss.kissnest.output.ServerOutput">
+        select se.*,en.name as envName, en.path as envPath from servers se
         left join environments en
         on se.envId = en.id
         where se.teamId = #{teamId}
@@ -98,27 +99,32 @@
         on se.envId = en.id
         where se.teamId = #{teamId}
     </select>
-    
+
     <select id="getServerOutputCount" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(*) from servers where teamId = #{teamId}
         <if test="envId != null">
             and envId = #{envId}
         </if>
     </select>
-    
+
     <select id="getServersByEnvId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.Server">
         select servers.*, envs.path as envPath from servers left join environments where envId = #{envId};
     </select>
-    
+
     <select id="getServerIpsByIds" parameterType="java.util.List" resultType="java.lang.String">
         select group_concat(se.innerIp) as innerIps from
         (
-          select concat("node-",replace(innerIp,'.','-')) as innerIp,teamId from servers
-           where id in
-           <foreach item="item" collection="list" open="(" separator="," close=")">
-               #{item}
-           </foreach>
+        select concat("node-",replace(innerIp,'.','-')) as innerIp,teamId from servers
+        where id in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
         ) se
         group by se.teamId
+    </select>
+
+    <select id="getServerByEnvIdAndInnerIp" parameterMap="java.lang.Object"
+            resultType="com.kiss.kissnest.entity.Server">
+        select * from servers where envId = #{envId} and innerIp = #{innerIp}
     </select>
 </mapper>
