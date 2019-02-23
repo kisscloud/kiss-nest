@@ -1,21 +1,15 @@
 package com.kiss.kissnest.service;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.kiss.kissnest.output.MessageOutput;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.socket.*;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 
 @Service
 @Slf4j
@@ -27,30 +21,37 @@ public class WebSocketService implements WebSocketHandler {
 
     private static final List<WebSocketSession> sessionMap = new ArrayList<>();
 
+    public void sendMessage(Object object, String bo) {
+
+        MessageOutput messageOutput = new MessageOutput(bo, object);
+        TextMessage textMessage = new TextMessage(JSONObject.toJSONString(messageOutput));
+        broadcastTeamMessage(textMessage);
+    }
+
 
     public void broadcastTeamMessage(TextMessage message) {
         for (WebSocketSession session : sessionMap) {
             System.out.println("session=" + session);
-            if (session.isOpen() && session.getAttributes().get("teamId").equals(1)) {
+            if (session.isOpen() && session.getAttributes().get("teamId").equals("1")) {
                 // 发送消息
                 try {
                     session.sendMessage(message);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-
+    public void afterConnectionEstablished(WebSocketSession webSocketSession) {
+        teamId = Integer.parseInt(webSocketSession.getAttributes().get("teamId").toString());
+        sessionMap.add(webSocketSession);
     }
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-        teamId = (Integer) webSocketSession.getAttributes().get("teamId");
-        System.out.println("前端发送的消息=" + webSocketMessage.toString());
-        sessionMap.add(webSocketSession);
+        System.out.println("hanlerMessage");
     }
 
     @Override
