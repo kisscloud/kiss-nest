@@ -4,10 +4,7 @@ import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.exception.TransactionalException;
-import com.kiss.kissnest.input.CreateProjectInput;
-import com.kiss.kissnest.input.CreateTagInput;
-import com.kiss.kissnest.input.QueryProjectInput;
-import com.kiss.kissnest.input.UpdateProjectInput;
+import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.GitlabApiUtil;
@@ -346,6 +343,16 @@ public class ProjectService {
         tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
 
         return tagOutput;
+    }
+
+    public void createBranch(CreateBranchInput createBranchInput) {
+
+        ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createBranchInput.getProjectId());
+        Integer repositoryId = projectRepository.getRepositoryId();
+        Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
+        gitlabApiUtil.createBranch(repositoryId,createBranchInput.getBranchName(),createBranchInput.getRef(),member.getAccessToken());
+        operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, createBranchInput, "id", OperationTargetType.TYPE__CREATE_PROJECT_Branch);
+        operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), projectRepository.getTeamId(), null, projectRepository.getProjectId(), OperationTargetType.TYPE__CREATE_PROJECT_Branch, createBranchInput);
     }
 
     public List<MemberOutput> getMemberProjectsByProjectId(Integer projectId) {

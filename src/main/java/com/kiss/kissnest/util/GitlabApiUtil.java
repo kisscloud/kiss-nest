@@ -162,6 +162,15 @@ public class GitlabApiUtil {
         }
     }
 
+    public void createBranch(Integer projectId,String branchName,String ref,String accessToken) {
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);
+            gitlabAPI.createBranch(projectId,branchName,ref);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<GitlabTag> getTags(Integer projectId, String accessToken) {
         try {
             GitlabAPI gitlabAPI = GitlabAPI.connect(gitlabServerUrl, accessToken, TokenType.ACCESS_TOKEN);

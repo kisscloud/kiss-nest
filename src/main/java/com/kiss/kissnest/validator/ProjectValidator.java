@@ -48,7 +48,8 @@ public class ProjectValidator implements Validator {
                 clazz.equals(UpdateProjectInput.class) ||
                 clazz.equals(CreateProjectRepositoryInput.class) ||
                 clazz.equals(CreateTagInput.class) ||
-                clazz.equals(QueryProjectInput.class);
+                clazz.equals(QueryProjectInput.class) ||
+                clazz.equals(CreateBranchInput.class);
     }
 
     @Override
@@ -95,6 +96,8 @@ public class ProjectValidator implements Validator {
                 validateTag(createTagInput.getTagName(), repositoryId, member.getAccessToken(), errors);
             }
         } else if (QueryProjectInput.class.isInstance(target)) {
+
+        } else if (CreateBranchInput.class.isInstance(target)) {
 
         }
     }
