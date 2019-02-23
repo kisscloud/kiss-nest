@@ -56,9 +56,9 @@ public class ProjectController {
         return projectService.updateProject(updateProjectInput);
     }
 
-    @PostMapping("/projects")
-    @ApiOperation(value = "获取项目")
-    public ProjectOutputs getProjects(@Validated @RequestBody QueryProjectInput queryProjectInput) {
+    @PostMapping("/projects/search")
+    @ApiOperation(value = "搜索项目")
+    public ProjectOutputs postProjectsSearch(@Validated @RequestBody QueryProjectInput queryProjectInput) {
 
         return projectService.getProjects(queryProjectInput);
     }

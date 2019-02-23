@@ -1,0 +1,13 @@
+package com.kiss.kissnest.entity;
+
+import lombok.Data;
+
+@Data
+public class ProgramMonitorLog {
+    private Integer id;
+    private Integer teamId;
+    private Integer envId;
+    private Integer projectId;
+    private Integer serverId;
+    private String programInfo;
+}
