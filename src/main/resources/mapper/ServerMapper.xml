@@ -123,7 +123,7 @@
         group by se.teamId
     </select>
 
-    <select id="getServerByEnvIdAndInnerIp" parameterMap="java.lang.Object"
+    <select id="getServerByEnvIdAndInnerIp" parameterType="java.lang.Object"
             resultType="com.kiss.kissnest.entity.Server">
         select * from servers where envId = #{envId} and innerIp = #{innerIp}
     </select>

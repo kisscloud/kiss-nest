@@ -28,7 +28,7 @@ public class TrackController {
 
     @PostMapping("/track")
     @ApiOperation(value = "接收动态信息")
-    public String note (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String note(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder builder = new StringBuilder();
         String aux = "";
 
@@ -43,7 +43,7 @@ public class TrackController {
     }
 
     @GetMapping("/track")
-    public List<TrackOutput> getTrack(@RequestParam("teamId") Integer teamId){
+    public List<TrackOutput> getTrack(@RequestParam("teamId") Integer teamId) {
 
         return trackService.getTracksByTeamId(teamId);
     }
