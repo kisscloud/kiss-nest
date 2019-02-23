@@ -8,6 +8,7 @@ import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.enums.BuildJobStatusEnums;
 import com.kiss.kissnest.enums.BuildJobTypeEnums;
 import com.kiss.kissnest.enums.OperationTargetType;
+import com.kiss.kissnest.enums.WebSocketMessageTypeEnums;
 import com.kiss.kissnest.exception.TransactionalException;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.*;
@@ -121,6 +122,9 @@ public class JobService {
 
     @Autowired
     private GroupDao groupDao;
+
+    @Autowired
+    private WebSocketService webSocketService;
 
 
     public static Map<String, String> buildRemarks = new HashMap<>();
@@ -257,6 +261,7 @@ public class JobService {
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         result.put("groupId", group.getId());
         result.put("groupName", group.getName());
+        webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), result);
         return result;
     }
 
