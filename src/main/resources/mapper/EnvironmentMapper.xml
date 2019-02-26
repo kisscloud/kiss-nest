@@ -53,7 +53,7 @@
     </delete>
 
     <select id="getEnvironmentByPath" parameterType="java.lang.String"
-            parameterMap="com.kiss.kissnest.entity.Environment">
+            resultType="com.kiss.kissnest.entity.Environment">
         select * from environments where path = #{path}
     </select>
 </mapper>

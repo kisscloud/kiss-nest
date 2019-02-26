@@ -37,13 +37,14 @@ public class MonitorReceiver {
         Message message = (Message) input;
         String body = new String(message.getBody());
         MonitorServerInput monitorServerInput = JSONObject.parseObject(body, MonitorServerInput.class);
-        Environment environment = environmentDao.getEnvironmentByPath(monitorServerInput.getEnvPath());
-        Server server = serverDao.getServerByEnvIdAndInnerIp(environment.getId(), monitorServerInput.getInnerIp());
-        ServerMonitorLog serverMonitorLog = new ServerMonitorLog();
-        serverMonitorLog.setEnvId(environment.getId());
-        serverMonitorLog.setServerId(server.getId());
-        serverMonitorLog.setServerInfo(body);
-        serverMonitorLog.setTeamId(environment.getTeamId());
-        serverMonitorLogDao.createServerMonitorLog(serverMonitorLog);
+//        environmentDao.getEnvironmentById(1);
+//        Environment environment = environmentDao.getEnvironmentByPath(monitorServerInput.getEnvPath());
+//        Server server = serverDao.getServerByEnvIdAndInnerIp(environment.getId(), monitorServerInput.getInnerIp());
+//        ServerMonitorLog serverMonitorLog = new ServerMonitorLog();
+//        serverMonitorLog.setEnvId(environment.getId());
+//        serverMonitorLog.setServerId(server.getId());
+//        serverMonitorLog.setServerInfo(body);
+//        serverMonitorLog.setTeamId(environment.getTeamId());
+//        serverMonitorLogDao.createServerMonitorLog(serverMonitorLog);
     }
 }
