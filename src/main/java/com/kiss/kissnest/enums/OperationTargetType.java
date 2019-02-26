@@ -24,5 +24,7 @@ public class OperationTargetType {
     public static final Integer TYPE__CREATE_DEPLOY_JOB = 20;
     public static final Integer TYPE__DEPLOY_JOB = 21;
     public static final Integer TYPE__CREATE_PROJECT_TAG = 22;
+    public static final Integer TYPE__CREATE_PROJECT_Branch = 23;
+
 
 }

@@ -116,4 +116,11 @@ public class ProjectController {
 
         return projectService.getProjectById(projectId);
     }
+
+    @PostMapping("/project/branch")
+    @ApiOperation(value = "创建分支")
+    public void createBranch(@Validated @RequestBody CreateBranchInput createBranchInput) {
+
+        projectService.createBranch(createBranchInput);
+    }
 }
