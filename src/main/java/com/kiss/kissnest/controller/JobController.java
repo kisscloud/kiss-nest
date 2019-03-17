@@ -9,7 +9,6 @@ import com.kiss.kissnest.service.PackageRepositoryService;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -232,7 +231,8 @@ public class JobController {
 
     @PostMapping("/job/jenkins/notification")
     @ApiOperation(value = "Jenkins消息回调")
-    public void postJenkinsNotification(@RequestBody Object callbackData) {
+    public Object postJenkinsNotification(@RequestBody Object callbackData) {
         log.info("回调数据：{}", callbackData);
+        return callbackData;
     }
 }
