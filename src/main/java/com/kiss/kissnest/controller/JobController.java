@@ -9,6 +9,8 @@ import com.kiss.kissnest.service.PackageRepositoryService;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -20,8 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @RestController
 @Api(tags = "Job", description = "构建部署任务相关接口")
+@Slf4j
 public class JobController {
 
     @Autowired
@@ -224,5 +228,11 @@ public class JobController {
     public HashMap getRestartProgram(@RequestParam("projectId") Integer projectId, @RequestParam("envId") Integer envId) {
 
         return jobService.restartProgram(projectId, envId);
+    }
+
+    @PostMapping("/job/jenkins/notification")
+    @ApiOperation(value = "Jenkins消息回调")
+    public void postJenkinsNotification(@RequestBody Object callbackData) {
+        log.info("回调数据：{}", callbackData);
     }
 }

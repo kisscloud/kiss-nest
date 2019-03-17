@@ -44,6 +44,7 @@ jenkins:
   crumbPath: /crumbIssuer/api/json
   queuePath: /api/json
   configurePath: /job/%s/configure
+  notificationUrl: https://console-gateway.jincse.com/kiss-nest/job/jenkins/notification
   bin:
     ip: 47.100.184.133
 

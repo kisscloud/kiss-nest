@@ -96,6 +96,9 @@ public class JobService {
     @Value("${jenkins.url}")
     private String jenkinsUrl;
 
+    @Value("${jenkins.notificationUrl}")
+    private String notificationUrl;
+
     @Autowired
     private DeployLogDao deployLogDao;
 
@@ -148,7 +151,7 @@ public class JobService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(projectId);
 
         String jobName = projectRepository.getPathWithNamespace().replaceAll("/", "-");
-        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), createJobInput.getWorkspace(), member.getApiToken());
+        boolean success = jenkinsUtil.createJobByShell(jobName, projectRepository.getPathWithNamespace(), createJobInput.getScript(), notificationUrl, projectRepository.getSshUrl(), guest.getUsername(), createJobInput.getWorkspace(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.CREATE_JENKINS_JOB_ERROR);
@@ -165,7 +168,9 @@ public class JobService {
         job.setWorkspace(createJobInput.getWorkspace());
         job.setJobUrl(String.format(jenkinsUrl + jenkinsConfigurePath, jobName));
         jobDao.createJob(job);
+
         JobOutput jobOutput = jobDao.getJobOutputsById(job.getId());
+
         operationLogService.saveOperationLog(project.getTeamId(), guest, null, job, "id", OperationTargetType.TYPE__CREATE_BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__CREATE_BUILD_JOB, job);
 
@@ -673,7 +678,7 @@ public class JobService {
             throw new StatusException(NestStatusCode.MEMBER_APITOKEN_IS_EMPTY);
         }
 
-        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), projectRepository.getSshUrl(), guest.getUsername(), updateJobInput.getWorkspace(), member.getApiToken());
+        boolean success = jenkinsUtil.updateJob(wholeJob.getJobName(), projectRepository.getPathWithNamespace(), updateJobInput.getScript(), notificationUrl, projectRepository.getSshUrl(), guest.getUsername(), updateJobInput.getWorkspace(), member.getApiToken());
 
         if (!success) {
             throw new TransactionalException(NestStatusCode.UPDATE_JENKINS_JOB_ERROR);
@@ -899,7 +904,7 @@ public class JobService {
                 Map<String, Object> result = new HashMap<>();
                 result.put("id", id);
                 webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), result);
-                log.info("id is {}",id);
+                log.info("id is {}", id);
 
             } catch (Exception e) {
                 e.printStackTrace();

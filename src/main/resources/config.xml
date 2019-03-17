@@ -4,6 +4,23 @@
     <description></description>
     <keepDependencies>false</keepDependencies>
     <properties>
+        <com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.13">
+            <endpoints>
+                <com.tikal.hudson.plugins.notification.Endpoint>
+                    <protocol>HTTP</protocol>
+                    <format>JSON</format>
+                    <urlInfo>
+                        <urlOrId>%s</urlOrId>
+                        <urlType>PUBLIC</urlType>
+                    </urlInfo>
+                    <event>all</event>
+                    <timeout>30000</timeout>
+                    <loglines>0</loglines>
+                    <buildNotes></buildNotes>
+                    <retries>5</retries>
+                </com.tikal.hudson.plugins.notification.Endpoint>
+            </endpoints>
+        </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
         <hudson.model.ParametersDefinitionProperty>
             <parameterDefinitions>
                 <hudson.model.StringParameterDefinition>
