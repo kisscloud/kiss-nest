@@ -19,6 +19,7 @@
   - [5.8 添加项目成员](guide/project-member.md)
   - [5.9 添加构建任务](guide/build-job.md)
   - [5.10 添加部署任务](guide/deploy-job.md)
+* [6. 测试用例](test.md) 
 
 
   

@@ -244,11 +244,13 @@ public class JobService {
 
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
-        String[] urlStr = location.split("/");
+
         Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getUsername(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
         thread.start();
+
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
+
         Group group = groupDao.getGroupByProjectId(buildJobInput.getProjectId());
         Map<String, Object> result = new HashMap<>();
         result.put("id", buildLog.getId());
@@ -261,7 +263,9 @@ public class JobService {
         result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
         result.put("groupId", group.getId());
         result.put("groupName", group.getName());
-        webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), result);
+
+        webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_START.value(), result);
+
         return result;
     }
 
@@ -300,6 +304,7 @@ public class JobService {
     }
 
     public HashMap startProgram(Integer projectId, Integer envId) {
+
         Job job = jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         List<Integer> serverIds = JSONObject.parseArray(job.getServerIds(), Integer.class);
@@ -323,6 +328,7 @@ public class JobService {
                 }
             }
         }
+
         return result;
     }
 
@@ -528,9 +534,8 @@ public class JobService {
 //        deployLog.setOperatorId(GuestUtil.getGuestId());
 //        deployLog.setOperatorName(GuestUtil.getName());
 //        deployLogDao.createDeployLog(deployLog);
-//
+
         DeployLogOutput deployLogOutput = deployLogDao.getDeployLogOutputById(deployLog.getId());
-//
         String commitPath = gitlabUrl + String.format(gitlabCommitPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getVersion());
         String branchPath = gitlabUrl + String.format(gitlabBranchPath, deployLogOutput.getCommitPath() == null ? "" : deployLogOutput.getCommitPath(), deployLogOutput.getBranch());
 
@@ -866,6 +871,7 @@ public class JobService {
             Build build = null;
             JenkinsServer jenkinsServer = null;
             Integer newNumber = -1;
+
             try {
                 jenkinsServer = jenkinsUtil.getJenkinsServer(account, passwordOrToken);
 
@@ -888,6 +894,12 @@ public class JobService {
                 }
 
                 updateBuildLog(build, id, jobName, operatorName, location, versionType, projectId);
+
+                // 构建成功，发送WS消息
+                Map<String, Object> result = new HashMap<>();
+                result.put("id", id);
+                webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), result);
+                log.info("id is {}",id);
 
             } catch (Exception e) {
                 e.printStackTrace();
