@@ -18,11 +18,18 @@ public class OutputUtil {
     private GroupDao groupDao;
 
     public BuildLogOutput toBuildLogOutput(BuildLog buildLog) {
+
         Group group = groupDao.getGroupByProjectId(buildLog.getProjectId());
+
         BuildLogOutput buildLogOutput = new BuildLogOutput();
         BeanUtils.copyProperties(buildLogOutput, buildLog);
-        buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLog.getStatus())));
+
+        if (buildLog.getStatus() != null) {
+            buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLog.getStatus())));
+        }
+
         buildLogOutput.setGroupName(group.getName());
+
         return buildLogOutput;
     }
 }
