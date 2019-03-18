@@ -9,6 +9,7 @@ public class JenkinsNotificationInput {
     private String url;
     private Build build;
 
+
     public boolean isQueued() {
         return build.getPhase().equals("QUEUED");
     }
@@ -30,12 +31,13 @@ public class JenkinsNotificationInput {
 class Build {
     private String full_url;
     private Integer number;
-    private Integer queueId;
     private Integer queue_id;
     private String phase;
     private String status;
     private String url;
     private SCM scm;
+    private String notes;
+    private String log;
 }
 
 @Data
