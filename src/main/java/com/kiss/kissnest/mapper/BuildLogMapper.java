@@ -11,7 +11,7 @@ import java.util.Map;
 @Mapper
 public interface BuildLogMapper {
 
-    Integer createBuildLog (BuildLog buildLog);
+    Integer createBuildLog(BuildLog buildLog);
 
     Integer deleteBuildLogById(Integer id);
 
@@ -19,11 +19,13 @@ public interface BuildLogMapper {
 
     BuildLog getBuildLogById(Integer id);
 
+    BuildLog getBuildLogByJobNameAndQueueId(@Param("jobName") String jobName, @Param("queueId") Integer queueId);
+
     List<BuildLog> getBuildLogs();
 
     BuildLog getLastBuildByJobNameAndProjectId(Map params);
 
-    List<BuildLogOutput> getBuildLogOutputsByTeamId(@Param("teamId") Integer teamId,@Param("start") Integer start,@Param("size") Integer size);
+    List<BuildLogOutput> getBuildLogOutputsByTeamId(@Param("teamId") Integer teamId, @Param("start") Integer start, @Param("size") Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer id);
 

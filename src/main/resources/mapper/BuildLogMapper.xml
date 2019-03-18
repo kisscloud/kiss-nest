@@ -5,7 +5,8 @@
 <!-- namespace 属性用来定义配置命名空间， 主要进行 session 级别的缓存管理 -->
 <!-- namespace 默认使用当前操作实体类的全路径 -->
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
-    <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog" useGeneratedKeys="true" keyProperty="id">
+    <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog" useGeneratedKeys="true"
+            keyProperty="id">
         insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt,type)
         value
         (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt},#{type})
@@ -61,6 +62,9 @@
         <if test="buildAt != null">
             ,buildAt = #{buildAt}
         </if>
+        <if test="logUrl != null">
+            ,logUrl = #{logUrl}
+        </if>
         <if test="type != null">
             ,type = #{type}
         </if>
@@ -69,6 +73,11 @@
 
     <select id="getBuildLogById" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.entity.BuildLog">
         select * from buildlogs where id = #{id};
+    </select>
+
+    <select id="getBuildLogByJobNameAndQueueId" parameterType="java.lang.Object"
+            resultType="com.kiss.kissnest.entity.BuildLog">
+        select * from buildlogs where jobName = #{jobName} and queueId = #{queueId};
     </select>
 
     <select id="getBuildLogs" resultType="com.kiss.kissnest.entity.BuildLog">
@@ -80,7 +89,8 @@
         select * from buildlogs where jobName=#{jobName} and projectId=#{projectId} order by number desc limit 0,1;
     </select>
 
-    <select id="getBuildLogOutputsByTeamId" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
+    <select id="getBuildLogOutputsByTeamId" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
         bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
@@ -99,7 +109,8 @@
         </if>
     </select>
 
-    <select id="getBuildRecentLog" parameterType="java.lang.Integer" resultType="com.kiss.kissnest.output.BuildLogOutput">
+    <select id="getBuildRecentLog" parameterType="java.lang.Integer"
+            resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
         bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
@@ -122,7 +133,7 @@
     <select id="getBuildLogCountByTeamId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         select count(*) from buildlogs where teamId = #{teamId};
     </select>
-    
+
     <select id="getDeployLogOutputTextById" parameterType="java.lang.Integer" resultType="java.lang.String">
         select output from buildlogs where id = #{id};
     </select>

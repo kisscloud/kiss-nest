@@ -43,6 +43,12 @@ public class BuildLogDaoImpl implements BuildLogDao {
     }
 
     @Override
+    public BuildLog getBuildLogByJobNameAndQueueId(String jobName, Integer queueId) {
+
+        return buildLogMapper.getBuildLogByJobNameAndQueueId(jobName, queueId);
+    }
+
+    @Override
     public List<BuildLog> getBuildLogs() {
 
         return buildLogMapper.getBuildLogs();

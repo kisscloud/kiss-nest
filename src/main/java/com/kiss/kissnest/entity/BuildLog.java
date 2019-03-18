@@ -41,6 +41,8 @@ public class BuildLog {
 
     private Long buildAt;
 
+    private String logUrl;
+
     private Integer type;
 
     private Date createdAt;

@@ -3,11 +3,11 @@ package com.kiss.kissnest.input;
 import lombok.Data;
 
 @Data
-public class JenkinsNotificationInput {
+public class JenkinsNotification {
 
     private String name;
     private String url;
-    private Build build;
+    private JenkinsNotificationBuild build;
 
 
     public boolean isQueued() {
@@ -27,25 +27,9 @@ public class JenkinsNotificationInput {
     }
 }
 
-@Data
-class Build {
-    private String full_url;
-    private Integer number;
-    private Integer queue_id;
-    private String phase;
-    private String status;
-    private String url;
-    private SCM scm;
-    private String notes;
-    private String log;
-}
 
-@Data
-class SCM {
-    private String url;
-    private String branch;
-    private String commit;
-}
+
+
 
 
 

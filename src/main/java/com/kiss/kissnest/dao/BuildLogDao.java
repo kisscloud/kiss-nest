@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BuildLogDao {
 
-    Integer createBuildLog (BuildLog buildLog);
+    Integer createBuildLog(BuildLog buildLog);
 
     Integer deleteBuildLogById(Integer id);
 
@@ -15,11 +15,13 @@ public interface BuildLogDao {
 
     BuildLog getBuildLogById(Integer id);
 
+    BuildLog getBuildLogByJobNameAndQueueId(String jobName, Integer queueId);
+
     List<BuildLog> getBuildLogs();
 
-    BuildLog getLastBuildByJobNameAndProjectId(String jobName,Integer projectId);
+    BuildLog getLastBuildByJobNameAndProjectId(String jobName, Integer projectId);
 
-    List<BuildLogOutput> getBuildLogOutputsByTeamId(Integer teamId,Integer start,Integer size);
+    List<BuildLogOutput> getBuildLogOutputsByTeamId(Integer teamId, Integer start, Integer size);
 
     BuildLogOutput getBuildRecentLog(Integer id);
 

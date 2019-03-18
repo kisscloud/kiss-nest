@@ -46,7 +46,7 @@ public class JobValidator implements Validator {
                 clazz.equals(UpdateDeployInput.class) ||
                 clazz.equals(DeployJobInput.class) ||
                 clazz.equals(DeployLogInput.class) ||
-                clazz.equals(JenkinsNotificationInput.class);
+                clazz.equals(JenkinsNotification.class);
     }
 
     @Override

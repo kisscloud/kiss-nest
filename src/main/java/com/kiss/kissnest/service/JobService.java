@@ -16,10 +16,8 @@ import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.LangUtil;
 import com.kiss.kissnest.util.SaltStackUtil;
-import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.kiss.foundation.entity.Guest;
 import com.kiss.foundation.exception.StatusException;
 import com.kiss.foundation.utils.BeanCopyUtil;
@@ -39,6 +37,8 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -239,30 +239,31 @@ public class JobService {
         Guest guest = ThreadLocalUtil.getGuest();
         Member member = memberDao.getMemberByAccountId(guest.getId());
 
-        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, 2);
-
-        if (buildLog == null) {
-            throw new StatusException(NestStatusCode.CREATE_BUILD_LOG_FAILED);
-        }
-
         String location = jenkinsUtil.buildJob(jobName, buildJobInput.getBranch(), guest.getUsername(), member.getApiToken());
 
         if (location == null) {
             throw new TransactionalException(NestStatusCode.BUILD_JENKINS_JOB_ERROR);
         }
 
-        location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
-        buildRemarks.put(location, buildJobInput.getRemark());
+        Pattern queueIdPattern = Pattern.compile(".*/queue/item/([0-9]+)");
+        Matcher queueIdMatcher = queueIdPattern.matcher(location);
+        Long queueId = null;
 
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getUsername(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
-        thread.start();
+        if (queueIdMatcher.find() && queueIdMatcher.group(1) != null) {
+            queueId = Long.parseLong(queueIdMatcher.group(1));
+        }
 
-        log.info("location is {} remark is {}", location, buildRemarks);
+        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, queueId, BuildJobStatusEnums.PENDING.value());
+
+        if (buildLog == null) {
+            throw new StatusException(NestStatusCode.CREATE_BUILD_LOG_FAILED);
+        }
 
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
 
         Group group = groupDao.getGroupByProjectId(buildJobInput.getProjectId());
+
         Map<String, Object> result = new HashMap<>();
         result.put("id", buildLog.getId());
         result.put("projectName", project.getName());
@@ -845,93 +846,7 @@ public class JobService {
         return jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
     }
 
-    class BuildLogRunnable implements Runnable {
-
-        private Integer id;
-
-        private String account;
-
-        private String passwordOrToken;
-
-        private Integer type;
-
-        private String location;
-
-        private String jobName;
-
-        private Integer versionType;
-
-        private Integer projectId;
-
-        private String operatorName;
-
-        public BuildLogRunnable(Integer buildLogId, String jobName, String account, String operatorName, String passwordOrToken, Integer type, String location, Integer versionType, Integer projectId) {
-            this.account = account;
-            this.passwordOrToken = passwordOrToken;
-            this.type = type;
-            this.location = location;
-            this.jobName = jobName;
-            this.id = buildLogId;
-            this.versionType = versionType;
-            this.projectId = projectId;
-            this.operatorName = operatorName;
-        }
-
-        @Override
-        public void run() {
-            Build build = null;
-            JenkinsServer jenkinsServer = null;
-            Integer newNumber = -1;
-
-            try {
-                jenkinsServer = jenkinsUtil.getJenkinsServer(account, passwordOrToken);
-
-                if (jenkinsServer == null) {
-                    return;
-                }
-
-                for (int i = 0; i < 300; i++) {
-                    build = jenkinsUtil.getBuild(jenkinsServer, location);
-
-                    if (build != null) {
-                        break;
-                    }
-
-                    Thread.sleep(1000);
-                }
-
-                if (build == null) {
-                    return;
-                }
-
-                updateBuildLog(build, id, jobName, operatorName, location, versionType, projectId);
-
-                // 构建成功，发送WS消息
-                Map<String, Object> result = new HashMap<>();
-                result.put("id", id);
-                webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), result);
-                log.info("id is {}", id);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (jenkinsServer != null) {
-                    jenkinsUtil.close(jenkinsServer);
-                }
-
-//                if (newNumber != -1) {
-//                    Integer count = jobDao.updateJobStatusAndNumber(projectId, type, 1, 0, newNumber);
-//
-//                    if (count == 0) {
-//                        log.info("{}的{}的buildLog更新失败,操作人员{},记录条目数,新条目数{}", projectId, type, operatorId, newNumber);
-//                    }
-//                }
-            }
-
-        }
-    }
-
-    public BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest, Integer status) {
+    private BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest, Long queueId, Integer status) {
 
         BuildLog buildLog = new BuildLog();
         buildLog.setTeamId(teamId);
@@ -941,6 +856,8 @@ public class JobService {
         buildLog.setOperatorId(guest.getId());
         buildLog.setOperatorName(guest.getName());
         buildLog.setStatus(status);
+        buildLog.setQueueId(queueId);
+
         Integer count = buildLogDao.createBuildLog(buildLog);
 
         if (count == 0) {
@@ -953,73 +870,73 @@ public class JobService {
         return buildLog;
     }
 
-    public void updateBuildLog(Build build, Integer id, String jobName, String operatorName, String location, Integer versionType, Integer projectId) throws InterruptedException {
 
-        JenkinsHttpConnection client = build.getClient();
-        String logUrl = String.format(jenkinsBuildLogUrl, jobName, build.getNumber());
-        BuildWithDetails buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client, logUrl);
+    public void buildJobQueued(String jobName, Integer queueId, Integer number, String jobUrl, String branch, String version) {
+        BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
+        if (buildLog != null) {
+            buildLog.setLogUrl(jobUrl + "/console");
+            buildLog.setStatus(BuildJobStatusEnums.QUEUEING.value());
+            buildLog.setNumber(number);
+            buildLog.setBranch(branch);
+            buildLog.setVersion(version);
+            buildLogDao.updateBuildLog(buildLog);
+        }
+    }
 
-        for (int i = 0; i < 1000; i++) {
-            buildWithDetails = jenkinsUtil.getLastBuildWithDetail(client, logUrl);
-            boolean run = buildWithDetails.isBuilding();
-            if (run) {
-                Thread.sleep(3000);
+    public void buildJobStarted(String jobName, Integer queueId) {
+        BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
+        if (buildLog != null) {
+            buildLog.setStatus(BuildJobStatusEnums.BUILDING.value());
+            buildLog.setBuildAt(System.currentTimeMillis() / 1000);
+            buildLogDao.updateBuildLog(buildLog);
+        }
+    }
+
+    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) {
+        BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
+        if (buildLog != null) {
+            buildLog.setDuration(System.currentTimeMillis() / 1000 - buildLog.getBuildAt());
+            if (status != null && status.equals("SUCCESS")) {
+                buildLog.setStatus(BuildJobStatusEnums.SUCCESS.value());
+                buildJobSuccess(buildLog, jobUrl);
             } else {
-                break;
+                buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
+                buildLogDao.updateBuildLog(buildLog);
             }
         }
+    }
 
-        client = buildWithDetails.getClient();
-        String output = jenkinsUtil.getConsoleOutputText(client, logUrl + jenkinsBuildOutputPath);
-        String result = buildWithDetails.getResult().name();
-        Long duration = buildWithDetails.getDuration();
-        Map<String, String> params = buildWithDetails.getParameters();
-        String branch = params.get("branch");
-        BuildLog buildLog = new BuildLog();
-        buildLog.setId(id);
-        buildLog.setBranch(branch);
-        buildLog.setType(versionType);
-        buildLog.setNumber(build.getNumber());
-        buildLog.setOperatorName(operatorName);
+    private void buildJobSuccess(BuildLog buildLog, String jobUrl) {
+
+        Build build = new Build(buildLog.getNumber(), jobUrl);
+
+        JenkinsHttpConnection client = build.getClient();
+
+        String output = jenkinsUtil.getConsoleOutputText(client, jobUrl + jenkinsBuildOutputPath);
         buildLog.setOutput(output);
-        buildLog.setBuildAt(buildWithDetails.getTimestamp());
-        buildLog.setRemark(buildRemarks.get(location));
-        buildRemarks.remove(location);
-        String[] urlStr = location.split("/");
-        buildLog.setQueueId(Long.valueOf(urlStr[urlStr.length - 1]));
-        buildLog.setDuration(duration);
+        buildLogDao.updateBuildLog(buildLog);
 
-        String version = "";
-        if (output.indexOf("versionStart") != -1) {
+        String version;
+
+        if (output.contains("versionStart")) {
             version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
             buildLog.setVersion(version);
         }
 
-        if (output.indexOf("jarNameStart") != -1) {
+        if (output.contains("jarNameStart")) {
             String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
             buildLog.setJarName(jarName);
         }
 
-        if (output.indexOf("tarNameStart") != -1) {
+        if (output.contains("tarNameStart")) {
             String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
             buildLog.setTarName(tarName);
         }
 
-        if ("success".equalsIgnoreCase(result)) {
-            buildLog.setStatus(1);
-        } else {
-            buildLog.setStatus(0);
-        }
-
-        buildLogDao.updateBuildLog(buildLog);
-        buildLog.setProjectId(projectId);
         packageRepositoryService.createPackageRepository(buildLog);
 
-        if (BuildJobTypeEnums.BRANCH.equals(versionType)) {
-            updateProjectLastBuild(projectId, version);
-        } else if (BuildJobTypeEnums.TAG.equals(version)) {
-            updateProjectLastBuild(projectId, branch);
-        }
+        updateProjectLastBuild(buildLog.getProjectId(), buildLog.getVersion());
+
     }
 
     public void updateProjectLastBuild(Integer projectId, String lastBuild) {
