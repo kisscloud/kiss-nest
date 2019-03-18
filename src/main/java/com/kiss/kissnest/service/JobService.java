@@ -228,6 +228,11 @@ public class JobService {
 
         List<Job> jobs = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
         Job job = jobs.size() > 0 ? jobs.get(0) : null;
+
+        if (job == null) {
+            throw new StatusException(NestStatusCode.JOB_NOT_EXIST);
+        }
+
         Project project = projectDao.getProjectById(job.getProjectId());
         String jobName = job.getJobName();
 
@@ -249,13 +254,11 @@ public class JobService {
         location = location.endsWith("/") ? location.substring(0, location.length() - 1) : location;
         buildRemarks.put(location, buildJobInput.getRemark());
 
-        Thread thread = new Thread(new BuildLogRunnable(buildLog.getId(), jobName, guest.getUsername(), guest.getName(), member.getApiToken(), 1, location, buildJobInput.getType(), project.getId()));
-        thread.start();
-
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
 
         Group group = groupDao.getGroupByProjectId(buildJobInput.getProjectId());
+
         Map<String, Object> result = new HashMap<>();
         result.put("id", buildLog.getId());
         result.put("projectName", project.getName());
