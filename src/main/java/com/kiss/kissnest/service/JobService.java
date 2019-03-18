@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.kiss.kissnest.dao.*;
 import com.kiss.kissnest.entity.*;
 import com.kiss.kissnest.enums.BuildJobStatusEnums;
-import com.kiss.kissnest.enums.BuildJobTypeEnums;
 import com.kiss.kissnest.enums.OperationTargetType;
 import com.kiss.kissnest.enums.WebSocketMessageTypeEnums;
 import com.kiss.kissnest.exception.TransactionalException;
@@ -15,6 +14,7 @@ import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.status.NestStatusCode;
 import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.LangUtil;
+import com.kiss.kissnest.util.OutputUtil;
 import com.kiss.kissnest.util.SaltStackUtil;
 import com.offbytwo.jenkins.client.JenkinsHttpConnection;
 import com.offbytwo.jenkins.model.Build;
@@ -123,13 +123,10 @@ public class JobService {
     private SaltStackUtil saltStackUtil;
 
     @Autowired
-    private GroupDao groupDao;
-
-    @Autowired
     private WebSocketService webSocketService;
 
-
-    public static Map<String, String> buildRemarks = new HashMap<>();
+    @Autowired
+    private OutputUtil outputUtil;
 
     public JobOutput createBuildJob(CreateJobInput createJobInput) {
 
@@ -224,7 +221,7 @@ public class JobService {
     }
 
     @Transactional
-    public Map<String, Object> buildJob(BuildJobInput buildJobInput) {
+    public BuildLog buildJob(BuildJobInput buildJobInput) {
 
         List<Job> jobs = jobDao.getJobByProjectIdAndType(buildJobInput.getProjectId(), 1);
         Job job = jobs.size() > 0 ? jobs.get(0) : null;
@@ -262,23 +259,8 @@ public class JobService {
         operationLogService.saveOperationLog(job.getTeamId(), guest, job, null, "id", OperationTargetType.TYPE__BUILD_JOB);
         operationLogService.saveDynamic(guest, job.getTeamId(), null, job.getProjectId(), OperationTargetType.TYPE__BUILD_JOB, job);
 
-        Group group = groupDao.getGroupByProjectId(buildJobInput.getProjectId());
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", buildLog.getId());
-        result.put("projectName", project.getName());
-        result.put("projectId", buildJobInput.getProjectId());
-        result.put("branch", buildJobInput.getBranch());
-        result.put("remark", buildJobInput.getRemark());
-        result.put("status", BuildJobStatusEnums.PENDING.value());
-        result.put("statusText", langUtil.getEnumsMessage("build.status", String.valueOf(result.get("status"))));
-        result.put("createdAt", buildLog.getCreatedAt() == null ? null : buildLog.getCreatedAt().getTime());
-        result.put("groupId", group.getId());
-        result.put("groupName", group.getName());
-
-        webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_START.value(), result);
-
-        return result;
+        return buildLog;
     }
 
 
@@ -872,7 +854,9 @@ public class JobService {
 
 
     public void buildJobQueued(String jobName, Integer queueId, Integer number, String jobUrl, String branch, String version) {
+
         BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
+
         if (buildLog != null) {
             buildLog.setLogUrl(jobUrl + "/console");
             buildLog.setStatus(BuildJobStatusEnums.QUEUEING.value());
@@ -880,6 +864,9 @@ public class JobService {
             buildLog.setBranch(branch);
             buildLog.setVersion(version);
             buildLogDao.updateBuildLog(buildLog);
+
+            BuildLogOutput buildLogOutput = outputUtil.toBuildLogOutput(buildLog);
+            webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_QUEUEING.value(), buildLogOutput);
         }
     }
 
@@ -889,6 +876,8 @@ public class JobService {
             buildLog.setStatus(BuildJobStatusEnums.BUILDING.value());
             buildLog.setBuildAt(System.currentTimeMillis() / 1000);
             buildLogDao.updateBuildLog(buildLog);
+            BuildLogOutput buildLogOutput = outputUtil.toBuildLogOutput(buildLog);
+            webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_START.value(), buildLogOutput);
         }
     }
 
@@ -903,6 +892,8 @@ public class JobService {
                 buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
                 buildLogDao.updateBuildLog(buildLog);
             }
+            BuildLogOutput buildLogOutput = outputUtil.toBuildLogOutput(buildLog);
+            webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_END.value(), buildLogOutput);
         }
     }
 
@@ -913,12 +904,9 @@ public class JobService {
         JenkinsHttpConnection client = build.getClient();
 
         String output = jenkinsUtil.getConsoleOutputText(client, jobUrl + jenkinsBuildOutputPath);
-        buildLog.setOutput(output);
-
-        String version;
 
         if (output.contains("versionStart")) {
-            version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
+            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
             buildLog.setVersion(version);
         }
 

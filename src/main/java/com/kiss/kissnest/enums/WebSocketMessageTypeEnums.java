@@ -2,6 +2,8 @@ package com.kiss.kissnest.enums;
 
 public enum WebSocketMessageTypeEnums {
 
+    BUILD_PROJECT_PENDING("buildProjectPending"),
+    BUILD_PROJECT_QUEUEING("buildProjectQueueing"),
     BUILD_PROJECT_START("buildProjectStart"),
     BUILD_PROJECT_END("buildProjectEnd"),
     DEPLOY_PROJECT_START("deployProjectStart"),

@@ -1,15 +1,23 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.foundation.utils.BeanCopyUtil;
+import com.kiss.kissnest.dao.GroupDao;
+import com.kiss.kissnest.entity.BuildLog;
+import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Job;
+import com.kiss.kissnest.enums.WebSocketMessageTypeEnums;
 import com.kiss.kissnest.input.*;
 import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.service.JobService;
 import com.kiss.kissnest.service.PackageRepositoryService;
+import com.kiss.kissnest.service.WebSocketService;
+import com.kiss.kissnest.util.LangUtil;
+import com.kiss.kissnest.util.OutputUtil;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -36,6 +44,12 @@ public class JobController {
     @Autowired
     private PackageRepositoryService packageRepositoryService;
 
+    @Autowired
+    private WebSocketService webSocketService;
+
+    @Autowired
+    private OutputUtil outputUtil;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
 
@@ -51,9 +65,15 @@ public class JobController {
 
     @PostMapping("/job/build/exec")
     @ApiOperation(value = "执行构建任务")
-    public Map<String, Object> execBuildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
+    public BuildLogOutput execBuildJob(@Validated @RequestBody BuildJobInput buildJobInput) {
 
-        return jobService.buildJob(buildJobInput);
+        BuildLog buildLog = jobService.buildJob(buildJobInput);
+
+        BuildLogOutput buildLogOutput = outputUtil.toBuildLogOutput(buildLog);
+
+        webSocketService.sendMessage(WebSocketMessageTypeEnums.BUILD_PROJECT_PENDING.value(), buildLogOutput);
+
+        return buildLogOutput;
     }
 
     @GetMapping("/job/exist")
