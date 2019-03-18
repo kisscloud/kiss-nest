@@ -914,7 +914,6 @@ public class JobService {
 
         String output = jenkinsUtil.getConsoleOutputText(client, jobUrl + jenkinsBuildOutputPath);
         buildLog.setOutput(output);
-        buildLogDao.updateBuildLog(buildLog);
 
         String version;
 
@@ -933,6 +932,7 @@ public class JobService {
             buildLog.setTarName(tarName);
         }
 
+        buildLogDao.updateBuildLog(buildLog);
         packageRepositoryService.createPackageRepository(buildLog);
 
         updateProjectLastBuild(buildLog.getProjectId(), buildLog.getVersion());
