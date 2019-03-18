@@ -231,7 +231,7 @@ public class JobController {
 
     @PostMapping("/job/jenkins/notification")
     @ApiOperation(value = "Jenkins消息回调")
-    public Object postJenkinsNotification(@RequestBody JenkinsNotificationInput callbackData) {
+    public Object postJenkinsNotification(@RequestBody Object callbackData) {
         log.info("回调数据：{}", callbackData);
         return callbackData;
     }
