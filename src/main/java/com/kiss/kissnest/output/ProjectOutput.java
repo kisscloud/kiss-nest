@@ -44,4 +44,8 @@ public class ProjectOutput {
     private Long createdAt;
 
     private Long updatedAt;
+
+    public String getLastBuild() {
+        return lastBuild == null ? null : lastBuild.substring(0, 8);
+    }
 }
