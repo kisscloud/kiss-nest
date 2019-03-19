@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -881,8 +882,10 @@ public class JobService {
         }
     }
 
-    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) {
+    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) throws IOException, URISyntaxException {
+
         BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
+
         if (buildLog != null) {
             buildLog.setDuration(System.currentTimeMillis() / 1000 - buildLog.getBuildAt());
             if (status != null && status.equals("SUCCESS")) {
@@ -897,23 +900,16 @@ public class JobService {
         }
     }
 
-    private void buildJobSuccess(BuildLog buildLog, String jobUrl) {
+    private void buildJobSuccess(BuildLog buildLog, String jobUrl) throws IOException, URISyntaxException {
 
-        Build build = new Build(buildLog.getNumber(), jobUrl);
 
-        JenkinsHttpConnection client = build.getClient();
+        Member member = memberDao.getMemberByAccountId(buildLog.getOperatorId());
+        String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, member.getUsername(), member.getApiToken());
 
-        String output = jenkinsUtil.getConsoleOutputText(client, jobUrl.substring(0, jobUrl.length() - 2) + jenkinsBuildOutputPath);
-
-        if (output.contains("versionStart")) {
-            String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);
-            buildLog.setVersion(version);
-        }
-
-        if (output.contains("jarNameStart")) {
-            String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
-            buildLog.setJarName(jarName);
-        }
+//        if (output.contains("jarNameStart")) {
+//            String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
+//            buildLog.setJarName(jarName);
+//        }
 
         if (output.contains("tarNameStart")) {
             String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
@@ -927,12 +923,12 @@ public class JobService {
 
     }
 
-    public void updateProjectLastBuild(Integer projectId, String lastBuild) {
+    private void updateProjectLastBuild(Integer projectId, String lastBuild) {
 
         projectDao.updateLastBuild(projectId, lastBuild);
     }
 
-    public void updateProjectLastDeploy(Integer projectId, String branch, String tag, String version) {
+    private void updateProjectLastDeploy(Integer projectId, String branch, String tag, String version) {
 
         String lastDeploy = "";
 

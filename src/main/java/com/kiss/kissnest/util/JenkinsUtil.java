@@ -27,6 +27,7 @@ import com.kiss.foundation.utils.ThreadLocalUtil;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -266,90 +267,85 @@ public class JenkinsUtil {
         }
     }
 
-    public JenkinsServer getJenkinsServer(String account, String passwordOrToken) {
-
-        JenkinsServer server = null;
-
-        try {
-            server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            return server;
-        }
-    }
-
-    public Build getBuild(String jobName, JenkinsServer server, Integer number) {
-
-        try {
-            JobWithDetails jobWithDetails = server.getJob(jobName);
-            Build build = jobWithDetails.getBuildByNumber(number);
-
-            return build;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Build getBuild(JenkinsServer server, String location) {
-
-        try {
-            QueueReference queueReference = new QueueReference(location + jenkinsQueuePath);
-            QueueItem queueItem = server.getQueueItem(queueReference);
-
-            if (queueItem == null) {
-                return null;
-            }
-
-            Build build = server.getBuild(queueItem);
-
-            return build;
-        } catch (Exception e) {
+//    public JenkinsServer getJenkinsServer(String account, String passwordOrToken) {
+//
+//        JenkinsServer server = null;
+//
+//        try {
+//            server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+//        } catch (Exception e) {
 //            e.printStackTrace();
-            return null;
-        }
+//        } finally {
+//            return server;
+//        }
+//    }
+
+//    public Build getBuild(String jobName, JenkinsServer server, Integer number) {
+//
+//        try {
+//            JobWithDetails jobWithDetails = server.getJob(jobName);
+//            Build build = jobWithDetails.getBuildByNumber(number);
+//
+//            return build;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+//    public Build getBuild(JenkinsServer server, String location) {
+//
+//        try {
+//            QueueReference queueReference = new QueueReference(location + jenkinsQueuePath);
+//            QueueItem queueItem = server.getQueueItem(queueReference);
+//
+//            if (queueItem == null) {
+//                return null;
+//            }
+//
+//            Build build = server.getBuild(queueItem);
+//
+//            return build;
+//        } catch (Exception e) {
+////            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+//    public Build getLastBuild(String jobName, JenkinsServer server) {
+//
+//        try {
+//            JobWithDetails jobWithDetails = server.getJob(jobName);
+//            Build build = jobWithDetails.getLastBuild();
+//
+//            return build;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+//    public BuildWithDetails getLastBuildWithDetail(JenkinsHttpConnection client, String url) {
+//
+//        try {
+//            BuildWithDetails buildWithDetails = client.get(url, BuildWithDetails.class);
+//            return buildWithDetails;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    public String getConsoleOutputText(String jobName, String xmlLogUrl, String account, String passwordOrToken) throws URISyntaxException, IOException {
+
+        JenkinsServer server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+        FolderJob folderJob = new FolderJob(jobName, jenkinsUrl);
+        JobWithDetails jobWithDetails = server.getJob(folderJob, jobName);
+        JenkinsHttpConnection client = jobWithDetails.getClient();
+
+        return client.get(xmlLogUrl);
     }
 
-    public Build getLastBuild(String jobName, JenkinsServer server) {
-
-        try {
-            JobWithDetails jobWithDetails = server.getJob(jobName);
-            Build build = jobWithDetails.getLastBuild();
-
-            return build;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public BuildWithDetails getLastBuildWithDetail(JenkinsHttpConnection client, String url) {
-
-        try {
-            BuildWithDetails buildWithDetails = client.get(url, BuildWithDetails.class);
-            return buildWithDetails;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String getConsoleOutputText(JenkinsHttpConnection client, String url) {
-
-        try {
-            return client.get(url);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    public void close(JenkinsServer server) {
-
-        if (server != null) {
-            server.close();
-        }
-    }
 
     public StringBuilder readFileFromClassPath(String name) throws IOException {
 
@@ -357,7 +353,7 @@ public class JenkinsUtil {
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(in);
         BufferedReader bufferedReader = new BufferedReader(reader);
-        String lineTxt = null;
+        String lineTxt;
         while ((lineTxt = bufferedReader.readLine()) != null) {
             builder.append(lineTxt);
         }
@@ -365,7 +361,7 @@ public class JenkinsUtil {
         return builder;
     }
 
-    public HttpResponse authorizationExecute(Map<String, String> params, String url, String account, String passwordOrToken) throws IOException {
+    private HttpResponse authorizationExecute(Map<String, String> params, String url, String account, String passwordOrToken) throws IOException {
 
         URI uri = URI.create(url);
         HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
@@ -374,7 +370,6 @@ public class JenkinsUtil {
         AuthCache authCache = new BasicAuthCache();
         BasicScheme basicAuth = new BasicScheme();
         authCache.put(host, basicAuth);
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
         HttpPost httpPost = new HttpPost(uri);
 
         if (null != params && !params.isEmpty()) {
@@ -392,11 +387,12 @@ public class JenkinsUtil {
         localContext.setAuthCache(authCache);
         HttpResponse response = null;
         CrumbEntity crumbEntity = getCrumb(jenkinsUrl, jenkinsCrumbPath, account, passwordOrToken);
-        try {
+
+        try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
+            assert crumbEntity != null;
             httpPost.addHeader(crumbEntity.getCrumbRequestField(), crumbEntity.getCrumb());
             response = httpClient.execute(host, httpPost, localContext);
 
-//            log.info(EntityUtils.toString(response.getEntity()));
             Integer code = response.getStatusLine().getStatusCode();
 
             if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
@@ -417,29 +413,35 @@ public class JenkinsUtil {
             }
 
             httpPost.releaseConnection();
-            httpClient.close();
         }
 
     }
 
-    public CrumbEntity getCrumb(String uri, String path, String username, String password) {
-        JenkinsHttpClient jenkinsHttpClient = null;
-        try {
-            jenkinsHttpClient = new JenkinsHttpClient(new URI(uri), username, password);
+    private CrumbEntity getCrumb(String uri, String path, String username, String password) {
+        try (JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI(uri), username, password)) {
             String jsonResult = jenkinsHttpClient.get(path);
-            CrumbEntity crumbEntity = JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
-
-            return crumbEntity;
+            return JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            jenkinsHttpClient.close();
         }
         return null;
     }
 
     public static void main(String[] args) throws Exception {
 
+
+        String account = "hucansen";
+        String passwordOrToken = "1135f747f0595b8249e3cd4785c45c802e";
+        String jobName = "youbipay-cloudtoken-cloud-token-api";
+        String jenkinsUrl = "http://47.75.39.53:8003";
+        String xmlLogUrl = "http://47.75.39.53:8003/job/youbipay-cloudtoken-cloud-token-api/105//logText/progressiveHtml";
+
+        JenkinsServer server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+        FolderJob folderJob = new FolderJob(jobName, jenkinsUrl);
+        JobWithDetails jobWithDetails = server.getJob(folderJob, jobName);
+
+        JenkinsHttpConnection client = jobWithDetails.getClient();
+        System.out.println(client.get(xmlLogUrl));
 //        String url = "http://localhost:8060/user/qrl758/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken";
 //
 //
@@ -548,70 +550,70 @@ public class JenkinsUtil {
 //            }
 //        }
 
-        try {
-            Map<String, String> params = new HashMap<>();
-//            String url = String.format("http://build.kisscloud.io/job/%s/buildWithParameters", "kiss-eureka-server");
-            String url = "http://build.kisscloud.io/user/xiaoqian/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken";
-            URI uri = URI.create(url);
-            HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-            CredentialsProvider credsProvider = new BasicCredentialsProvider();
-            credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials("xiaoqian", "12345678"));
-            AuthCache authCache = new BasicAuthCache();
-            BasicScheme basicAuth = new BasicScheme();
-            authCache.put(host, basicAuth);
-            CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-            HttpPost httpPost = new HttpPost(uri);
-
-            if (null != params && !params.isEmpty()) {
-                List<BasicNameValuePair> pairs = new ArrayList<>();
-
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-                }
-
-                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(pairs, "UTF-8");
-                httpPost.setEntity(urlEncodedFormEntity);
-            }
-
-            HttpClientContext localContext = HttpClientContext.create();
-            localContext.setAuthCache(authCache);
-            HttpResponse response = null;
-
-            JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"), "xiaoqian", "12345678");
-            String jsonResult = jenkinsHttpClient.get("/crumbIssuer/api/json");
-            CrumbEntity crumbEntity = JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
-            try {
-                httpPost.addHeader(crumbEntity.getCrumbRequestField(), crumbEntity.getCrumb());
-                response = httpClient.execute(host, httpPost, localContext);
-
-//            log.info(EntityUtils.toString(response.getEntity()));
-                Integer code = response.getStatusLine().getStatusCode();
-
-                if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
-                    HttpEntity httpEntity = response.getEntity();
-//                    InputStream in = httpEntity.getContent();
-//                    Header[] heads = response.getHeaders("Location");
-//                    String value = heads[0].getValue();
-                    System.out.println(EntityUtils.toString(response.getEntity(), "utf-8"));
-                    System.out.println(httpEntity);
-                }
-                System.out.println("aaa");
-            } catch (Exception e) {
-                httpPost.abort();
-                e.printStackTrace();
-            } finally {
-
-                if (response != null) {
-                    ((CloseableHttpResponse) response).close();
-                }
-
-                httpPost.releaseConnection();
-                httpClient.close();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Map<String, String> params = new HashMap<>();
+////            String url = String.format("http://build.kisscloud.io/job/%s/buildWithParameters", "kiss-eureka-server");
+//            String url = "http://build.kisscloud.io/user/xiaoqian/descriptorByName/jenkins.security.ApiTokenProperty/generateNewToken";
+//            URI uri = URI.create(url);
+//            HttpHost host = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+//            CredentialsProvider credsProvider = new BasicCredentialsProvider();
+//            credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials("xiaoqian", "12345678"));
+//            AuthCache authCache = new BasicAuthCache();
+//            BasicScheme basicAuth = new BasicScheme();
+//            authCache.put(host, basicAuth);
+//            CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+//            HttpPost httpPost = new HttpPost(uri);
+//
+//            if (null != params && !params.isEmpty()) {
+//                List<BasicNameValuePair> pairs = new ArrayList<>();
+//
+//                for (Map.Entry<String, String> entry : params.entrySet()) {
+//                    pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+//                }
+//
+//                UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(pairs, "UTF-8");
+//                httpPost.setEntity(urlEncodedFormEntity);
+//            }
+//
+//            HttpClientContext localContext = HttpClientContext.create();
+//            localContext.setAuthCache(authCache);
+//            HttpResponse response = null;
+//
+//            JenkinsHttpClient jenkinsHttpClient = new JenkinsHttpClient(new URI("http://build.kisscloud.io"), "xiaoqian", "12345678");
+//            String jsonResult = jenkinsHttpClient.get("/crumbIssuer/api/json");
+//            CrumbEntity crumbEntity = JsonUtil.getJsonObject(jsonResult, CrumbEntity.class);
+//            try {
+//                httpPost.addHeader(crumbEntity.getCrumbRequestField(), crumbEntity.getCrumb());
+//                response = httpClient.execute(host, httpPost, localContext);
+//
+////            log.info(EntityUtils.toString(response.getEntity()));
+//                Integer code = response.getStatusLine().getStatusCode();
+//
+//                if (code == HttpStatus.SC_OK || code == HttpStatus.SC_CREATED) {
+//                    HttpEntity httpEntity = response.getEntity();
+////                    InputStream in = httpEntity.getContent();
+////                    Header[] heads = response.getHeaders("Location");
+////                    String value = heads[0].getValue();
+//                    System.out.println(EntityUtils.toString(response.getEntity(), "utf-8"));
+//                    System.out.println(httpEntity);
+//                }
+//                System.out.println("aaa");
+//            } catch (Exception e) {
+//                httpPost.abort();
+//                e.printStackTrace();
+//            } finally {
+//
+//                if (response != null) {
+//                    ((CloseableHttpResponse) response).close();
+//                }
+//
+//                httpPost.releaseConnection();
+//                httpClient.close();
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 //        JenkinsServer server = null;
 //
 //        try {
