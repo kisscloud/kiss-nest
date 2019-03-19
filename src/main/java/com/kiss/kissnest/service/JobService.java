@@ -230,7 +230,6 @@ public class JobService {
             throw new StatusException(NestStatusCode.JOB_NOT_EXIST);
         }
 
-        Project project = projectDao.getProjectById(job.getProjectId());
         String jobName = job.getJobName();
 
         Guest guest = ThreadLocalUtil.getGuest();
@@ -250,7 +249,7 @@ public class JobService {
             queueId = Long.parseLong(queueIdMatcher.group(1));
         }
 
-        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, queueId, BuildJobStatusEnums.PENDING.value());
+        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName,buildJobInput.getType(), buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, queueId, BuildJobStatusEnums.PENDING.value());
 
         if (buildLog == null) {
             throw new StatusException(NestStatusCode.CREATE_BUILD_LOG_FAILED);
@@ -828,11 +827,12 @@ public class JobService {
         return jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
     }
 
-    private BuildLog saveBuildLog(Integer teamId, String jobName, String branch, Integer projectId, Guest guest, Long queueId, Integer status) {
+    private BuildLog saveBuildLog(Integer teamId, String jobName, Integer type ,String branch, Integer projectId, Guest guest, Long queueId, Integer status) {
 
         BuildLog buildLog = new BuildLog();
         buildLog.setTeamId(teamId);
         buildLog.setJobName(jobName);
+        buildLog.setType(type);
         buildLog.setBranch(branch);
         buildLog.setProjectId(projectId);
         buildLog.setOperatorId(guest.getId());
