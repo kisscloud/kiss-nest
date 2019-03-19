@@ -13,7 +13,7 @@
                         <urlOrId>%s</urlOrId>
                         <urlType>PUBLIC</urlType>
                     </urlInfo>
-                    <event>all</event>
+                    <event>100</event>
                     <timeout>30000</timeout>
                     <loglines>0</loglines>
                     <buildNotes></buildNotes>

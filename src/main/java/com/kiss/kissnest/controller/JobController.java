@@ -253,7 +253,7 @@ public class JobController {
         } else if (data.isStarted()) {
             jobService.buildJobStarted(data.getName(), data.getBuild().getQueue_id());
         } else if (data.isFinalized()) {
-            jobService.buildJobFinalized(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getStatus(), data.getBuild().getFull_url());
+            jobService.buildJobFinalized(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getStatus(), data.getBuild().getLog());
         }
     }
 }

@@ -882,7 +882,7 @@ public class JobService {
         }
     }
 
-    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) {
+    public void buildJobFinalized(String jobName, Integer queueId, String status, String log) {
 
         BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
 
@@ -890,7 +890,7 @@ public class JobService {
             buildLog.setDuration(System.currentTimeMillis() / 1000 - buildLog.getBuildAt());
             if (status != null && status.equals("SUCCESS")) {
                 buildLog.setStatus(BuildJobStatusEnums.SUCCESS.value());
-                buildJobSuccess(buildLog, jobUrl);
+                buildJobSuccess(buildLog, log);
             } else {
                 buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
                 buildLogDao.updateBuildLog(buildLog);
@@ -900,21 +900,14 @@ public class JobService {
         }
     }
 
-    private void buildJobSuccess(BuildLog buildLog, String jobUrl) {
+    private void buildJobSuccess(BuildLog buildLog, String log) {
 
 
-        Member member = memberDao.getMemberByAccountId(buildLog.getOperatorId());
-        String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, member.getUsername(), member.getApiToken());
-        log.info("member is {}", member);
-        log.info("output is {}", output);
-        log.info("jobUrl is {}", jobUrl + jenkinsBuildOutputPath);
-        if (output == null) {
-            buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
-        } else {
-            if (output.contains("tarNameStart")) {
-                String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
-                buildLog.setTarName(tarName);
-            }
+        String tarName = log.substring(log.indexOf("tarNameStart") + 13, log.indexOf("tarNameEnd") - 1);
+        buildLog.setTarName(tarName);
+
+        if (buildLog.getTarName() == null || buildLog.getTarName().isEmpty()) {
+            buildLog.setStatus(BuildJobStatusEnums.PACKAGE_MISS.value());
         }
 
         buildLogDao.updateBuildLog(buildLog);
