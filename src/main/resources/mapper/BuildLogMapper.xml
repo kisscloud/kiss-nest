@@ -7,9 +7,9 @@
 <mapper namespace="com.kiss.kissnest.mapper.BuildLogMapper">
     <insert id="createBuildLog" parameterType="com.kiss.kissnest.entity.BuildLog" useGeneratedKeys="true"
             keyProperty="id">
-        insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,jarName,operatorId,operatorName,buildAt,type)
+        insert into buildlogs (teamId,jobName,branch,number,queueId,version,projectId,remark,status,output,duration,operatorId,operatorName,buildAt,type)
         value
-        (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{jarName},#{operatorId},#{operatorName},#{buildAt},#{type})
+        (#{teamId},#{jobName},#{branch},#{number},#{queueId},#{version},#{projectId},#{remark},#{status},#{output},#{duration},#{operatorId},#{operatorName},#{buildAt},#{type})
     </insert>
 
     <delete id="deleteBuildLogById" parameterType="java.lang.Integer">
@@ -46,9 +46,6 @@
         </if>
         <if test="duration != null">
             ,duration = #{duration}
-        </if>
-        <if test="jarName != null">
-            ,jarName = #{jarName}
         </if>
         <if test="tarName != null">
             ,tarName = #{tarName}
@@ -92,7 +89,7 @@
     <select id="getBuildLogOutputsByTeamId" parameterType="java.lang.Integer"
             resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
-        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.logUrl,bu.operatorId,
+        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.logUrl,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
         UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt,
         po.groupId,gr.name as groupName
@@ -112,7 +109,7 @@
     <select id="getBuildRecentLog" parameterType="java.lang.Integer"
             resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
-        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
+        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
         UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt,
         po.groupId,gr.name as groupName

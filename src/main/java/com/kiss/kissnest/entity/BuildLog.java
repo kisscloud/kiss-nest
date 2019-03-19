@@ -31,8 +31,6 @@ public class BuildLog {
 
     private Long duration;
 
-    private String jarName;
-
     private String tarName;
 
     private Integer operatorId;
