@@ -13,8 +13,6 @@ public class PackageRepository {
 
     private Integer buildLogId;
 
-    private String jarName;
-
     private String tarName;
 
     private String version;
