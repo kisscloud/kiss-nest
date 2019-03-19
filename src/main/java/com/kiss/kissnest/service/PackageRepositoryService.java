@@ -20,7 +20,6 @@ public class PackageRepositoryService {
         PackageRepository packageRepository = new PackageRepository();
         packageRepository.setProjectId(buildLog.getProjectId());
         packageRepository.setBuildLogId(buildLog.getId());
-        packageRepository.setJarName(buildLog.getJarName());
         packageRepository.setVersion(buildLog.getVersion());
         packageRepository.setTarName(buildLog.getTarName());
 
