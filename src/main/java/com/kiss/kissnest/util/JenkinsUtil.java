@@ -336,14 +336,22 @@ public class JenkinsUtil {
 //        }
 //    }
 
-    public String getConsoleOutputText(String jobName, String xmlLogUrl, String account, String passwordOrToken) throws URISyntaxException, IOException {
+    public String getConsoleOutputText(String jobName, String xmlLogUrl, String account, String passwordOrToken) {
 
-        JenkinsServer server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
-        FolderJob folderJob = new FolderJob(jobName, jenkinsUrl);
-        JobWithDetails jobWithDetails = server.getJob(folderJob, jobName);
-        JenkinsHttpConnection client = jobWithDetails.getClient();
+        try {
 
-        return client.get(xmlLogUrl);
+            JenkinsServer server = new JenkinsServer(new URI(jenkinsUrl), account, passwordOrToken);
+            FolderJob folderJob = new FolderJob(jobName, jenkinsUrl);
+            JobWithDetails jobWithDetails = server.getJob(folderJob, jobName);
+            JenkinsHttpConnection client = jobWithDetails.getClient();
+
+            return client.get(xmlLogUrl);
+
+        } catch (Exception e) {
+
+            return null;
+        }
+
     }
 
 

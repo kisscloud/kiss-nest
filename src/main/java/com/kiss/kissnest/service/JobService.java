@@ -882,7 +882,7 @@ public class JobService {
         }
     }
 
-    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) throws IOException, URISyntaxException {
+    public void buildJobFinalized(String jobName, Integer queueId, String status, String jobUrl) {
 
         BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
 
@@ -900,20 +900,22 @@ public class JobService {
         }
     }
 
-    private void buildJobSuccess(BuildLog buildLog, String jobUrl) throws IOException, URISyntaxException {
+    private void buildJobSuccess(BuildLog buildLog, String jobUrl) {
 
 
         Member member = memberDao.getMemberByAccountId(buildLog.getOperatorId());
         String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, member.getUsername(), member.getApiToken());
-
+        if (output == null) {
+            buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
+        } else {
 //        if (output.contains("jarNameStart")) {
 //            String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
 //            buildLog.setJarName(jarName);
 //        }
-
-        if (output.contains("tarNameStart")) {
-            String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
-            buildLog.setTarName(tarName);
+            if (output.contains("tarNameStart")) {
+                String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
+                buildLog.setTarName(tarName);
+            }
         }
 
         buildLogDao.updateBuildLog(buildLog);
