@@ -904,7 +904,7 @@ public class JobService {
 
 
         Member member = memberDao.getMemberByAccountId(buildLog.getOperatorId());
-        String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, "hucansen", member.getApiToken());
+        String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, member.getUsername(), member.getApiToken());
         log.info("member is {}", member);
         log.info("output is {}", output);
         log.info("jobUrl is {}", jobUrl + jenkinsBuildOutputPath);
