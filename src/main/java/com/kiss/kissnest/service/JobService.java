@@ -396,7 +396,6 @@ public class JobService {
             packageRepository.setBranch(deployJobInput.getBranch());
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
-            jarName = packageRepository.getJarName();
             version = packageRepository.getVersion();
         } else {
             PackageRepository packageRepository = new PackageRepository();
@@ -404,11 +403,10 @@ public class JobService {
             packageRepository.setTag(deployJobInput.getTag());
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
             tarName = packageRepository.getTarName();
-            jarName = packageRepository.getJarName();
             version = packageRepository.getVersion();
         }
 
-        if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(jarName) || StringUtils.isEmpty(version)) {
+        if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(version)) {
             throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
         }
 
@@ -429,7 +427,7 @@ public class JobService {
 
         if (job.getUseSupervisor()) {
             conf = job.getConf();
-            conf = conf.replace("__BIN__", jarName);
+            conf = conf.replace("__BIN__", tarName);
             conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
             command = command + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf ";
         } else {
