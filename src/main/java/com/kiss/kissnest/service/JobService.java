@@ -905,13 +905,12 @@ public class JobService {
 
         Member member = memberDao.getMemberByAccountId(buildLog.getOperatorId());
         String output = jenkinsUtil.getConsoleOutputText(buildLog.getJobName(), jobUrl + jenkinsBuildOutputPath, member.getUsername(), member.getApiToken());
+        log.info("member is {}", member);
+        log.info("output is {}", output);
+        log.info("jobUrl is {}", jobUrl + jenkinsBuildOutputPath);
         if (output == null) {
             buildLog.setStatus(BuildJobStatusEnums.FAILED.value());
         } else {
-//        if (output.contains("jarNameStart")) {
-//            String jarName = output.substring(output.indexOf("jarNameStart") + 13, output.indexOf("jarNameEnd") - 1);
-//            buildLog.setJarName(jarName);
-//        }
             if (output.contains("tarNameStart")) {
                 String tarName = output.substring(output.indexOf("tarNameStart") + 13, output.indexOf("tarNameEnd") - 1);
                 buildLog.setTarName(tarName);
