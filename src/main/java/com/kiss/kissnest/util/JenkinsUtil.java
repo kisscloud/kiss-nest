@@ -348,7 +348,7 @@ public class JenkinsUtil {
             return client.get(xmlLogUrl);
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             return null;
         }
 
