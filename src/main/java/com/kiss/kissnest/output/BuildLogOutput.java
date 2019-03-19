@@ -31,6 +31,10 @@ public class BuildLogOutput {
 
     private String remark;
 
+    private Integer duration;
+
+    private String logUrl;
+
     private Integer status;
 
     private String statusText;

@@ -858,7 +858,7 @@ public class JobService {
         BuildLog buildLog = buildLogDao.getBuildLogByJobNameAndQueueId(jobName, queueId);
 
         if (buildLog != null) {
-            buildLog.setLogUrl(jobUrl + "/console");
+            buildLog.setLogUrl(jobUrl + "console");
             buildLog.setStatus(BuildJobStatusEnums.QUEUEING.value());
             buildLog.setNumber(number);
             buildLog.setBranch(branch);

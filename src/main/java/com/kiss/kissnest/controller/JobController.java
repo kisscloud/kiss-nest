@@ -254,11 +254,11 @@ public class JobController {
     public void postJenkinsNotification(@RequestBody JenkinsNotification data) {
         log.info("Jenkins 回调数据：{}", data);
         if (data.isQueued()) {
-            jobService.buildJobQueued(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getNumber(), data.getUrl(), data.getBuild().getScm().getBranch(), data.getBuild().getScm().getCommit());
+            jobService.buildJobQueued(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getNumber(), data.getBuild().getFull_url(), data.getBuild().getScm().getBranch(), data.getBuild().getScm().getCommit());
         } else if (data.isStarted()) {
             jobService.buildJobStarted(data.getName(), data.getBuild().getQueue_id());
         } else if (data.isFinalized()) {
-            jobService.buildJobFinalized(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getStatus(), data.getUrl());
+            jobService.buildJobFinalized(data.getName(), data.getBuild().getQueue_id(), data.getBuild().getStatus(), data.getBuild().getFull_url());
         }
     }
 }
