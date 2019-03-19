@@ -22,7 +22,7 @@ public class OutputUtil {
         Group group = groupDao.getGroupByProjectId(buildLog.getProjectId());
 
         BuildLogOutput buildLogOutput = new BuildLogOutput();
-        BeanUtils.copyProperties(buildLogOutput, buildLog);
+        BeanUtils.copyProperties(buildLog, buildLogOutput);
 
         if (buildLog.getStatus() != null) {
             buildLogOutput.setStatusText(langUtil.getEnumsMessage("build.status", String.valueOf(buildLog.getStatus())));
