@@ -155,7 +155,7 @@
     <select id="getProjectOutputs" parameterType="com.kiss.kissnest.input.QueryProjectInput"
             resultType="com.kiss.kissnest.output.ProjectOutput">
         select
-        pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.slug,gr.name
+        pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.lastBuild,pr.lastDeploy,pr.slug,gr.name
         as groupName,
         UNIX_TIMESTAMP(pr.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(pr.updatedAt) * 1000 as updatedAt
         from projects pr

@@ -33,6 +33,14 @@ public class ProjectOutput {
 
     private String slug;
 
+    private String lastBuild;
+
+    private String lastBuildUrl;
+
+    private String lastDeploy;
+
+    private String lastDeployUrl;
+
     private Long createdAt;
 
     private Long updatedAt;

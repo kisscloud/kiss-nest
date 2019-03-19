@@ -427,7 +427,7 @@ public class JobService {
 
         if (job.getUseSupervisor()) {
             conf = job.getConf();
-            conf = conf.replace("__BIN__", tarName);
+            conf = conf.replace("__BIN__", tarName.replace(".tar.gz", ""));
             conf = conf.replace("__CONFIG__", "/opt/configs/" + path + "config");
             command = command + " && cd /etc/supervisor/conf.d && echo '" + conf + "' > " + slug + ".conf ";
         } else {
