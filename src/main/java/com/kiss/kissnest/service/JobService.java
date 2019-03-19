@@ -249,7 +249,7 @@ public class JobService {
             queueId = Long.parseLong(queueIdMatcher.group(1));
         }
 
-        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName,buildJobInput.getType(), buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, queueId, BuildJobStatusEnums.PENDING.value());
+        BuildLog buildLog = saveBuildLog(job.getTeamId(), jobName, buildJobInput.getType(), buildJobInput.getBranch(), buildJobInput.getProjectId(), guest, queueId, BuildJobStatusEnums.PENDING.value());
 
         if (buildLog == null) {
             throw new StatusException(NestStatusCode.CREATE_BUILD_LOG_FAILED);
@@ -827,7 +827,7 @@ public class JobService {
         return jobDao.getDeployJobByProjectIdAndEnvId(projectId, envId);
     }
 
-    private BuildLog saveBuildLog(Integer teamId, String jobName, Integer type ,String branch, Integer projectId, Guest guest, Long queueId, Integer status) {
+    private BuildLog saveBuildLog(Integer teamId, String jobName, Integer type, String branch, Integer projectId, Guest guest, Long queueId, Integer status) {
 
         BuildLog buildLog = new BuildLog();
         buildLog.setTeamId(teamId);
@@ -903,7 +903,7 @@ public class JobService {
 
         JenkinsHttpConnection client = build.getClient();
 
-        String output = jenkinsUtil.getConsoleOutputText(client, jobUrl + jenkinsBuildOutputPath);
+        String output = jenkinsUtil.getConsoleOutputText(client, jobUrl.substring(0, jobUrl.length() - 2) + jenkinsBuildOutputPath);
 
         if (output.contains("versionStart")) {
             String version = output.substring(output.indexOf("versionStart") + 13, output.indexOf("versionEnd") - 1);

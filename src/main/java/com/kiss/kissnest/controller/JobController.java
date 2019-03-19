@@ -1,9 +1,7 @@
 package com.kiss.kissnest.controller;
 
 import com.kiss.foundation.utils.BeanCopyUtil;
-import com.kiss.kissnest.dao.GroupDao;
 import com.kiss.kissnest.entity.BuildLog;
-import com.kiss.kissnest.entity.Group;
 import com.kiss.kissnest.entity.Job;
 import com.kiss.kissnest.enums.WebSocketMessageTypeEnums;
 import com.kiss.kissnest.input.*;
@@ -11,18 +9,15 @@ import com.kiss.kissnest.output.*;
 import com.kiss.kissnest.service.JobService;
 import com.kiss.kissnest.service.PackageRepositoryService;
 import com.kiss.kissnest.service.WebSocketService;
-import com.kiss.kissnest.util.LangUtil;
 import com.kiss.kissnest.util.OutputUtil;
 import com.kiss.kissnest.validator.JobValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -92,7 +92,7 @@
     <select id="getBuildLogOutputsByTeamId" parameterType="java.lang.Integer"
             resultType="com.kiss.kissnest.output.BuildLogOutput">
         select bu.id,bu.teamId,bu.jobName,bu.branch,bu.number,bu.queueId,bu.version,
-        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.operatorId,
+        bu.projectId,bu.remark,bu.status,bu.output,bu.duration,bu.jarName,bu.logUrl,bu.operatorId,
         bu.operatorName,bu.buildAt,bu.type,pr.pathWithNamespace as commitPath,po.name as projectName,
         UNIX_TIMESTAMP(bu.createdAt)*1000 as createdAt,UNIX_TIMESTAMP(bu.updatedAt)*1000 as updatedAt,
         po.groupId,gr.name as groupName
