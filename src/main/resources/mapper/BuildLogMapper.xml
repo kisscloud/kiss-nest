@@ -100,7 +100,7 @@
         on bu.projectId = po.id and bu.teamId = po.teamId
         left join groups gr
         on po.groupId = gr.id
-        where bu.teamId = #{teamId} order by bu.buildAt desc
+        where bu.teamId = #{teamId} order by bu.id desc
         <if test="start != null">
             limit #{start},#{size}
         </if>

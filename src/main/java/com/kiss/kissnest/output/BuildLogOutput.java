@@ -52,4 +52,11 @@ public class BuildLogOutput {
     private Long createdAt;
 
     private Long updatedAt;
+
+    public String getVersion() {
+        if (version != null) {
+            return version.substring(0, 8);
+        }
+        return version;
+    }
 }
