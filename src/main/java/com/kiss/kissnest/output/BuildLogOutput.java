@@ -31,7 +31,7 @@ public class BuildLogOutput {
 
     private String remark;
 
-    private Integer duration;
+    private Long duration;
 
     private String logUrl;
 
