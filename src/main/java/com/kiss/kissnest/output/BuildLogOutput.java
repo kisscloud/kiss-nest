@@ -49,9 +49,9 @@ public class BuildLogOutput {
 
     private Long buildAt;
 
-    private Long createdAt;
+    private Date createdAt;
 
-    private Long updatedAt;
+    private Date updatedAt;
 
     public String getVersion() {
         if (version != null) {
