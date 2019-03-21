@@ -15,7 +15,7 @@
                     </urlInfo>
                     <event>100</event>
                     <timeout>30000</timeout>
-                    <loglines>0</loglines>
+                    <loglines>100</loglines>
                     <buildNotes></buildNotes>
                     <retries>5</retries>
                 </com.tikal.hudson.plugins.notification.Endpoint>
