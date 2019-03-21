@@ -14,8 +14,4 @@ public class JenkinsNotificationBuild {
     private JenkinsNotificationSCM scm;
     private String notes;
     private String log;
-
-    public String getLog() {
-        return log == null ? "" : log;
-    }
 }
