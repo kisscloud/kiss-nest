@@ -860,8 +860,8 @@ public class JobService {
             buildLog.setLogUrl(jobUrl + "console");
             buildLog.setStatus(BuildJobStatusEnums.QUEUEING.value());
             buildLog.setNumber(number);
-            buildLog.setBranch(branch);
-            buildLog.setVersion(version);
+//            buildLog.setBranch(branch);
+//            buildLog.setVersion(version);
             buildLogDao.updateBuildLog(buildLog);
 
             BuildLogOutput buildLogOutput = outputUtil.toBuildLogOutput(buildLog);
