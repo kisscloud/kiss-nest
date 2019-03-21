@@ -157,10 +157,14 @@
         select
         pr.id,pr.name,pr.teamId,pr.groupId,pr.membersCount,pr.needsCount,pr.issuesCount,pr.operatorId,pr.operatorName,pr.type,pr.lastBuild,pr.lastDeploy,pr.slug,gr.name
         as groupName,
+        pp.httpUrl as lastBuildUrl,
+        pp.httpUrl as lastDeployUrl,
         UNIX_TIMESTAMP(pr.createdAt) * 1000 as createdAt,UNIX_TIMESTAMP(pr.updatedAt) * 1000 as updatedAt
         from projects pr
         left join groups gr
         on pr.groupId = gr.id
+        left join projectrepository pp
+        on pp.projectId=pr.id
         <include refid="queryProjectsWhere"/>
         <if test="orderFiledName != null">
             <if test="orderFiledName == 'name'">

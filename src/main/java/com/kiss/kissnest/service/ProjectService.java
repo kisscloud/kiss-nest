@@ -63,6 +63,12 @@ public class ProjectService {
     @Value("${project.type}")
     private String projectTypes;
 
+    @Value("${gitlab.server.url}")
+    private String gitlabUrl;
+
+    @Value("${gitlab.server.commitPath}")
+    private String gitlabCommitPath;
+
     @Autowired
     private OperationLogService operationLogService;
 
@@ -209,7 +215,12 @@ public class ProjectService {
         queryProjectInput.setPage(start);
 
         List<ProjectOutput> projectOutputList = projectDao.getProjectOutputs(queryProjectInput);
-        projectOutputList.forEach((projectOutput -> projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())))));
+        for (ProjectOutput projectOutput : projectOutputList) {
+            projectOutput.setTypeText(langUtil.getEnumsMessage("project.type", String.valueOf(projectOutput.getType())));
+            projectOutput.setLastBuildUrl(String.format("%s/commit/%s", projectOutput.getLastBuildUrl().replace(".git", ""), projectOutput.getLastBuild()));
+            projectOutput.setLastDeployUrl(String.format("%s/commit/%s", projectOutput.getLastDeployUrl().replace(".git", ""), projectOutput.getLastDeploy()));
+        }
+
         Integer count = projectDao.getProjectOutputsCount(queryProjectInput);
 
         return new ProjectOutputs(projectOutputList, count);
@@ -350,7 +361,7 @@ public class ProjectService {
         ProjectRepository projectRepository = projectRepositoryDao.getProjectRepositoryByProjectId(createBranchInput.getProjectId());
         Integer repositoryId = projectRepository.getRepositoryId();
         Member member = memberDao.getMemberByAccountId(GuestUtil.getGuestId());
-        gitlabApiUtil.createBranch(repositoryId,createBranchInput.getBranchName(),createBranchInput.getRef(),member.getAccessToken());
+        gitlabApiUtil.createBranch(repositoryId, createBranchInput.getBranchName(), createBranchInput.getRef(), member.getAccessToken());
         operationLogService.saveOperationLog(projectRepository.getTeamId(), ThreadLocalUtil.getGuest(), null, createBranchInput, "id", OperationTargetType.TYPE__CREATE_PROJECT_Branch);
         operationLogService.saveDynamic(ThreadLocalUtil.getGuest(), projectRepository.getTeamId(), null, projectRepository.getProjectId(), OperationTargetType.TYPE__CREATE_PROJECT_Branch, createBranchInput);
     }
