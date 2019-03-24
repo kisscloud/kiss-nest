@@ -270,11 +270,14 @@ public class ProjectService {
                 if (!StringUtils.isEmpty(gitlabTag.getName())) {
                     TagOutput tagOutput = new TagOutput();
                     GitlabBranchCommit gitlabBranchCommit = gitlabTag.getCommit();
-                    GitlabRelease gitlabRelease = gitlabTag.getRelease();
-                    tagOutput.setTagName(gitlabRelease.getTagName());
-                    tagOutput.setDescription(gitlabRelease.getDescription());
+                    // @TODO 为啥打了版本了 Release 还会为 null 呢
+                    // GitlabRelease gitlabRelease = gitlabTag.getRelease();
+
+                    tagOutput.setTagName(gitlabTag.getName());
+                    tagOutput.setDescription(gitlabTag.getMessage());
                     tagOutput.setMessage(gitlabTag.getMessage());
                     tagOutput.setCreatedAt(gitlabBranchCommit.getCommittedDate().getTime());
+
 
                     branches.add(tagOutput);
                 }

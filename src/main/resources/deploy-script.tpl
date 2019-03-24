@@ -17,8 +17,9 @@ tar -xvf * &#x000A;
 
 # 克隆配置仓库 &#x000A;
 if [ ! -d "/opt/configs/$groupPath/$projectPath" ];then &#x000A;
+  mkdir -p /opt/configs/$groupPath
   cd /opt/configs/$groupPath&#x000A;
-  git clone cloneUrl/$projectPath.git &#x000A;
+  git clone $cloneUrl/$projectPath.git &#x000A;
 else &#x000A;
   cd /opt/configs/$groupPath/$projectPath &#x000A;
   git pull &#x000A;

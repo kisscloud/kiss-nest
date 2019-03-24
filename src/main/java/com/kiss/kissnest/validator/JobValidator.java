@@ -223,7 +223,7 @@ public class JobValidator implements Validator {
     public void validateRelativeTargetDir(String relativeTargetDir, Errors errors) {
 
         if (StringUtils.isEmpty(relativeTargetDir)) {
-            errors.rejectValue("relativeTargetDir", String.valueOf(NestStatusCode.RELATIVETARGETDIR_IS_EMPTY));
+            errors.rejectValue("relativeTargetDir", String.valueOf(NestStatusCode.RELATIVE_TARGET_DIR_IS_EMPTY));
         }
     }
 }

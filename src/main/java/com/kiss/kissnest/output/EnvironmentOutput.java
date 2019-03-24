@@ -15,6 +15,8 @@ public class EnvironmentOutput {
 
     private String typeText;
 
+    private String path;
+
     private Integer serverCount;
 
     private String saltHost;

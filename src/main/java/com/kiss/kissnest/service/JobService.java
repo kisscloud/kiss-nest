@@ -16,8 +16,6 @@ import com.kiss.kissnest.util.JenkinsUtil;
 import com.kiss.kissnest.util.LangUtil;
 import com.kiss.kissnest.util.OutputUtil;
 import com.kiss.kissnest.util.SaltStackUtil;
-import com.offbytwo.jenkins.client.JenkinsHttpConnection;
-import com.offbytwo.jenkins.model.Build;
 import com.kiss.foundation.entity.Guest;
 import com.kiss.foundation.exception.StatusException;
 import com.kiss.foundation.utils.BeanCopyUtil;
@@ -35,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -386,7 +384,6 @@ public class JobService {
         Environment environment = environmentDao.getEnvironmentById(job.getEnvId());
         Integer type = environment.getType();
         String tarName;
-        String jarName;
         String version;
 
         //测试环境
@@ -395,6 +392,9 @@ public class JobService {
             packageRepository.setProjectId(deployJobInput.getProjectId());
             packageRepository.setBranch(deployJobInput.getBranch());
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
+            if (packageRepository == null) {
+                throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
+            }
             tarName = packageRepository.getTarName();
             version = packageRepository.getVersion();
         } else {
@@ -402,11 +402,14 @@ public class JobService {
             packageRepository.setProjectId(deployJobInput.getProjectId());
             packageRepository.setTag(deployJobInput.getTag());
             packageRepository = packageRepositoryDao.getPackageRepository(packageRepository);
+            if (packageRepository == null) {
+                throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
+            }
             tarName = packageRepository.getTarName();
             version = packageRepository.getVersion();
         }
 
-        if (StringUtils.isEmpty(tarName) || StringUtils.isEmpty(version)) {
+        if (tarName == null || StringUtils.isEmpty(tarName) || version == null || StringUtils.isEmpty(version)) {
             throw new StatusException(NestStatusCode.JOB_DEPLOY_PACKAGE_LOSE);
         }
 
@@ -461,10 +464,10 @@ public class JobService {
 
         for (String deployNode : deployNodes) {
             String nodeStatus = (String) programStates.get(deployNode);
-            if (nodeStatus.equals("NONE")) {
-                runCommand = command + "&& supervisorctl reread && supervisorctl update " + slug;
-            } else if (nodeStatus == null || nodeStatus.equals("STOPPED")) {
+            if (nodeStatus == null || nodeStatus.equals("STOPPED")) {
                 runCommand = command + "&& supervisorctl reread && supervisorctl start " + slug;
+            } else if (nodeStatus.equals("NONE")) {
+                runCommand = command + "&& supervisorctl reread && supervisorctl update " + slug;
             } else {
                 runCommand = command + "&& supervisorctl reread && supervisorctl restart " + slug;
             }
@@ -559,6 +562,9 @@ public class JobService {
             JSONObject node = returnArray.getJSONObject(0);
 
             String message = node.getString(deployNode);
+            if (message == null) {
+                throw new StatusException(NestStatusCode.DEPLOY_MESSAGE_IS_EMPTY);
+            }
             System.out.println(message);
             System.out.println(message.lastIndexOf("\n"));
             String status = message.substring(message.lastIndexOf("\n") + 1);
