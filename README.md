@@ -6,7 +6,7 @@ Nest 是一个基于 KISS CLOUD 架构，整合了 Jenkins、Gitlab、Salt Stuck
 
 安装参考教程：[https://docs.docker.com/install/](https://docs.docker.com/install/)
 
-## 2. 安装 Docker Compose
+## 2. 安装 Docker Compose
 
 安装参考教程：[https://docs.docker.com/compose/](https://docs.docker.com/compose/)
 
